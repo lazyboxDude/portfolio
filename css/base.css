@@ -11,3 +11,10 @@
 body { margin: 0; font-family: var(--font-main); background: var(--bg-color); color: var(--text-color); line-height: 1.6; transition: background 0.3s ease; overflow-x: hidden; }
 a { color: var(--accent-color); text-decoration: none; }
 section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    section { 
+        padding: 2.5rem 1.25rem; /* Standard mobile padding (40px top/bottom, 20px sides) */
+    }
+}
