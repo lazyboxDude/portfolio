@@ -1,0 +1,755 @@
+/* Hero / About */
+.hero { text-align: center; padding: 6rem 4rem; background: transparent; transition: background 0.5s; }
+.hero h1 { font-size: 3rem; margin-bottom: 1rem; position: relative; display: inline-block; min-height: 1.2em; }
+.hero p { font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 0 auto 2rem; }
+.skills { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+.skill-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #444; transition: all 0.3s; }
+
+/* Hero Intro Box */
+.hero-intro {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.hero-intro h1 {
+    display: block;
+    margin: 0.5rem 0 1rem;
+    text-align: left;
+}
+
+.hero-intro p {
+    margin: 0;
+    max-width: 100%;
+    text-align: left;
+}
+
+/* Venture Showcase */
+.venture-showcase {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid #333;
+    border-radius: 12px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    transition: all 0.3s ease;
+}
+
+.venture-showcase:hover {
+    border-color: var(--accent-color);
+    background: rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.venture-info {
+    flex: 1;
+}
+
+.venture-info h3 {
+    margin: 0.5rem 0;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.role-badge {
+    background: var(--accent-color);
+    color: #000;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.live-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1rem;
+    color: var(--accent-color);
+    font-family: monospace;
+    border: 1px solid var(--accent-color);
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.live-link-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #00ff00;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #00ff00;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Gallery */
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.card { background: var(--card-bg); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+.placeholder-3d { height: 250px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; position: relative; overflow: hidden; }
+.info { padding: 1.5rem; }
+.info h3 { margin: 0 0 0.5rem 0; color: #fff; }
+.info p { margin: 0; color: #bbb; font-size: 0.9rem; }
+
+/* Card Tags */
+.card-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.card-tag {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    border: 1px solid #444;
+}
+
+.card-tag.unity {
+    border-color: #fff;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* --- GALLERY TABS --- */
+.gallery-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid #444;
+    color: #888;
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: var(--font-main);
+}
+
+.tab-btn:hover {
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.tab-btn.active {
+    background: var(--accent-color);
+    color: #000;
+    border-color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Cyber Mode Overrides for Tabs */
+body.cyber-mode .tab-btn {
+    border-radius: 0;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+body.cyber-mode .tab-btn.active {
+    background: transparent;
+    color: var(--accent-color);
+    box-shadow: 0 0 15px var(--accent-color);
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
+/* Gallery Grid Animation */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card.hidden {
+    display: none;
+}
+
+.card.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Unified Content Box (Glass Panel) */
+.content-box {
+    margin: 0 auto 2rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #333;
+    border-radius: 16px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    max-width: 1100px; /* Consistent max-width */
+}
+
+.content-box:hover {
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* B2B Section */
+.b2b { margin-top: 2rem; }
+.b2b h2 { color: var(--accent-color); border-bottom: 2px solid #444; padding-bottom: 10px; display: inline-block; }
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.service-icon {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+    background: var(--accent-color);
+    color: #000;
+    box-shadow: 0 0 15px var(--accent-color);
+}
+
+.service-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.service-card p {
+    color: #aaa;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.service-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+}
+
+.service-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ccc;
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+}
+
+.service-features li:last-child {
+    margin-bottom: 0;
+}
+
+.service-features li i {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+}
+
+/* Cyber Mode Overrides for Services */
+body.cyber-mode .service-card {
+    border-radius: 0;
+    border: 1px solid #333;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 90% 100%, 0 100%);
+}
+
+body.cyber-mode .service-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+}
+
+body.cyber-mode .service-icon {
+    border-radius: 0;
+    border: 1px solid var(--accent-color);
+    background: transparent;
+    color: var(--accent-color);
+}
+
+body.cyber-mode .service-card:hover .service-icon {
+    background: var(--accent-color);
+    color: #000;
+}
+
+/* Skills Section */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.skill-category h3 {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.skill-category h3 i {
+    color: var(--accent-color);
+}
+
+.skill-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.skill-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.skill-name {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.skill-bar {
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-progress {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 3px;
+    position: relative;
+    transition: width 1s ease-in-out;
+}
+
+/* Service Category Title */
+.service-category-title {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-top: 2rem;
+}
+
+.service-category-title i {
+    color: var(--accent-color);
+}
+
+/* Cyber Mode Overrides for Service Category Title */
+body.cyber-mode .service-category-title {
+    border-bottom: 1px solid var(--accent-color);
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
+/* Cyber Mode Overrides for Skills */
+body.cyber-mode .skill-bar {
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.cyber-mode .skill-progress {
+    border-radius: 0;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.contact-btn { background: var(--accent-color); color: #000; padding: 10px 25px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 1rem; transition: transform 0.1s; }
+.contact-btn:active { transform: scale(0.95); }
+
+/* Social Links */
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.social-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+}
+
+/* Visual Services Grid (New Design) */
+.visual-services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.visual-service-card {
+    position: relative;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    text-decoration: none;
+    border: 1px solid #333;
+    transition: all 0.3s ease;
+}
+
+.visual-service-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.visual-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+    z-index: 1;
+}
+
+/* Placeholder Gradients/Patterns until images are added */
+.asset-bg {
+    background: linear-gradient(45deg, #2a2a2a, #1a1a1a);
+    background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.level-bg {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
+}
+
+.tech-bg {
+    background: #111;
+    background-image: repeating-linear-gradient(45deg, #1a1a1a 0, #1a1a1a 10px, #222 10px, #222 20px);
+}
+
+.course-bg {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 10px);
+}
+
+.art-bg {
+    background: linear-gradient(45deg, #4a148c, #880e4f);
+    background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+.godot-bg {
+    background: linear-gradient(135deg, #478cbf, #2c3e50);
+    background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.modeling-bg {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 10px);
+}
+
+.mentorship-bg {
+    background: linear-gradient(135deg, #8e44ad, #2c3e50);
+    background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.cover-art-bg {
+    background: linear-gradient(135deg, #ff00cc, #333399);
+    background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 15px 15px;
+}
+
+.print-bg {
+    background: linear-gradient(135deg, #ff9966, #ff5e62);
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px);
+}
+
+.visual-service-card:hover .visual-bg {
+    transform: scale(1.1);
+}
+
+.visual-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.service-icon-large {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.visual-service-card h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.explore-btn {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    font-weight: bold;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.visual-service-card:hover .explore-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Cyber Mode Overrides for Visual Cards */
+body.cyber-mode .visual-service-card {
+    border-radius: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 90% 100%, 0 100%);
+}
+
+body.cyber-mode .visual-service-card:hover {
+    box-shadow: 0 0 20px var(--accent-color);
+}
+
+body.cyber-mode .asset-bg {
+    background: repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0, 243, 255, 0.1) 20px);
+}
+
+body.cyber-mode .level-bg {
+    background-image: radial-gradient(var(--accent-color) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.3;
+}
+
+body.cyber-mode .tech-bg {
+    background: #000;
+    border: 1px solid var(--accent-color); /* Internal border effect */
+}
+
+body.cyber-mode .course-bg {
+    background: #000;
+    background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, .1) 25%, rgba(0, 255, 0, .1) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .1) 75%, rgba(0, 255, 0, .1) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, .1) 25%, rgba(0, 255, 0, .1) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .1) 75%, rgba(0, 255, 0, .1) 76%, transparent 77%, transparent);
+    background-size: 30px 30px;
+}
+
+body.cyber-mode .art-bg {
+    background: #050505;
+    background-image: radial-gradient(var(--accent-secondary) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+body.cyber-mode .godot-bg {
+    background: #000;
+    border: 1px solid #478cbf;
+    box-shadow: inset 0 0 20px rgba(71, 140, 191, 0.2);
+}
+
+body.cyber-mode .modeling-bg {
+    background: #000;
+    border: 1px solid #e67e22;
+    box-shadow: inset 0 0 20px rgba(230, 126, 34, 0.2);
+}
+
+body.cyber-mode .mentorship-bg {
+    background: #000;
+    border: 1px solid #8e44ad;
+    box-shadow: inset 0 0 20px rgba(142, 68, 173, 0.2);
+}
+
+body.cyber-mode .cover-art-bg {
+    background: #000;
+    border: 1px solid #ff00cc;
+    box-shadow: inset 0 0 20px rgba(255, 0, 204, 0.2);
+}
+
+body.cyber-mode .print-bg {
+    background: #000;
+    border: 1px solid #ff5e62;
+    box-shadow: inset 0 0 20px rgba(255, 94, 98, 0.2);
+}
+
+/* Mobile Section Adjustments */
+@media (max-width: 768px) {
+    /* Fix Hero Padding on Mobile */
+    .hero {
+        padding: 2rem 1rem;
+    }
+
+    .content-box {
+        padding: 1.5rem;
+    }
+
+    /* Additional Mobile Tweaks */
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .venture-showcase {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-intro {
+        text-align: center;
+    }
+    
+    .hero-intro h1, 
+    .hero-intro p {
+        text-align: center;
+    }
+
+    /* Adjust Gallery Grid for Mobile - Compact 2 Column */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 Columns to save vertical space */
+        gap: 10px;
+        padding-bottom: 0;
+        overflow-x: visible;
+    }
+
+    .card {
+        min-width: 0;
+        margin-bottom: 0;
+    }
+
+    /* Adjust Card Placeholder Height for compact view */
+    .placeholder-3d {
+        height: 120px; /* Smaller height */
+    }
+    
+    .info {
+        padding: 0.8rem; /* Compact padding */
+    }
+    
+    .info h3 {
+        font-size: 1rem; /* Smaller title */
+        margin-bottom: 0.2rem;
+    }
+    
+    .info p {
+        font-size: 0.8rem;
+        display: none; /* Hide description on mobile to save space */
+    }
+    
+    .card-tags {
+        display: none; /* Hide tags on mobile to save space */
+    }
+
+    /* Visual Services Grid Mobile Adjustments */
+    .visual-services-grid {
+        grid-template-columns: 1fr !important; /* Force single column on mobile */
+        gap: 1.5rem;
+    }
+
+    .visual-service-card {
+        height: 250px; /* Slightly smaller height on mobile */
+    }
+
+    .visual-content {
+        padding: 1.5rem;
+    }
+
+    .visual-service-card h3 {
+        font-size: 1.3rem;
+    }
+}

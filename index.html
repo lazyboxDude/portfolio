@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/sections.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/cyberpunk.css">
 </head>
@@ -39,8 +41,10 @@
     </div>
     <nav id="main-nav">
         <a href="#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
+        <a href="#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Skills">Skills</span></a>
         <a href="#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
         <a href="#b2b" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
+        <a href="#contact" onclick="closeMobileMenu()"><i class="fas fa-envelope"></i> <span data-text="Contact">Contact</span></a>
         <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="resume-link" onclick="closeMobileMenu()"><i class="fas fa-file-download"></i> <span data-text="Resume">Resume</span></a>
         <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
     </nav>
@@ -58,7 +62,7 @@
 
         <div class="venture-showcase">
             <div class="venture-info">
-                <span class="role-badge">Co-Founder & Game Lead</span>
+                <span class="role-badge">Co-Founder & Game Designer</span>
                 <h3>Moonflux Interactive</h3>
                 <p>Co-founding Moonflux Interactive, an indie game studio dedicated to narrative-driven experiences. Currently developing our debut title <em>Aphonia</em>.</p>
                 <a href="https://moonflux-interactive.com" target="_blank" class="live-link-btn">
@@ -88,7 +92,7 @@
                 <div class="skill-list">
                     <div class="skill-item">
                         <span class="skill-name">Unity</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 70%"></div></div>
                     </div>
                     <div class="skill-item">
                         <span class="skill-name">Unreal Engine 5</span>
@@ -103,11 +107,11 @@
                 <div class="skill-list">
                     <div class="skill-item">
                         <span class="skill-name">Blender</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 95%"></div></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 20%"></div></div>
                     </div>
                     <div class="skill-item">
                         <span class="skill-name">ZBrush</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 80%"></div></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 50%"></div></div>
                     </div>
                     <div class="skill-item">
                         <span class="skill-name">Substance Painter</span>
@@ -115,7 +119,7 @@
                     </div>
                     <div class="skill-item">
                         <span class="skill-name">Maya</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 75%"></div></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
                     </div>
                 </div>
             </div>
@@ -126,11 +130,11 @@
                 <div class="skill-list">
                     <div class="skill-item">
                         <span class="skill-name">C#</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 50%"></div></div>
                     </div>
                     <div class="skill-item">
                         <span class="skill-name">Blueprints</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 70%"></div></div>
                     </div>
                 </div>
             </div>
@@ -331,22 +335,110 @@
     <div class="content-box">
         <div style="text-align: left; margin-bottom: 2rem;">
             <span class="role-badge"><i class="fas fa-handshake"></i> Services</span>
-            <h2 style="margin: 0.5rem 0 0 0;" data-text="Game Development Services">Game Development Services</h2>
+            <h2 style="margin: 0.5rem 0 0 0;" data-text="Services">Services</h2>
         </div>
-        <p style="color: #ccc; margin-top: 10px; margin-bottom: 2rem;">Looking for assets for your game or technical expertise for your studio? I offer tailored B2B services.</p>
-        <div class="services-list">
-            <div class="service-item">
-                <h3 data-text="Asset Creation">Asset Creation</h3>
-                <p>High-quality, optimized 3D assets ready for game engines (Unity/Unreal) or AR/VR applications.</p>
-            </div>
-            <div class="service-item">
-                <h3 data-text="Level Design & Lighting">Level Design & Lighting</h3>
-                <p>Creating atmospheric game worlds with a focus on environmental storytelling and performance.</p>
-            </div>
-            <div class="service-item">
-                <h3 data-text="Technical Art">Technical Art</h3>
-                <p>Optimization, shader creation, and pipeline tools to ensure your game runs as good as it looks.</p>
-            </div>
+        <p style="color: #ccc; margin-top: 10px; margin-bottom: 3rem;">From technical game development to creative education and artwork. Explore the different ways we can work together.</p>
+        
+        <!-- Sub-Header: Game Development -->
+        <h3 class="service-category-title"><i class="fas fa-gamepad"></i> Game Development</h3>
+        <div class="visual-services-grid">
+            <!-- Service 1: Asset Creation -->
+            <a href="services.html#asset-creation" class="visual-service-card">
+                <div class="visual-bg asset-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-cube service-icon-large"></i>
+                    <h3>3D Asset Creation</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Service 2: Level Design -->
+            <a href="services.html#level-design" class="visual-service-card">
+                <div class="visual-bg level-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-map service-icon-large"></i>
+                    <h3>Level Design</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Service 3: Technical Art -->
+            <a href="services.html#tech-art" class="visual-service-card">
+                <div class="visual-bg tech-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-microchip service-icon-large"></i>
+                    <h3>Technical Art</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Sub-Header: Education -->
+        <h3 class="service-category-title" style="margin-top: 3rem;"><i class="fas fa-graduation-cap"></i> Education</h3>
+        <div class="visual-services-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <!-- Godot Course -->
+            <a href="services.html#courses" class="visual-service-card">
+                <div class="visual-bg godot-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-robot service-icon-large"></i>
+                    <h3>Godot Course</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- 3D Modeling -->
+            <a href="services.html#courses" class="visual-service-card">
+                <div class="visual-bg modeling-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-cubes service-icon-large"></i>
+                    <h3>3D Modeling</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Get in Touch -->
+            <a href="#contact" class="visual-service-card">
+                <div class="visual-bg mentorship-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-envelope-open-text service-icon-large"></i>
+                    <h3>Get in Touch</h3>
+                    <span class="explore-btn">Contact <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Sub-Header: Creative -->
+        <h3 class="service-category-title" style="margin-top: 3rem;"><i class="fas fa-palette"></i> Creative</h3>
+        <div class="visual-services-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <!-- Art Commissions -->
+            <a href="services.html#commissions" class="visual-service-card">
+                <div class="visual-bg art-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-paint-brush service-icon-large"></i>
+                    <h3>Art Commissions</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Cover Art -->
+            <a href="services.html#commissions" class="visual-service-card">
+                <div class="visual-bg cover-art-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-compact-disc service-icon-large"></i>
+                    <h3>Cover Art</h3>
+                    <span class="explore-btn">Explore <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Ask for a Print -->
+            <a href="#contact" class="visual-service-card">
+                <div class="visual-bg print-bg"></div>
+                <div class="visual-content">
+                    <i class="fas fa-print service-icon-large"></i>
+                    <h3>Ask for a Print</h3>
+                    <span class="explore-btn">Order Now <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
         </div>
     </div>
 </section>

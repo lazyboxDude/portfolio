@@ -83,6 +83,12 @@ body.cyber-mode i {
     margin-right: 5px; /* Default spacing */
 }
 
+/* Fix for Custom HTML Icons (like Fiverr) in Cyber Mode */
+body.cyber-mode .social-btn span {
+    color: var(--accent-color) !important;
+    text-shadow: 0 0 8px var(--accent-color);
+}
+
 /* Remove margin for icons that are alone or centered */
 body.cyber-mode .social-btn i,
 body.cyber-mode .hamburger-menu i {

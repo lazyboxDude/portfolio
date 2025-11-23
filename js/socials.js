@@ -19,6 +19,11 @@ const socialLinks = [
         customHtml: '<span style="font-weight: bold; font-family: sans-serif; font-size: 0.9rem;">fi</span>'
     },
     {
+        platform: "LinkedIn",
+        url: "https://www.linkedin.com/in/micael-gomes-fernandes",
+        icon: "fab fa-linkedin-in"
+    },
+    {
         platform: "GitHub",
         url: "https://github.com/lazyboxDude",
         icon: "fab fa-github"
