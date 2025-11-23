@@ -4,40 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lazybox Studio | 3D Artist & Design</title>
+    <!-- Load Google Fonts for the effect -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         /* Base Styles */
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #f0f0f0; line-height: 1.6; }
-        a { color: #00d2ff; text-decoration: none; }
-        section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #00d2ff;
+            --card-bg: #333;
+            --header-bg: #252525;
+            --font-main: 'Segoe UI', sans-serif;
+        }
+
+        body { margin: 0; font-family: var(--font-main); background: var(--bg-color); color: var(--text-color); line-height: 1.6; transition: background 0.3s ease; overflow-x: hidden; }
+        a { color: var(--accent-color); text-decoration: none; }
+        section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; }
         
         /* Header */
-        header { background: #252525; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; }
-        .logo span { color: #00d2ff; }
+        header { background: var(--header-bg); padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); transition: background 0.3s; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; position: relative; }
+        .logo span { color: var(--accent-color); }
+        nav { display: flex; align-items: center; }
         nav a { margin-left: 20px; color: #ccc; font-weight: 500; transition: color 0.3s; }
-        nav a:hover { color: #00d2ff; }
+        nav a:hover { color: var(--accent-color); }
 
         /* Hero / About */
-        .hero { text-align: center; padding: 6rem 2rem; background: linear-gradient(45deg, #1a1a1a, #2a2a2a); }
-        .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero { text-align: center; padding: 6rem 2rem; background: linear-gradient(45deg, #1a1a1a, #2a2a2a); transition: background 0.5s; }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; position: relative; display: inline-block; min-height: 1.2em; }
         .hero p { font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 0 auto 2rem; }
         .skills { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-        .skill-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #444; }
+        .skill-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #444; transition: all 0.3s; }
 
         /* Gallery */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-        .card { background: #333; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .placeholder-3d { height: 250px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; position: relative; }
+        .placeholder-3d { height: 250px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; position: relative; overflow: hidden; }
         .info { padding: 1.5rem; }
         .info h3 { margin: 0 0 0.5rem 0; color: #fff; }
         .info p { margin: 0; color: #bbb; font-size: 0.9rem; }
 
         /* B2B Section */
-        .b2b { background: #222; border-radius: 10px; margin-top: 2rem; }
-        .b2b h2 { color: #00d2ff; border-bottom: 2px solid #444; padding-bottom: 10px; display: inline-block; }
+        .b2b { background: #222; border-radius: 10px; margin-top: 2rem; transition: background 0.3s; }
+        .b2b h2 { color: var(--accent-color); border-bottom: 2px solid #444; padding-bottom: 10px; display: inline-block; }
         .services-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem; }
-        .service-item { background: #2a2a2a; padding: 1.5rem; border-left: 3px solid #00d2ff; }
+        .service-item { background: #2a2a2a; padding: 1.5rem; border-left: 3px solid var(--accent-color); transition: background 0.3s; }
 
         /* Modal Overlay */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
@@ -48,26 +61,181 @@
         .modal-image { width: 100%; height: 400px; background: #000; display: flex; align-items: center; justify-content: center; color: #666; }
 
         /* Footer */
-        footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; margin-top: 4rem; }
-        .contact-btn { background: #00d2ff; color: #000; padding: 10px 25px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 1rem; }
+        footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; margin-top: 4rem; position: relative; z-index: 10; }
+        .contact-btn { background: var(--accent-color); color: #000; padding: 10px 25px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 1rem; }
+
+        /* --- BACKGROUND EFFECTS (Plexus & Texture) --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 1s;
+            pointer-events: none;
+        }
+        .texture-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0; /* Hidden by default */
+            z-index: -1;
+            pointer-events: none;
+            transition: opacity 1s;
+        }
+
+        /* --- VOID / CYBERPUNK MODE --- */
+        .funky-btn {
+            margin-left: 20px;
+            background: transparent;
+            border: 1px solid #ccc;
+            color: #ccc;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .funky-btn:hover { background: #fff; color: #000; }
+
+        /* CYBERPUNK OVERRIDES */
+        body.cyber-mode {
+            --bg-color: #030303; /* Darker for canvas trails */
+            --text-color: #a0c0d0;
+            --accent-color: #00f3ff; /* Electric Cyan */
+            --accent-secondary: #ff0055; /* Neon Pink */
+            --card-bg: rgba(10, 20, 30, 0.8);
+            --header-bg: rgba(5, 10, 16, 0.9);
+            --font-main: 'Space Mono', monospace; /* Font update */
+        }
+
+        /* Show Effects in Cyber Mode */
+        body.cyber-mode #bg-canvas { opacity: 1; }
+        body.cyber-mode .texture-overlay { opacity: 0.20; }
+
+        body.cyber-mode .logo, 
+        body.cyber-mode .hero h1, 
+        body.cyber-mode h2, 
+        body.cyber-mode h3,
+        body.cyber-mode nav a,
+        body.cyber-mode .contact-btn {
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px var(--accent-color);
+        }
+
+        body.cyber-mode .logo span { color: var(--accent-secondary); text-shadow: 0 0 5px var(--accent-secondary), 0 0 15px var(--accent-secondary); }
+        
+        body.cyber-mode .hero { background: transparent; border-bottom: 1px solid var(--accent-color); box-shadow: 0 0 30px rgba(0, 243, 255, 0.1); }
+        body.cyber-mode .hero h1 { color: var(--accent-color); }
+
+        body.cyber-mode .skill-tag { 
+            border-radius: 0; 
+            border: 1px solid var(--accent-color); 
+            background: rgba(0, 243, 255, 0.1); 
+            color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        /* Angular Cards with Glow */
+        body.cyber-mode .card {
+            border-radius: 0;
+            border: 1px solid #333;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            background: var(--card-bg);
+        }
+        body.cyber-mode .card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+        body.cyber-mode .card::before {
+            content: "SYSTEM_LOCK";
+            position: absolute;
+            top: 5px; right: 5px;
+            font-size: 10px;
+            color: var(--accent-secondary);
+            opacity: 0.7;
+            text-shadow: 0 0 5px var(--accent-secondary);
+        }
+
+        /* B2B Section */
+        body.cyber-mode .b2b { background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 0; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        body.cyber-mode .service-item { border-left: 3px solid var(--accent-secondary); background: rgba(255, 255, 255, 0.02); }
+        body.cyber-mode .service-item:hover { background: rgba(255, 0, 85, 0.05); box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.1); }
+        
+        /* Buttons */
+        body.cyber-mode .contact-btn {
+            background: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 0;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+        body.cyber-mode .contact-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+            text-shadow: none;
+        }
+        
+        body.cyber-mode .funky-btn {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            text-shadow: 0 0 5px var(--accent-secondary);
+            box-shadow: 0 0 10px var(--accent-secondary), inset 0 0 5px var(--accent-secondary);
+        }
+        body.cyber-mode .funky-btn:hover {
+            background: var(--accent-secondary);
+            color: #fff;
+            text-shadow: none;
+        }
+
+        /* Scanline Overlay (Updated per request) */
+        body.cyber-mode::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg, 
+                rgba(255, 0, 0, 0.06), 
+                rgba(0, 255, 0, 0.02), 
+                rgba(0, 0, 255, 0.06)
+            );
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0.6;
+        }
+
     </style>
 </head>
 <body>
 
+<!-- BACKGROUND ANIMATION -->
+<canvas id="bg-canvas"></canvas>
+<div class="texture-overlay"></div>
+
 <!-- Navigation -->
 <header>
-    <div class="logo">Lazybox<span>Studio</span></div>
+    <div class="logo" data-text="Lazybox Studio">Lazybox<span>Studio</span></div>
     <nav>
-        <a href="#about">About</a>
-        <a href="#work">Work</a>
-        <a href="#b2b">Services</a>
-        <a href="#contact">Contact</a>
+        <a href="#about" data-text="About">About</a>
+        <a href="#work" data-text="Work">Work</a>
+        <a href="#b2b" data-text="Services">Services</a>
+        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode()">ENTER THE VOID</button>
     </nav>
 </header>
 
 <!-- Hero / About Section -->
 <section id="about" class="hero">
-    <h1>Visualizing the Imaginary</h1>
+    <h1 data-text="Visualizing the Imaginary">Visualizing the Imaginary</h1>
     <p>I'm a 3D Generalist specializing in hard-surface modeling and real-time environments. I turn concepts into production-ready assets.</p>
     <div class="skills">
         <span class="skill-tag">Blender</span>
@@ -79,7 +247,7 @@
 
 <!-- Portfolio Grid -->
 <section id="work">
-    <h2 style="margin-bottom: 2rem;">Selected Works</h2>
+    <h2 style="margin-bottom: 2rem;" data-text="Selected Works">Selected Works</h2>
     <div class="gallery-grid">
         <!-- Item 1 -->
         <div class="card" onclick="openModal('project1')">
@@ -87,7 +255,7 @@
                 <span>Click to View</span>
             </div>
             <div class="info">
-                <h3>Cyberpunk Vehicle</h3>
+                <h3 data-text="Cyberpunk Vehicle">Cyberpunk Vehicle</h3>
                 <p>Automotive Design / Rendering</p>
             </div>
         </div>
@@ -97,7 +265,7 @@
                 <span>Click to View</span>
             </div>
             <div class="info">
-                <h3>Ancient Ruins</h3>
+                <h3 data-text="Ancient Ruins">Ancient Ruins</h3>
                 <p>Environment Art / Level Design</p>
             </div>
         </div>
@@ -107,7 +275,7 @@
                 <span>Click to View</span>
             </div>
             <div class="info">
-                <h3>Mecha Pilot</h3>
+                <h3 data-text="Mecha Pilot">Mecha Pilot</h3>
                 <p>Character Sculpting</p>
             </div>
         </div>
@@ -116,19 +284,19 @@
 
 <!-- B2B / Services Section -->
 <section id="b2b" class="b2b">
-    <h2>Business Solutions</h2>
+    <h2 data-text="Business Solutions">Business Solutions</h2>
     <p style="color: #ccc; margin-top: 10px;">Looking for assets for your game or product visualization for your brand? I offer tailored B2B services.</p>
     <div class="services-list">
         <div class="service-item">
-            <h3>Asset Creation</h3>
+            <h3 data-text="Asset Creation">Asset Creation</h3>
             <p>High-quality, optimized 3D assets ready for game engines (Unity/Unreal) or AR/VR applications.</p>
         </div>
         <div class="service-item">
-            <h3>Product Visualization</h3>
+            <h3 data-text="Product Visualization">Product Visualization</h3>
             <p>Photorealistic renders of your physical products for marketing, packaging, and e-commerce.</p>
         </div>
         <div class="service-item">
-            <h3>3D Printing Prep</h3>
+            <h3 data-text="3D Printing Prep">3D Printing Prep</h3>
             <p>Watertight modeling and optimization for additive manufacturing processes.</p>
         </div>
     </div>
@@ -136,7 +304,7 @@
 
 <!-- Contact / Footer -->
 <section id="contact" style="text-align: center;">
-    <h2>Let's Build Something</h2>
+    <h2 data-text="Let's Build Something">Let's Build Something</h2>
     <p>Available for freelance and contract work.</p>
     <a href="mailto:contact@lazyboxstudio.com" class="contact-btn">Get in Touch</a>
 </section>
@@ -184,19 +352,129 @@
         if(data) {
             document.getElementById('modal-title').innerText = data.title;
             document.getElementById('modal-desc').innerText = data.desc;
-            // Here you would load your 3D viewer or image
             document.getElementById('modal-img').innerText = data.content; 
-            
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
+            document.body.style.overflow = 'hidden'; 
         }
     }
 
     function closeModal(e) {
-        // Close if clicked on overlay or close button
         if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn')) {
             document.getElementById('project-modal').classList.remove('active');
-            document.body.style.overflow = 'auto'; // Restore scrolling
+            document.body.style.overflow = 'auto'; 
+        }
+    }
+
+    // --- HACKER TEXT EFFECT ---
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+-=[]{}|;':\",./<>?";
+
+    function scrambleText(element) {
+        let iteration = 0;
+        const originalText = element.dataset.text || element.innerText;
+        if (!element.dataset.text) element.dataset.text = originalText;
+        clearInterval(element.interval);
+        element.interval = setInterval(() => {
+            element.innerText = originalText.split("").map((letter, index) => {
+                if(index < iteration) return originalText[index];
+                return letters[Math.floor(Math.random() * letters.length)];
+            }).join("");
+            if(iteration >= originalText.length) {
+                clearInterval(element.interval);
+                element.innerText = originalText; 
+            }
+            iteration += 1 / 3; 
+        }, 30);
+    }
+
+    // --- PLEXUS EFFECT ---
+    const App = {
+        bgCanvas: null,
+        ctxPlexus: null,
+        particles: [],
+        initPlexus() {
+            this.bgCanvas = document.getElementById('bg-canvas');
+            this.ctxPlexus = this.bgCanvas.getContext('2d');
+            this.resizeCanvas(); 
+            this.animatePlexus();
+        },
+        animatePlexus() {
+            if (!this.ctxPlexus) return; 
+            const connectionDistance = 150;
+            // Clear with opacity for trail effect
+            this.ctxPlexus.fillStyle = 'rgba(3, 3, 3, 0.1)'; 
+            this.ctxPlexus.fillRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
+            
+            this.particles.forEach(p => { p.update(); p.draw(this.ctxPlexus); });
+            for (let i = 0; i < this.particles.length; i++) {
+                for (let j = i + 1; j < this.particles.length; j++) {
+                    const dx = this.particles[i].x - this.particles[j].x;
+                    const dy = this.particles[i].y - this.particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < connectionDistance) {
+                        const opacity = 0.5 - dist / connectionDistance / 2;
+                        this.ctxPlexus.strokeStyle = `rgba(0, 243, 255, ${opacity})`; 
+                        this.ctxPlexus.lineWidth = 0.5;
+                        this.ctxPlexus.beginPath();
+                        this.ctxPlexus.moveTo(this.particles[i].x, this.particles[i].y);
+                        this.ctxPlexus.lineTo(this.particles[j].x, this.particles[j].y);
+                        this.ctxPlexus.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(this.animatePlexus.bind(this));
+        },
+        resizeCanvas() {
+            if (this.bgCanvas) {
+                this.bgCanvas.width = window.innerWidth;
+                this.bgCanvas.height = window.innerHeight;
+                this.particles = [];
+                const particleCount = 50 + Math.floor(this.bgCanvas.width / 1000 * 30); 
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push(new Particle(this.bgCanvas));
+                }
+            }
+        }
+    };
+    
+    class Particle {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 1.0; 
+            this.vy = (Math.random() - 0.5) * 1.0; 
+            this.size = Math.random() * 2 + 1; 
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > this.canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > this.canvas.height) this.vy *= -1;
+        }
+        draw(ctx) {
+            ctx.fillStyle = '#00f3ff'; 
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Initialize App
+    App.initPlexus();
+    window.addEventListener('resize', App.resizeCanvas.bind(App));
+
+    // Cyber Mode Toggle
+    function toggleCyberMode() {
+        document.body.classList.toggle('cyber-mode');
+        const btn = document.getElementById('modeBtn');
+        const isCyber = document.body.classList.contains('cyber-mode');
+        
+        if (isCyber) {
+            btn.innerText = "EXIT THE VOID";
+            const targets = document.querySelectorAll('h1, h2, h3, .logo, nav a');
+            targets.forEach(el => scrambleText(el));
+        } else {
+            btn.innerText = "ENTER THE VOID";
         }
     }
 </script>
