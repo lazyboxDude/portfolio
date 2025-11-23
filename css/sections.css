@@ -1648,7 +1648,15 @@ body.cyber-mode .compact-service-card:hover {
 }
 
 .quest-completed .quest-card {
-    border-left-color: #00ff00; /* Green for completed */
+    border-left-color: #4caf50; /* Green for completed */
+    opacity: 0.8;
+}
+
+/* Future Quest Styling */
+.quest-future .quest-card {
+    border-left-color: #a855f7; /* Purple for future */
+    background: rgba(168, 85, 247, 0.05);
+    border-style: dashed;
 }
 
 .quest-status {

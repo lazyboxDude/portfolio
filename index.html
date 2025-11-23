@@ -16,6 +16,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
 
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <!-- Load Google Fonts for the effect -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
@@ -35,28 +39,7 @@
 
 <!-- Navigation -->
 <header>
-    <div class="logo">
-        <span class="logo-main" data-text="Lazybox">Lazybox</span>
-        <span class="logo-sub" data-text="by Micael G. Fernandes">by Micael G. Fernandes</span>
-    </div>
-    <div class="hamburger-menu" onclick="toggleMobileMenu()">
-        <i class="fas fa-bars"></i>
-    </div>
-    <nav id="main-nav">
-        <a href="#" onclick="closeMobileMenu()"><i class="fas fa-home"></i> <span data-text="Home">Home</span></a>
-        <a href="#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
-        <a href="#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Skills">Skills</span></a>
-        <a href="#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
-        <a href="#b2b" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
-        <a href="resume.html" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> <span data-text="Resume">Resume</span></a>
-    
-        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
-
-        <div class="sidebar-footer">
-            <div class="social-links"></div>
-            <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="cta-btn">Get in Touch</a>
-        </div>
-    </nav>
+    <!-- Sidebar loaded dynamically from components/sidebar.html -->
 </header>
 
 <main>
@@ -408,10 +391,29 @@
         <div style="text-align: center; margin-top: 1rem;">
              <a href="services.html" class="cta-btn" style="padding: 1rem 3rem; font-size: 1.1rem;">View Full Details <i class="fas fa-arrow-right"></i></a>
         </div>
+
+        <!-- Trusted By Section -->
+        <div class="trusted-by-container" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+            <p style="font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #666; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">Trusted By & Collaborating With</p>
+            <div class="trusted-logos" style="display: flex; justify-content: center; align-items: center; gap: 4rem; flex-wrap: wrap;">
+                <!-- IBW Chur -->
+                <a href="https://www.ibw.ch" target="_blank" rel="noopener noreferrer" class="trusted-logo" style="filter: grayscale(100%) brightness(200%); transition: all 0.3s; opacity: 0.7; display: block; text-decoration: none;">
+                    <img src="https://logo.clearbit.com/ibw.ch" alt="IBW Chur" style="height: 40px; width: auto;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <span style="display:none; font-weight:bold; font-size:1.5rem; color:#ccc;">IBW Chur</span>
+                </a>
+                <!-- WDC -->
+                <a href="https://whales.org" target="_blank" rel="noopener noreferrer" class="trusted-logo" style="filter: grayscale(100%) brightness(200%); transition: all 0.3s; opacity: 0.7; display: block; text-decoration: none;">
+                    <img src="https://logo.clearbit.com/whales.org" alt="WDC Whale and Dolphin Conservation" style="height: 50px; width: auto;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <span style="display:none; font-weight:bold; font-size:1.5rem; color:#ccc;">WDC</span>
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- Contact Section Removed -->
+
+<!-- Contact Section Removed (Moved to Modal) -->
 
 <footer>
     <p>&copy; 2025 Lazybox. All rights reserved.</p>
@@ -468,9 +470,54 @@
     </div>
 </div>
 
-<script src="js/socials.js"></script>
-<script src="js/projects-data.js"></script>
-<script src="js/script.js"></script>
+<!-- Contact Modal (Terminal Style) -->
+<div id="contact-modal" class="modal-overlay" onclick="closeContactModal(event)">
+    <div class="terminal-window" onclick="event.stopPropagation()">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span class="term-btn close" onclick="closeContactModal(event)"></span>
+                <span class="term-btn minimize" onclick="minimizeTerminal(event)"></span>
+                <span class="term-btn maximize" onclick="maximizeTerminal(event)"></span>
+            </div>
+            <div class="terminal-title">guest@lazybox: ~/contact-uplink</div>
+        </div>
+        <div class="terminal-body">
+            <div class="term-line"><span class="term-green">guest@lazybox:~$</span> ./init_uplink.sh</div>
+            <div class="term-line term-gray">Establishing secure connection... <span class="term-green">Done.</span></div>
+            <div class="term-line term-gray">Target: <span class="term-blue">Micael G. Fernandes</span></div>
+            
+            <form action="https://formsubmit.co/micael@gomes-fernandes.ch" method="POST" class="terminal-form">
+                <input type="text" name="_honey" style="display:none">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_next" value="https://lazyboxdude.github.io/portfolio/index.html">
+
+                <div class="term-input-group">
+                    <span class="term-prompt">name:</span>
+                    <input type="text" name="name" class="term-input" required placeholder="_" autocomplete="off">
+                </div>
+                
+                <div class="term-input-group">
+                    <span class="term-prompt">email:</span>
+                    <input type="email" name="email" class="term-input" required placeholder="_" autocomplete="off">
+                </div>
+                
+                <div class="term-input-group">
+                    <span class="term-prompt">message:</span>
+                    <textarea name="message" class="term-textarea" required placeholder="_"></textarea>
+                </div>
+                
+                <button type="submit" class="term-submit">
+                    > EXECUTE_SEND
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="js/socials.js" defer></script>
+<script src="js/loader.js" defer></script>
+<script src="js/projects-data.js" defer></script>
+<script src="js/script.js" defer></script>
 
 </body>
 </html>

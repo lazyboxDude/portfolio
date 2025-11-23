@@ -30,8 +30,8 @@ const socialLinks = [
     }
 ];
 
-// --- RENDER LOGIC (DO NOT EDIT BELOW THIS LINE) ---
-document.addEventListener('DOMContentLoaded', () => {
+// --- RENDER LOGIC ---
+function initSocials() {
     const container = document.querySelector('.social-links');
     if (!container) return;
 
@@ -39,4 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = link.customHtml ? link.customHtml : `<i class="${link.icon}"></i>`;
         return `<a href="${link.url}" target="_blank" class="social-btn" title="${link.platform}">${content}</a>`;
     }).join('');
-});
+}
+
+// Expose to global scope
+window.initSocials = initSocials;
+
+// Try to init on load (in case it's static)
+document.addEventListener('DOMContentLoaded', initSocials);

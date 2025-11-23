@@ -100,26 +100,55 @@ const App = {
     bgCanvas: null,
     ctxPlexus: null,
     particles: [],
+    isRunning: false,
+    animationFrameId: null,
+
     initPlexus() {
         this.bgCanvas = document.getElementById('bg-canvas');
+        if (!this.bgCanvas) return;
         this.ctxPlexus = this.bgCanvas.getContext('2d');
         this.resizeCanvas(); 
-        this.animatePlexus();
+        
+        // Only start if Cyber Mode is already active (e.g. persisted state)
+        if (document.body.classList.contains('cyber-mode')) {
+            this.startAnimation();
+        }
     },
+
+    startAnimation() {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.animatePlexus();
+        }
+    },
+
+    stopAnimation() {
+        this.isRunning = false;
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+    },
+
     animatePlexus() {
-        if (!this.ctxPlexus) return; 
+        if (!this.ctxPlexus || !this.isRunning) return; 
+        
         const connectionDistance = 150;
+        const connectionDistanceSq = connectionDistance * connectionDistance;
+
         // Clear with opacity for trail effect
         this.ctxPlexus.fillStyle = 'rgba(3, 3, 3, 0.1)'; 
         this.ctxPlexus.fillRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
         
         this.particles.forEach(p => { p.update(); p.draw(this.ctxPlexus); });
+        
         for (let i = 0; i < this.particles.length; i++) {
             for (let j = i + 1; j < this.particles.length; j++) {
                 const dx = this.particles[i].x - this.particles[j].x;
                 const dy = this.particles[i].y - this.particles[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < connectionDistance) {
+                const distSq = dx * dx + dy * dy;
+                
+                if (distSq < connectionDistanceSq) {
+                    const dist = Math.sqrt(distSq); // Only sqrt for opacity calc
                     const opacity = 0.5 - dist / connectionDistance / 2;
                     this.ctxPlexus.strokeStyle = `rgba(0, 243, 255, ${opacity})`; 
                     this.ctxPlexus.lineWidth = 0.5;
@@ -130,14 +159,25 @@ const App = {
                 }
             }
         }
-        requestAnimationFrame(this.animatePlexus.bind(this));
+        this.animationFrameId = requestAnimationFrame(this.animatePlexus.bind(this));
     },
     resizeCanvas() {
         if (this.bgCanvas) {
             this.bgCanvas.width = window.innerWidth;
             this.bgCanvas.height = window.innerHeight;
             this.particles = [];
-            const particleCount = 50 + Math.floor(this.bgCanvas.width / 1000 * 30); 
+            
+            // Adjust particle count based on screen size
+            // Mobile: Standard density
+            // Desktop: Reduced density to avoid "blue blob" effect
+            let particleCount;
+            if (window.innerWidth < 768) {
+                particleCount = 40 + Math.floor(this.bgCanvas.width / 1000 * 20); 
+            } else {
+                // Reduce count on larger screens
+                particleCount = 60 + Math.floor(this.bgCanvas.width / 1000 * 15); 
+            }
+
             for (let i = 0; i < particleCount; i++) {
                 this.particles.push(new Particle(this.bgCanvas));
             }
@@ -150,9 +190,15 @@ class Particle {
         this.canvas = canvas;
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 1.0; 
-        this.vy = (Math.random() - 0.5) * 1.0; 
-        this.size = Math.random() * 2 + 1; 
+        this.vx = (Math.random() - 0.5) * 0.8; // Slower movement
+        this.vy = (Math.random() - 0.5) * 0.8; 
+        
+        // Smaller particles on desktop
+        if (window.innerWidth > 768) {
+            this.size = Math.random() * 1.5 + 0.5; 
+        } else {
+            this.size = Math.random() * 2 + 1; 
+        }
     }
     update() {
         this.x += this.vx;
@@ -182,8 +228,10 @@ function toggleCyberMode() {
         btn.innerText = "EXIT THE VOID";
         const targets = document.querySelectorAll('h1, h2, h3, .logo span, nav a span');
         targets.forEach(el => scrambleText(el));
+        App.startAnimation(); // Start canvas loop
     } else {
         btn.innerText = "ENTER THE VOID";
+        App.stopAnimation(); // Stop canvas loop to save resources
     }
 }
 
@@ -436,5 +484,69 @@ function closeAchievementModal(e) {
     if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn') || e.target.closest('.close-btn')) {
         document.getElementById('achievement-modal').classList.remove('active');
         document.body.style.overflow = 'auto';
+    }
+}
+
+// Contact Modal Functions
+function openContactModal() {
+    const modal = document.getElementById('contact-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+        
+        // Reset states when opening
+        const terminal = modal.querySelector('.terminal-window');
+        if(terminal) {
+            terminal.classList.remove('minimized', 'maximized');
+        }
+        modal.classList.remove('minimized-overlay');
+    }
+}
+
+function closeContactModal(e) {
+    // Check if clicked overlay OR the close button (X) OR the red terminal dot
+    if (e.target.id === 'contact-modal' || 
+        e.target.classList.contains('close-btn') || 
+        e.target.classList.contains('close')) {
+        
+        const modal = document.getElementById('contact-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+    }
+}
+
+// Terminal Window Functions
+function minimizeTerminal(e) {
+    e.stopPropagation();
+    const terminal = document.querySelector('.terminal-window');
+    const modal = document.getElementById('contact-modal');
+    
+    // Toggle minimized state
+    const isMinimized = terminal.classList.toggle('minimized');
+    
+    if (isMinimized) {
+        modal.classList.add('minimized-overlay');
+        terminal.classList.remove('maximized');
+        document.body.style.overflow = 'auto'; // Allow scrolling website
+    } else {
+        modal.classList.remove('minimized-overlay');
+        document.body.style.overflow = 'hidden'; // Lock scrolling
+    }
+}
+
+function maximizeTerminal(e) {
+    e.stopPropagation();
+    const terminal = document.querySelector('.terminal-window');
+    const modal = document.getElementById('contact-modal');
+
+    // Toggle maximized state
+    const isMaximized = terminal.classList.toggle('maximized');
+    
+    if (isMaximized) {
+        terminal.classList.remove('minimized');
+        modal.classList.remove('minimized-overlay');
+        document.body.style.overflow = 'hidden';
     }
 }

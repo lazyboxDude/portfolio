@@ -211,3 +211,37 @@ body.cyber-mode .role-badge i {
     color: var(--accent-color);
     text-shadow: 0 0 8px var(--accent-color);
 }
+
+/* Cyber Mode Form Overrides */
+body.cyber-mode .form-input,
+body.cyber-mode .form-textarea {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+    border-radius: 0;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent-color);
+}
+
+body.cyber-mode .form-input:focus,
+body.cyber-mode .form-textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+    background: rgba(0, 243, 255, 0.05);
+}
+
+body.cyber-mode .submit-btn {
+    background: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 0;
+    box-shadow: 0 0 10px var(--accent-color);
+    font-family: 'Space Mono', monospace;
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
+body.cyber-mode .submit-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    text-shadow: none;
+    box-shadow: 0 0 20px var(--accent-color);
+}

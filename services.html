@@ -8,6 +8,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
 
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,28 +31,7 @@
 
 <!-- Sidebar Navigation (Modified for Sub-page) -->
 <header>
-    <div class="logo">
-        <span class="logo-main" data-text="Lazybox">Lazybox</span>
-        <span class="logo-sub" data-text="by Micael G. Fernandes">by Micael G. Fernandes</span>
-    </div>
-    <div class="hamburger-menu" onclick="toggleMobileMenu()">
-        <i class="fas fa-bars"></i>
-    </div>
-    <nav id="main-nav">
-        <a href="index.html" onclick="closeMobileMenu()"><i class="fas fa-home"></i> <span data-text="Home">Home</span></a>
-        <a href="index.html#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
-        <a href="index.html#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Skills">Skills</span></a>
-        <a href="index.html#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
-        <a href="services.html" class="active" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
-        <a href="resume.html" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> <span data-text="Resume">Resume</span></a>
-    
-        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
-
-        <div class="sidebar-footer">
-            <div class="social-links"></div>
-            <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="cta-btn">Get in Touch</a>
-        </div>
-    </nav>
+    <!-- Sidebar loaded dynamically from components/sidebar.html -->
 </header>
 
 <main class="fade-in-page">
@@ -57,6 +40,12 @@
             <div style="text-align: center; margin-bottom: 3rem;">
                 <h1 data-text="Services">Services</h1>
                 <p class="subtitle">Professional solutions for your digital needs</p>
+                
+                <!-- Trusted By (Mini) -->
+                <div class="trusted-logos-mini" style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 1.5rem; opacity: 0.6;">
+                    <img src="https://logo.clearbit.com/ibw.ch" alt="IBW" style="height: 30px; filter: grayscale(100%) brightness(200%);">
+                    <img src="https://logo.clearbit.com/whales.org" alt="WDC" style="height: 35px; filter: grayscale(100%) brightness(200%);">
+                </div>
             </div>
 
             <!-- Interactive Services Layout -->
@@ -350,7 +339,8 @@
     </footer>
 </main>
 
-<script src="js/socials.js"></script>
-<script src="js/script.js"></script>
+<script src="js/socials.js" defer></script>
+<script src="js/loader.js" defer></script>
+<script src="js/script.js" defer></script>
 </body>
 </html>

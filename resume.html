@@ -8,6 +8,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
 
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,28 +31,7 @@
 
 <!-- Navigation -->
 <header>
-    <div class="logo">
-        <span class="logo-main" data-text="Lazybox">Lazybox</span>
-        <span class="logo-sub" data-text="by Micael G. Fernandes">by Micael G. Fernandes</span>
-    </div>
-    <div class="hamburger-menu" onclick="toggleMobileMenu()">
-        <i class="fas fa-bars"></i>
-    </div>
-    <nav id="main-nav">
-        <a href="index.html" onclick="closeMobileMenu()"><i class="fas fa-home"></i> <span data-text="Home">Home</span></a>
-        <a href="index.html#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
-        <a href="index.html#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Skills">Skills</span></a>
-        <a href="index.html#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
-        <a href="services.html" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
-        <a href="resume.html" class="active" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> <span data-text="Resume">Resume</span></a>
-    
-        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
-
-        <div class="sidebar-footer">
-            <div class="social-links"></div>
-            <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="cta-btn">Get in Touch</a>
-        </div>
-    </nav>
+    <!-- Sidebar loaded dynamically from components/sidebar.html -->
 </header>
 
 <main class="fade-in-page">
@@ -99,6 +82,44 @@
             </div>
             
             <div class="timeline">
+                <!-- Aphonia Launch (Future) -->
+                <div class="timeline-item quest-future">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2027</div>
+                    <div class="timeline-content quest-card future-card">
+                        <div class="quest-status future">LOCKED</div>
+                        <h3><i class="fas fa-rocket"></i> Aphonia Launch</h3>
+                        <span class="company">Moonflux Interactive</span>
+                        <p>Official release of the narrative puzzle game "Aphonia".</p>
+                        <div class="loot-drop">
+                            <span class="loot-label">Reward:</span>
+                            <div class="tech-stack">
+                                <span>Global Release</span>
+                                <span>Steam Achievement</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dolphin Rush Release (Future) -->
+                <div class="timeline-item quest-future">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">April 2025</div>
+                    <div class="timeline-content quest-card future-card">
+                        <div class="quest-status future">UPCOMING</div>
+                        <h3><i class="fas fa-water"></i> Dolphin Rush Release</h3>
+                        <span class="company">WDC & Moonflux Interactive</span>
+                        <p>Educational game launch for Whale and Dolphin Conservation.</p>
+                        <div class="loot-drop">
+                            <span class="loot-label">Reward:</span>
+                            <div class="tech-stack">
+                                <span>Education</span>
+                                <span>Conservation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Moonflux Interactive -->
                 <div class="timeline-item quest-active">
                     <div class="timeline-dot"></div>
@@ -332,7 +353,8 @@
     </div>
 </div>
 
-<script src="js/socials.js"></script>
-<script src="js/script.js"></script>
+<script src="js/socials.js" defer></script>
+<script src="js/loader.js" defer></script>
+<script src="js/script.js" defer></script>
 </body>
 </html>
