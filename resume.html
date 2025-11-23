@@ -27,7 +27,10 @@
 
 <!-- Navigation -->
 <header>
-    <div class="logo"><span data-text="Lazy">Lazy</span><span data-text="box">box</span></div>
+    <div class="logo">
+        <span class="logo-main" data-text="Lazybox">Lazybox</span>
+        <span class="logo-sub" data-text="by Micael G. Fernandes">by Micael G. Fernandes</span>
+    </div>
     <div class="hamburger-menu" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
     </div>
@@ -49,66 +52,140 @@
 </header>
 
 <main class="fade-in-page">
-    <section class="services-hero">
-        <div class="content-box" style="text-align: center;">
-            <h1 data-text="Interactive Resume">Interactive Resume</h1>
-            <p class="subtitle">Experience, Skills, and Journey</p>
-            <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="cta-btn" style="margin-top: 1rem;"><i class="fas fa-download"></i> Download PDF Version</a>
+    <!-- Character Sheet / Hero -->
+    <section class="character-sheet-section">
+        <div class="content-box character-sheet">
+            <div class="char-avatar">
+                <div class="avatar-frame">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <div class="level-badge">Lvl. 26</div>
+            </div>
+            <div class="char-stats">
+                <h1 class="char-name" data-text="Micael Gomes Fernandes">Micael Gomes Fernandes</h1>
+                <div class="char-class">
+                    <span class="class-tag"><i class="fas fa-dungeon"></i> Class: Game Designer</span>
+                    <span class="class-tag"><i class="fas fa-users"></i> Guild: Moonflux</span>
+                    <span class="class-tag"><i class="fas fa-map-marker-alt"></i> Server: Switzerland</span>
+                </div>
+                
+                <div class="status-bars">
+                    <div class="bar-row">
+                        <span class="bar-label">HP</span>
+                        <div class="status-bar hp"><div class="status-fill" style="width: 100%"></div></div>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">MP</span>
+                        <div class="status-bar mp"><div class="status-fill" style="width: 85%"></div></div>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">XP</span>
+                        <div class="status-bar xp"><div class="status-fill" style="width: 60%"></div></div>
+                    </div>
+                </div>
+
+                <div class="char-actions">
+                    <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="game-btn"><i class="fas fa-file-export"></i> Export Save File (PDF)</a>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Experience Timeline -->
+    <!-- Quest Log (Experience) -->
     <section class="resume-section">
         <div class="content-box">
             <div class="section-header">
-                <h2 data-text="Experience">Experience</h2>
+                <h2 data-text="Quest Log">Quest Log</h2>
             </div>
             
             <div class="timeline">
-                <!-- Timeline Item 1 -->
-                <div class="timeline-item">
+                <!-- Moonflux Interactive -->
+                <div class="timeline-item quest-active">
                     <div class="timeline-dot"></div>
-                    <div class="timeline-date">2023 - Present</div>
-                    <div class="timeline-content">
-                        <h3>Freelance Game Developer</h3>
-                        <span class="company">Lazybox Studio</span>
-                        <p>Developing indie games, creating 3D assets for clients, and teaching game development workflows. Specializing in Godot and Unity pipelines.</p>
-                        <div class="tech-stack">
-                            <span>Godot</span>
-                            <span>Blender</span>
-                            <span>C#</span>
+                    <div class="timeline-date">Current Quest</div>
+                    <div class="timeline-content quest-card">
+                        <div class="quest-status">IN PROGRESS</div>
+                        <h3><i class="fas fa-scroll"></i> Game Designer & Co-Founder</h3>
+                        <span class="company">Moonflux Interactive - Oerlikon, ZH</span>
+                        <p>Co-founded the company. Responsible for designing and planning player experiences, as well as documenting technical and game design specifications.</p>
+                        <div class="loot-drop">
+                            <span class="loot-label">Loot:</span>
+                            <div class="tech-stack">
+                                <span>Game Design</span>
+                                <span>Planning</span>
+                                <span>Documentation</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Timeline Item 2 -->
-                <div class="timeline-item">
+                <!-- Cinema 8 -->
+                <div class="timeline-item quest-active">
                     <div class="timeline-dot"></div>
-                    <div class="timeline-date">2021 - 2023</div>
-                    <div class="timeline-content">
-                        <h3>3D Artist & Level Designer</h3>
-                        <span class="company">Freelance / Contract</span>
-                        <p>Worked with various indie teams to produce environment art, props, and level layouts. Optimized assets for mobile and VR platforms.</p>
-                        <div class="tech-stack">
-                            <span>Maya</span>
-                            <span>Substance Painter</span>
-                            <span>Unity</span>
+                    <div class="timeline-date">Side Quest</div>
+                    <div class="timeline-content quest-card">
+                        <div class="quest-status">IN PROGRESS</div>
+                        <h3><i class="fas fa-ticket-alt"></i> Operator</h3>
+                        <span class="company">Cinema 8 - Schöftland AG</span>
+                        <p>Coordination of the admission team and protocol management.</p>
+                        <div class="loot-drop">
+                            <span class="loot-label">Loot:</span>
+                            <div class="tech-stack">
+                                <span>Team Coordination</span>
+                                <span>Management</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Timeline Item 3 -->
-                <div class="timeline-item">
+                <!-- Läbensruum -->
+                <div class="timeline-item quest-completed">
                     <div class="timeline-dot"></div>
-                    <div class="timeline-date">2019 - 2021</div>
-                    <div class="timeline-content">
-                        <h3>Junior Developer</h3>
-                        <span class="company">Tech Solutions Inc. (Placeholder)</span>
-                        <p>Assisted in the development of internal tools and maintained legacy codebases. Gained strong foundation in software architecture.</p>
-                        <div class="tech-stack">
-                            <span>Python</span>
-                            <span>JavaScript</span>
-                            <span>Git</span>
+                    <div class="timeline-date">2021 - 2024</div>
+                    <div class="timeline-content quest-card">
+                        <div class="quest-status completed">COMPLETED</div>
+                        <h3><i class="fas fa-check-circle"></i> Operations Staff</h3>
+                        <span class="company">Läbensruum - Winterthur, ZH</span>
+                        <p>Ticket machine conversion for Stadtbus Winterthur, assistance with removals/disposals, and warehouse logistics.</p>
+                    </div>
+                </div>
+
+                <!-- Raumgleiter AG -->
+                <div class="timeline-item quest-completed">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2019</div>
+                    <div class="timeline-content quest-card">
+                        <div class="quest-status completed">COMPLETED</div>
+                        <h3><i class="fas fa-cube"></i> 3D Artist</h3>
+                        <span class="company">Raumgleiter AG - Zürich, ZH</span>
+                        <p>Created 3D models in Blender and worked on AR-Archviewer projects.</p>
+                        <div class="loot-drop">
+                            <span class="loot-label">Loot:</span>
+                            <div class="tech-stack">
+                                <span>Blender</span>
+                                <span>AR</span>
+                                <span>Modeling</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gustello GmbH -->
+                <div class="timeline-item quest-completed">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2016 - 2019</div>
+                    <div class="timeline-content quest-card">
+                        <div class="quest-status completed">COMPLETED</div>
+                        <h3><i class="fas fa-briefcase"></i> Commercial Clerk (EFZ)</h3>
+                        <span class="company">gustello GmbH - Winterthur, ZH</span>
+                        <p>Website management, design of advertising materials, and purchasing/sales on various online platforms.</p>
+                        <div class="loot-drop">
+                            <span class="loot-label">Loot:</span>
+                            <div class="tech-stack">
+                                <span>Web Management</span>
+                                <span>Design</span>
+                                <span>Sales</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -116,11 +193,46 @@
         </div>
     </section>
 
-    <!-- Skills Matrix -->
+    <!-- Achievements (Education) -->
     <section class="resume-section">
         <div class="content-box">
             <div class="section-header">
-                <h2 data-text="Technical Arsenal">Technical Arsenal</h2>
+                <h2 data-text="Achievements">Achievements</h2>
+                <p style="color: #888; font-size: 0.9rem;">Click on an achievement to inspect acquired data.</p>
+            </div>
+            <div class="achievements-grid">
+                <!-- SAE -->
+                <div class="achievement-card" onclick="showAchievement('sae')">
+                    <div class="achievement-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="achievement-info">
+                        <h3>Diploma: Game Art & 3D Animation</h3>
+                        <span class="company">SAE Institute - Zürich ZH</span>
+                        <span class="date">2019 - 2021</span>
+                    </div>
+                    <div class="click-hint"><i class="fas fa-search"></i> Inspect</div>
+                </div>
+
+                <!-- KV Winterthur -->
+                <div class="achievement-card" onclick="showAchievement('kv')">
+                    <div class="achievement-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="achievement-info">
+                        <h3>Certificate: Commercial Basic Training (EFZ)</h3>
+                        <span class="company">Wirtschaftsschule KV Winterthur</span>
+                        <span class="date">2016 - 2019</span>
+                    </div>
+                    <div class="click-hint"><i class="fas fa-search"></i> Inspect</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Skill Tree -->
+    <section class="resume-section">
+        <div class="content-box">
+            <div class="section-header">
+                <h2 data-text="Skill Tree">Skill Tree</h2>
             </div>
             
             <div class="skills-grid-advanced">
@@ -129,24 +241,24 @@
                     <h3><i class="fas fa-gamepad"></i> Game Engines</h3>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>Godot</span>
+                            <span>Unreal Engine 5</span>
                             <span>90%</span>
                         </div>
                         <div class="skill-bar"><div class="skill-fill" style="width: 90%;"></div></div>
                     </div>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>Unity</span>
+                            <span>Godot 4</span>
                             <span>85%</span>
                         </div>
                         <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
                     </div>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>Unreal Engine</span>
-                            <span>70%</span>
+                            <span>Unity</span>
+                            <span>80%</span>
                         </div>
-                        <div class="skill-bar"><div class="skill-fill" style="width: 70%;"></div></div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 80%;"></div></div>
                     </div>
                 </div>
 
@@ -155,24 +267,24 @@
                     <h3><i class="fas fa-cube"></i> 3D & Art</h3>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>Blender</span>
-                            <span>95%</span>
+                            <span>Blender / Maya</span>
+                            <span>90%</span>
                         </div>
-                        <div class="skill-bar"><div class="skill-fill" style="width: 95%;"></div></div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 90%;"></div></div>
                     </div>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>Substance Painter</span>
+                            <span>Substance Suite</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Affinity Suite</span>
                             <span>80%</span>
                         </div>
                         <div class="skill-bar"><div class="skill-fill" style="width: 80%;"></div></div>
-                    </div>
-                    <div class="skill-bar-container">
-                        <div class="skill-info">
-                            <span>Photoshop</span>
-                            <span>75%</span>
-                        </div>
-                        <div class="skill-bar"><div class="skill-fill" style="width: 75%;"></div></div>
                     </div>
                 </div>
 
@@ -181,24 +293,24 @@
                     <h3><i class="fas fa-code"></i> Programming</h3>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>GDScript</span>
+                            <span>Blueprints (UE)</span>
                             <span>95%</span>
                         </div>
                         <div class="skill-bar"><div class="skill-fill" style="width: 95%;"></div></div>
                     </div>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>C#</span>
-                            <span>80%</span>
+                            <span>GDScript</span>
+                            <span>85%</span>
                         </div>
-                        <div class="skill-bar"><div class="skill-fill" style="width: 80%;"></div></div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
                     </div>
                     <div class="skill-bar-container">
                         <div class="skill-info">
-                            <span>Python</span>
-                            <span>75%</span>
+                            <span>C++ / Python</span>
+                            <span>70%</span>
                         </div>
-                        <div class="skill-bar"><div class="skill-fill" style="width: 75%;"></div></div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 70%;"></div></div>
                     </div>
                 </div>
             </div>
@@ -209,6 +321,16 @@
         <p>&copy; 2025 Lazybox. All rights reserved.</p>
     </footer>
 </main>
+
+<!-- Achievement Modal (Moved outside main to avoid transform context issues) -->
+<div id="achievement-modal" class="modal-overlay" onclick="closeAchievementModal(event)">
+    <div class="modal-content achievement-modal-box">
+        <button class="close-btn" onclick="closeAchievementModal(event)"><i class="fas fa-times"></i></button>
+        <div id="achievement-data-content">
+            <!-- Content injected via JS -->
+        </div>
+    </div>
+</div>
 
 <script src="js/socials.js"></script>
 <script src="js/script.js"></script>

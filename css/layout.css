@@ -3,12 +3,12 @@ header {
     background: rgba(20, 20, 20, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 3rem 2rem; 
+    padding: 2rem 1.5rem; 
     position: fixed; 
     top: 0; 
     left: 0;
     height: 100vh;
-    width: 280px;
+    width: 260px;
     z-index: 100; 
     display: flex; 
     flex-direction: column;
@@ -17,19 +17,47 @@ header {
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 5px 0 30px rgba(0,0,0,0.5); 
     transition: all 0.3s ease;
-    gap: 3rem;
+    gap: 2rem;
 }
 
 .logo { 
-    font-size: 2rem; 
+    font-size: 1.8rem; 
     font-weight: bold; 
     color: #fff; 
     position: relative; 
     width: 100%;
-    padding-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    padding-left: 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
 }
-.logo span { color: var(--accent-color); }
+
+.logo-main { 
+    color: var(--accent-color); 
+    display: inline-block;
+    /* Glitch Animation: Starts after 3s, loops every 5s */
+    animation: glitch-text 5s infinite;
+    animation-delay: 3s;
+}
+
+.logo-sub { 
+    font-size: 0.75rem; 
+    color: #888; 
+    font-weight: 400; 
+    margin-top: 5px; 
+    letter-spacing: 0.5px;
+}
+
+/* Glitch Keyframes */
+@keyframes glitch-text {
+    0% { text-shadow: 0 0 0 transparent; transform: translate(0); }
+    1% { text-shadow: 2px 2px 0 #ff0055, -2px -2px 0 #00d2ff; transform: translate(-2px, 1px); }
+    2% { text-shadow: -2px -2px 0 #ff0055, 2px 2px 0 #00d2ff; transform: translate(2px, -1px); }
+    3% { text-shadow: 0 0 0 transparent; transform: translate(0); }
+    100% { text-shadow: 0 0 0 transparent; transform: translate(0); }
+}
 
 nav { 
     display: flex; 
@@ -102,15 +130,15 @@ nav a i {
 .sidebar-footer .social-links {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     margin-top: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .sidebar-footer .cta-btn {
     display: block;
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background: var(--accent-color);
     color: #000;
     text-align: center;
@@ -120,7 +148,7 @@ nav a i {
     box-sizing: border-box;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .sidebar-footer .cta-btn:hover {
@@ -146,8 +174,8 @@ body.cyber-mode .sidebar-footer .cta-btn:hover {
 
 /* Main Content Wrapper */
 main {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    margin-left: 260px;
+    width: calc(100% - 260px);
     min-height: 100vh;
     position: relative;
 }

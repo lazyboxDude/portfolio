@@ -358,3 +358,83 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+/* --- ACHIEVEMENT DATA LOG --- */
+const achievementData = {
+    'sae': {
+        title: "Game Art & 3D Animation",
+        icon: "fas fa-graduation-cap",
+        modules: [
+            "High-Poly & Low-Poly Modeling (Maya, ZBrush)",
+            "PBR Texturing & Shading (Substance Painter)",
+            "Character Design & Anatomy",
+            "Rigging & Animation Principles",
+            "Level Design & Environmental Storytelling",
+            "Game Engine Integration (Unreal Engine / Unity)",
+            "Compositing & Post-Processing"
+        ],
+        softSkills: [
+            "Agile Project Management",
+            "Team Collaboration",
+            "Creative Problem Solving"
+        ]
+    },
+    'kv': {
+        title: "Commercial Basic Training (EFZ)",
+        icon: "fas fa-certificate",
+        modules: [
+            "Financial Accounting & Controlling",
+            "Economics & Law",
+            "Information, Communication & Administration (IKA)",
+            "Project Management Basics",
+            "Business English (B2)",
+            "Business French (B1)"
+        ],
+        softSkills: [
+            "Professional Communication",
+            "Customer Service",
+            "Organizational Skills"
+        ]
+    }
+};
+
+function showAchievement(id) {
+    const data = achievementData[id];
+    if (!data) return;
+
+    const modal = document.getElementById('achievement-modal');
+    const content = document.getElementById('achievement-data-content');
+
+    let modulesHtml = data.modules.map(m => `<li><i class="fas fa-caret-right"></i> ${m}</li>`).join('');
+    let softSkillsHtml = data.softSkills.map(s => `<li><i class="fas fa-check"></i> ${s}</li>`).join('');
+
+    content.innerHTML = `
+        <div class="achievement-header">
+            <i class="${data.icon}"></i>
+            <div>
+                <h2 style="font-family: 'Space Mono', monospace;">${data.title}</h2>
+                <span style="color: #888; font-size: 0.8rem;">DATA LOG ACCESSED</span>
+            </div>
+        </div>
+        
+        <div class="data-section-title">Core Modules</div>
+        <ul class="data-list">
+            ${modulesHtml}
+        </ul>
+
+        <div class="data-section-title">Acquired Skills</div>
+        <ul class="data-list">
+            ${softSkillsHtml}
+        </ul>
+    `;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAchievementModal(e) {
+    if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn') || e.target.closest('.close-btn')) {
+        document.getElementById('achievement-modal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}

@@ -454,14 +454,14 @@ body.cyber-mode .skill-progress {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
     border: 1px solid #444;
     transition: all 0.3s ease;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .social-btn:hover {
@@ -964,10 +964,9 @@ body.cyber-mode .big-cta-btn:hover {
 .services-interactive-layout {
     display: flex;
     gap: 4rem;
-    max-width: 1200px;
-    margin: 0 auto 4rem;
-    padding: 0 2rem;
+    width: 100%;
     min-height: 500px;
+    align-items: center;
 }
 
 .services-menu {
@@ -1471,7 +1470,7 @@ body.cyber-mode .compact-service-card:hover {
     .services-interactive-layout {
         flex-direction: column;
         gap: 2rem;
-        padding: 0 1.5rem 4rem;
+        padding: 0;
     }
     
     .services-menu {
@@ -1492,4 +1491,346 @@ body.cyber-mode .compact-service-card:hover {
     .service-detail-view h2 {
         font-size: 1.8rem;
     }
+}
+
+/* --- GAMIFIED RESUME STYLES --- */
+
+/* Character Sheet */
+.character-sheet-section {
+    padding: 4rem 2rem 2rem;
+}
+
+.character-sheet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid #444;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.char-avatar {
+    flex: 0 0 150px;
+    text-align: center;
+    position: relative;
+}
+
+.avatar-frame {
+    width: 120px;
+    height: 120px;
+    background: #222;
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+}
+
+.avatar-frame i {
+    font-size: 4rem;
+    color: var(--accent-color);
+}
+
+.level-badge {
+    background: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.char-stats {
+    flex: 1;
+    min-width: 300px;
+}
+
+.char-name {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    color: #fff;
+}
+
+.char-class {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.class-tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #ccc;
+    border: 1px solid #444;
+}
+
+.class-tag i {
+    color: var(--accent-color);
+    margin-right: 5px;
+}
+
+/* Status Bars (HP/MP/XP) */
+.status-bars {
+    margin-bottom: 1.5rem;
+    max-width: 500px;
+}
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.bar-label {
+    width: 30px;
+    font-weight: bold;
+    font-family: 'Space Mono', monospace;
+    color: #888;
+}
+
+.status-bar {
+    flex: 1;
+    height: 12px;
+    background: #111;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.status-fill {
+    height: 100%;
+    border-radius: 6px;
+    position: relative;
+}
+
+.status-bar.hp .status-fill { background: linear-gradient(90deg, #ff4d4d, #ff0000); width: 100%; }
+.status-bar.mp .status-fill { background: linear-gradient(90deg, #4d94ff, #0066ff); width: 85%; }
+.status-bar.xp .status-fill { background: linear-gradient(90deg, #ffd700, #ffaa00); width: 60%; }
+
+.game-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px 20px;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.game-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    box-shadow: 0 0 15px var(--accent-color);
+}
+
+/* Quest Log Styling */
+.quest-card {
+    border-left: 4px solid #444;
+    position: relative;
+}
+
+.quest-active .quest-card {
+    border-left-color: #ffd700; /* Gold for active */
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.quest-completed .quest-card {
+    border-left-color: #00ff00; /* Green for completed */
+}
+
+.quest-status {
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #333;
+    color: #aaa;
+}
+
+.quest-active .quest-status {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border: 1px solid #ffd700;
+}
+
+.quest-completed .quest-status {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.loot-drop {
+    margin-top: 1rem;
+    border-top: 1px dashed #444;
+    padding-top: 0.5rem;
+}
+
+.loot-label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-right: 0.5rem;
+    font-family: 'Space Mono', monospace;
+}
+
+/* Achievements Grid */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    transition: transform 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.achievement-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-icon {
+    width: 60px;
+    height: 60px;
+    background: #222;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffd700; /* Gold border */
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.achievement-icon i {
+    font-size: 1.5rem;
+    color: #ffd700;
+}
+
+.achievement-info h3 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.achievement-info .company {
+    display: block;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.achievement-info .date {
+    font-size: 0.8rem;
+    color: #666;
+    font-family: 'Space Mono', monospace;
+}
+
+/* --- ACHIEVEMENT MODAL --- */
+.achievement-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.click-hint {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-family: 'Space Mono', monospace;
+}
+
+.achievement-card:hover .click-hint {
+    opacity: 1;
+}
+
+.achievement-modal-box {
+    background: rgba(15, 15, 20, 0.95);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
+    max-width: 600px;
+    width: 90%;
+    padding: 2rem;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.achievement-header {
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.achievement-header i {
+    font-size: 2rem;
+    color: var(--accent-color);
+}
+
+.achievement-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.data-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.data-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.data-list li i {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+}
+
+.data-list li:last-child {
+    border-bottom: none;
+}
+
+.data-section-title {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent-color);
+    margin: 1.5rem 0 0.5rem 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
