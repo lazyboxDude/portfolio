@@ -782,14 +782,40 @@ footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; 
         height: 250px;
     }
 
-    /* Adjust Gallery Grid for Mobile */
+    /* Adjust Gallery Grid for Mobile - Compact 2 Column */
     .gallery-grid {
-        grid-template-columns: 1fr; /* Stack cards on mobile */
-        gap: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 Columns to save vertical space */
+        gap: 10px;
+        padding-bottom: 0;
+        overflow-x: visible;
     }
 
-    /* Adjust Card Placeholder Height */
+    .card {
+        min-width: 0;
+        margin-bottom: 0;
+    }
+
+    /* Adjust Card Placeholder Height for compact view */
     .placeholder-3d {
-        height: 200px;
+        height: 120px; /* Smaller height */
+    }
+    
+    .info {
+        padding: 0.8rem; /* Compact padding */
+    }
+    
+    .info h3 {
+        font-size: 1rem; /* Smaller title */
+        margin-bottom: 0.2rem;
+    }
+    
+    .info p {
+        font-size: 0.8rem;
+        display: none; /* Hide description on mobile to save space */
+    }
+    
+    .card-tags {
+        display: none; /* Hide tags on mobile to save space */
     }
 }
