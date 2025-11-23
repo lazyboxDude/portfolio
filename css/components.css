@@ -668,8 +668,6 @@ footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; 
         display: block;
     }
     
-    /* ...existing code... */
-    
     /* Adjust Header for Mobile */
     header {
         position: fixed;
@@ -736,6 +734,15 @@ footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; 
         padding: 10px 20px;
     }
     
+    /* Fix Hero Padding on Mobile */
+    .hero {
+        padding: 2rem 1rem;
+    }
+
+    .content-box {
+        padding: 1.5rem;
+    }
+
     /* Fix Mobile Menu Links & Icons */
     nav a i {
         font-size: 1.4rem;
@@ -773,5 +780,16 @@ footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; 
     
     .modal-image {
         height: 250px;
+    }
+
+    /* Adjust Gallery Grid for Mobile */
+    .gallery-grid {
+        grid-template-columns: 1fr; /* Stack cards on mobile */
+        gap: 1.5rem;
+    }
+
+    /* Adjust Card Placeholder Height */
+    .placeholder-3d {
+        height: 200px;
     }
 }
