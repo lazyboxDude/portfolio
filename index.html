@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Artist Portfolio</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #f0f0f0; }
+        header { padding: 2rem; text-align: center; background: #252525; }
+        h1 { margin: 0; font-size: 2.5rem; color: #00d2ff; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .card { background: #333; border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .placeholder-3d { height: 200px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; }
+        .info { padding: 1rem; }
+        .contact { text-align: center; padding: 4rem 1rem; background: #222; }
+        button { background: #00d2ff; border: none; padding: 10px 20px; color: #000; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My 3D Portfolio</h1>
+    <p>Character Artist | Environment Design | Animation</p>
+</header>
+
+<div class="gallery">
+    <!-- Project 1 -->
+    <div class="card">
+        <div class="placeholder-3d">[ 3D Model Viewer Placeholder ]</div>
+        <div class="info">
+            <h3>Sci-Fi Helmet</h3>
+            <p>High poly model modeled in Blender, textured in Substance.</p>
+        </div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="card">
+        <div class="placeholder-3d">[ 3D Model Viewer Placeholder ]</div>
+        <div class="info">
+            <h3>Forest Environment</h3>
+            <p>Real-time environment running in Unreal Engine 5.</p>
+        </div>
+    </div>
+</div>
+
+<div class="contact">
+    <h2>Interested in working together?</h2>
+    <!-- Formspree Contact Form -->
+    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" style="max-width: 400px; margin: 20px auto; display: flex; flex-direction: column; gap: 10px;">
+        <input type="email" name="email" placeholder="Your Email" required style="padding: 10px;">
+        <textarea name="message" placeholder="Your Message" required style="padding: 10px; min-height: 100px;"></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+</div>
+
+</body>
+</html>
