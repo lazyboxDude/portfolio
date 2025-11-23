@@ -1,6 +1,6 @@
 # Images Folder
 
-This folder contains all images and visual assets for the Lazybox Studio portfolio website.
+This folder contains all images and visual assets for the Lazybox portfolio website.
 
 ## Folder Structure
 
@@ -29,7 +29,7 @@ images/
 - Recommended format: SVG (scalable) or PNG with transparent background
 
 ### Logos (`logos/`)
-- Lazybox Studio logo variations
+- Lazybox logo variations
 - Brand assets and identity files
 
 ## Best Practices
@@ -54,7 +54,7 @@ To use images from this folder in your `index.html`:
 <div style="background-image: url('images/backgrounds/hero-bg.jpg')"></div>
 
 <!-- Example for logo -->
-<img src="images/logos/studio-logo.svg" alt="Lazybox Studio">
+<img src="images/logos/studio-logo.svg" alt="Lazybox">
 ```
 
 ## Notes

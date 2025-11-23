@@ -1,0 +1,13 @@
+/* Base Styles */
+:root {
+    --bg-color: #1a1a1a;
+    --text-color: #f0f0f0;
+    --accent-color: #00d2ff;
+    --card-bg: #333;
+    --header-bg: #252525;
+    --font-main: 'Segoe UI', sans-serif;
+}
+
+body { margin: 0; font-family: var(--font-main); background: var(--bg-color); color: var(--text-color); line-height: 1.6; transition: background 0.3s ease; overflow-x: hidden; }
+a { color: var(--accent-color); text-decoration: none; }
+section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; }

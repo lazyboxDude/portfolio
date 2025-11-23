@@ -1,0 +1,133 @@
+/* --- BACKGROUND EFFECTS (Plexus & Texture) --- */
+#bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -2;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 1s;
+    pointer-events: none;
+}
+.texture-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+    opacity: 0; /* Hidden by default */
+    z-index: -1;
+    pointer-events: none;
+    transition: opacity 1s;
+}
+
+/* CYBERPUNK OVERRIDES */
+body.cyber-mode {
+    --bg-color: #030303; /* Darker for canvas trails */
+    --text-color: #a0c0d0;
+    --accent-color: #00f3ff; /* Electric Cyan */
+    --accent-secondary: #ff0055; /* Neon Pink */
+    --card-bg: rgba(10, 20, 30, 0.8);
+    --header-bg: rgba(5, 10, 16, 0.9);
+    --font-main: 'Space Mono', monospace; /* Font update */
+}
+
+/* Show Effects in Cyber Mode */
+body.cyber-mode #bg-canvas { opacity: 1; }
+body.cyber-mode .texture-overlay { opacity: 0.20; }
+
+body.cyber-mode .logo, 
+body.cyber-mode .hero h1, 
+body.cyber-mode h2, 
+body.cyber-mode h3,
+body.cyber-mode nav a,
+body.cyber-mode .contact-btn {
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px var(--accent-color);
+}
+
+body.cyber-mode .logo span { color: var(--accent-secondary); text-shadow: 0 0 5px var(--accent-secondary), 0 0 15px var(--accent-secondary); }
+
+body.cyber-mode .hero { background: transparent; border-bottom: 1px solid var(--accent-color); box-shadow: 0 0 30px rgba(0, 243, 255, 0.1); }
+body.cyber-mode .hero h1 { color: var(--accent-color); }
+
+body.cyber-mode .skill-tag { 
+    border-radius: 0; 
+    border: 1px solid var(--accent-color); 
+    background: rgba(0, 243, 255, 0.1); 
+    color: var(--accent-color);
+    box-shadow: 0 0 5px var(--accent-color);
+}
+
+/* Angular Cards with Glow */
+body.cyber-mode .card {
+    border-radius: 0;
+    border: 1px solid #333;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    background: var(--card-bg);
+}
+body.cyber-mode .card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+}
+body.cyber-mode .card::before {
+    content: "SYSTEM_LOCK";
+    position: absolute;
+    top: 5px; right: 5px;
+    font-size: 10px;
+    color: var(--accent-secondary);
+    opacity: 0.7;
+    text-shadow: 0 0 5px var(--accent-secondary);
+}
+
+/* B2B Section */
+body.cyber-mode .b2b { background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 0; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+body.cyber-mode .service-item { border-left: 3px solid var(--accent-secondary); background: rgba(255, 255, 255, 0.02); }
+body.cyber-mode .service-item:hover { background: rgba(255, 0, 85, 0.05); box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.1); }
+
+/* Buttons */
+body.cyber-mode .contact-btn {
+    background: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 0;
+    box-shadow: 0 0 10px var(--accent-color);
+}
+body.cyber-mode .contact-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    text-shadow: none;
+}
+
+body.cyber-mode .funky-btn {
+    border-color: var(--accent-secondary);
+    color: var(--accent-secondary);
+    text-shadow: 0 0 5px var(--accent-secondary);
+    box-shadow: 0 0 10px var(--accent-secondary), inset 0 0 5px var(--accent-secondary);
+}
+body.cyber-mode .funky-btn:hover {
+    background: var(--accent-secondary);
+    color: #fff;
+    text-shadow: none;
+}
+
+/* Cyber Mode overrides for Venture */
+body.cyber-mode .venture-showcase {
+    border-color: var(--accent-color);
+    background: rgba(0, 243, 255, 0.05);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+/* Cyber Mode overrides for Header */
+body.cyber-mode header {
+    background: rgba(5, 10, 16, 0.85);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+    border-radius: 16px; /* Ensure rounded corners stay even in cyber mode */
+}
+
+/* Cyber Mode overrides for Hero Box */
+body.cyber-mode .hero-intro-box {
+    border-color: var(--accent-color);
+    background: rgba(0, 243, 255, 0.05);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
