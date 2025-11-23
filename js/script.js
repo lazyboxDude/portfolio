@@ -2,53 +2,91 @@
 const projects = {
     'aphonia': {
         title: 'Aphonia',
-        desc: 'A narrative puzzle game about the erosion of sound and the act of listening. Players accompany Leelo, a mute being with an extraordinary sensitivity to what others no longer notice.',
-        content: '<div style="padding:20px; text-align:center;"><h3>Aphonia</h3><p>Currently in development by Moonflux Interactive.</p><a href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" target="_blank" style="color:#00d2ff;">Wishlist on Steam</a></div>'
+        subtitle: 'Narrative Puzzle Game',
+        desc: 'A narrative puzzle game about the erosion of sound and the act of listening. Players accompany Leelo, a mute being with an extraordinary sensitivity to what others no longer notice. Currently in development by Moonflux Interactive.',
+        heroMedia: '<img src="images/portfolio/aphonia_cover.jpg" onerror="this.src=\'https://placehold.co/800x450?text=Aphonia+Game\'" style="width:100%; height:100%; object-fit:cover;">',
+        gallery: [],
+        tools: ['Unity', 'C#', 'Blender'],
+        year: '2025',
+        links: [
+            { text: 'Wishlist on Steam', url: 'https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/' },
+            { text: 'Moonflux Interactive', url: 'https://moonflux-interactive.com' }
+        ]
     },
     'dolphinrush': {
         title: 'Dolphin Rush',
+        subtitle: 'Educational Game',
         desc: 'Created for Whale and Dolphin Conservation. An interactive experience raising awareness for marine life preservation.',
-        content: '<div style="padding:20px; text-align:center;"><h3>Dolphin Rush</h3><p>A game created for the Whale and Dolphin Conservation.</p><a href="https://moonflux-interactive.com" target="_blank" style="color:#00d2ff;">Learn More</a></div>'
+        heroMedia: '<img src="images/portfolio/dolphin_cover.jpg" onerror="this.src=\'https://placehold.co/800x450?text=Dolphin+Rush\'" style="width:100%; height:100%; object-fit:cover;">',
+        tools: ['Unity', 'C#'],
+        year: '2023',
+        links: [
+            { text: 'Play Game', url: 'https://moonflux-interactive.com' }
+        ]
     },
     'bf': {
         title: 'BF',
-        desc: '3D Composition',
-        content: '<img src="images/portfolio/BF.png" alt="BF" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: '3D Composition',
+        desc: 'A study in abstract form and lighting. This piece explores the relationship between organic shapes and synthetic materials.',
+        heroMedia: '<img src="images/portfolio/BF.png" alt="BF" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Blender', 'Cycles'],
+        year: '2024'
     },
     'fbdnl': {
         title: 'FBDNL',
-        desc: 'Digital Art',
-        content: '<img src="images/portfolio/FBDNL.png" alt="FBDNL" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Digital Art',
+        desc: 'Digital art composition focusing on color theory and mood.',
+        heroMedia: '<img src="images/portfolio/FBDNL.png" alt="FBDNL" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Photoshop'],
+        year: '2023'
     },
     'fridom': {
         title: 'Fridom',
-        desc: 'Concept Art',
-        content: '<img src="images/portfolio/Fridom.png" alt="Fridom" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Concept Art',
+        desc: 'Character concept art exploring futuristic fashion and cybernetic enhancements.',
+        heroMedia: '<img src="images/portfolio/Fridom.png" alt="Fridom" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Photoshop', 'Midjourney'],
+        year: '2023'
     },
     'fys02': {
         title: 'FYS 02',
-        desc: 'Abstract Design',
-        content: '<img src="images/portfolio/fys02.png" alt="FYS 02" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Abstract Design',
+        desc: 'Abstract geometric design.',
+        heroMedia: '<img src="images/portfolio/fys02.png" alt="FYS 02" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Illustrator'],
+        year: '2023'
     },
     'gone': {
         title: 'Gone',
-        desc: 'Atmospheric Render',
-        content: '<img src="images/portfolio/Gone.png" alt="Gone" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Atmospheric Render',
+        desc: 'An atmospheric scene depicting isolation and vastness.',
+        heroMedia: '<img src="images/portfolio/Gone.png" alt="Gone" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Blender'],
+        year: '2024'
     },
     'sunshine': {
         title: 'Sunshine',
-        desc: 'Lighting Study',
-        content: '<img src="images/portfolio/Sunshine.png" alt="Sunshine" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Lighting Study',
+        desc: 'A study of natural lighting and volumetric fog effects.',
+        heroMedia: '<img src="images/portfolio/Sunshine.png" alt="Sunshine" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Unreal Engine 5'],
+        year: '2024'
     },
     'thoughts': {
         title: 'Thoughts',
-        desc: 'Surreal Composition',
-        content: '<img src="images/portfolio/Thoughts.png" alt="Thoughts" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Surreal Composition',
+        desc: 'Surrealist composition exploring the visualization of thought processes.',
+        heroMedia: '<img src="images/portfolio/Thoughts.png" alt="Thoughts" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Blender', 'Photoshop'],
+        year: '2024'
     },
     'underthebridge': {
         title: 'Under The Bridge',
-        desc: 'Environment Art',
-        content: '<img src="images/portfolio/UnderTheBridge.png" alt="Under The Bridge" style="width:100%; height:100%; object-fit:contain;">'
+        subtitle: 'Environment Art',
+        desc: 'Detailed environment art piece focusing on urban decay and texture work.',
+        heroMedia: '<img src="images/portfolio/UnderTheBridge.png" alt="Under The Bridge" style="width:100%; height:100%; object-fit:contain;">',
+        tools: ['Maya', 'Substance Painter'],
+        year: '2024'
     }
 };
 
@@ -57,9 +95,63 @@ function openModal(projectId) {
     const data = projects[projectId];
     
     if(data) {
+        // Text Content
         document.getElementById('modal-title').innerText = data.title;
+        document.getElementById('modal-subtitle').innerText = data.subtitle || '';
         document.getElementById('modal-desc').innerText = data.desc;
-        document.getElementById('modal-img').innerHTML = data.content; 
+        
+        // Media
+        document.getElementById('modal-main-media').innerHTML = data.heroMedia;
+        
+        // Meta (Tools & Year)
+        const metaContainer = document.getElementById('modal-meta');
+        metaContainer.innerHTML = '';
+        
+        if (data.year) {
+            const yearSpan = document.createElement('span');
+            yearSpan.className = 'meta-year';
+            yearSpan.innerText = data.year;
+            metaContainer.appendChild(yearSpan);
+        }
+
+        if (data.tools && data.tools.length > 0) {
+            data.tools.forEach(tool => {
+                const tag = document.createElement('span');
+                tag.className = 'meta-tag';
+                tag.innerText = tool;
+                metaContainer.appendChild(tag);
+            });
+        }
+
+        // Links
+        const linksContainer = document.getElementById('modal-links');
+        linksContainer.innerHTML = '';
+        if (data.links && data.links.length > 0) {
+            data.links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.target = '_blank';
+                a.className = 'modal-link-btn';
+                a.innerHTML = `${link.text} <i class="fas fa-external-link-alt"></i>`;
+                linksContainer.appendChild(a);
+            });
+        }
+
+        // Gallery (Optional)
+        const galleryStrip = document.getElementById('modal-gallery-strip');
+        galleryStrip.innerHTML = '';
+        if (data.gallery && data.gallery.length > 0) {
+            data.gallery.forEach(imgSrc => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.className = 'gallery-thumb';
+                img.onclick = () => {
+                    document.getElementById('modal-main-media').innerHTML = `<img src="${imgSrc}" style="width:100%; height:100%; object-fit:contain;">`;
+                };
+                galleryStrip.appendChild(img);
+            });
+        }
+
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; 
     }
@@ -178,7 +270,7 @@ function toggleCyberMode() {
     
     if (isCyber) {
         btn.innerText = "EXIT THE VOID";
-        const targets = document.querySelectorAll('h1, h2, h3, .logo, nav a');
+        const targets = document.querySelectorAll('h1, h2, h3, .logo span, nav a span');
         targets.forEach(el => scrambleText(el));
     } else {
         btn.innerText = "ENTER THE VOID";
@@ -211,4 +303,36 @@ function closeMobileMenu() {
         hamburger.classList.remove('fa-times');
         hamburger.classList.add('fa-bars');
     }
+}
+
+// --- GALLERY FILTERING ---
+function filterGallery(category) {
+    const cards = document.querySelectorAll('.card');
+    const buttons = document.querySelectorAll('.tab-btn');
+    
+    // Update Active Button
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText.toLowerCase().includes(category === 'all' ? 'all' : (category === 'games' ? 'interactive' : '3d'))) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Filter Cards
+    cards.forEach(card => {
+        // Reset animation
+        card.classList.remove('fade-in');
+        
+        if (category === 'all') {
+            card.classList.remove('hidden');
+            setTimeout(() => card.classList.add('fade-in'), 50);
+        } else {
+            if (card.classList.contains(`category-${category}`)) {
+                card.classList.remove('hidden');
+                setTimeout(() => card.classList.add('fade-in'), 50);
+            } else {
+                card.classList.add('hidden');
+            }
+        }
+    });
 }

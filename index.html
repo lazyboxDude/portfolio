@@ -33,15 +33,15 @@
 
 <!-- Navigation -->
 <header>
-    <div class="logo" data-text="Lazybox">Lazy<span>box</span></div>
+    <div class="logo"><span data-text="Lazy">Lazy</span><span data-text="box">box</span></div>
     <div class="hamburger-menu" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
     </div>
     <nav id="main-nav">
-        <a href="#about" data-text="About" onclick="closeMobileMenu()"><i class="fas fa-user"></i> About</a>
-        <a href="#work" data-text="Work" onclick="closeMobileMenu()"><i class="fas fa-briefcase"></i> Work</a>
-        <a href="#b2b" data-text="Services" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> Services</a>
-        <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" data-text="Resume" class="resume-link" onclick="closeMobileMenu()"><i class="fas fa-file-download"></i> Resume</a>
+        <a href="#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="About">About</span></a>
+        <a href="#work" onclick="closeMobileMenu()"><i class="fas fa-briefcase"></i> <span data-text="Work">Work</span></a>
+        <a href="#b2b" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
+        <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="resume-link" onclick="closeMobileMenu()"><i class="fas fa-file-download"></i> <span data-text="Resume">Resume</span></a>
         <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
     </nav>
 </header>
@@ -79,142 +79,148 @@
 <!-- Portfolio Grid -->
 <section id="work">
     <h2 style="margin-bottom: 2rem;" data-text="Selected Works">Selected Works</h2>
-    <div class="gallery-grid">
-        <!-- Aphonia -->
-        <div class="card" onclick="openModal('aphonia')" style="border: 1px solid var(--accent-color);">
-            <div class="placeholder-3d" style="background: #111;">
-                <span style="font-size: 1.5rem; color: var(--accent-color);">APHONIA</span>
-            </div>
-            <div class="info">
-                <h3 data-text="Aphonia">Aphonia</h3>
-                <p>Narrative Puzzle Game</p>
-                <div class="card-tags">
-                    <span class="card-tag unity">Made with Unity</span>
+    
+    <div class="gallery-container-box">
+        <!-- Gallery Tabs -->
+        <div class="gallery-tabs">
+            <button class="tab-btn active" onclick="filterGallery('all')">All</button>
+            <button class="tab-btn" onclick="filterGallery('games')">Interactive / Games</button>
+            <button class="tab-btn" onclick="filterGallery('art')">3D Art & Design</button>
+        </div>
+
+        <div class="gallery-grid">
+            <!-- Aphonia (Game) -->
+            <div class="card category-games" onclick="openModal('aphonia')" style="border: 1px solid var(--accent-color);">
+                <div class="placeholder-3d" style="background: #111;">
+                    <span style="font-size: 1.5rem; color: var(--accent-color);">APHONIA</span>
+                </div>
+                <div class="info">
+                    <h3 data-text="Aphonia">Aphonia</h3>
+                    <p>Narrative Puzzle Game</p>
+                    <div class="card-tags">
+                        <span class="card-tag unity">Made with Unity</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Dolphin Rush -->
-        <div class="card" onclick="openModal('dolphinrush')" style="border: 1px solid var(--accent-color);">
-            <div class="placeholder-3d" style="background: #111;">
-                <span style="font-size: 1.5rem; color: var(--accent-color);">DOLPHIN RUSH</span>
-            </div>
-            <div class="info">
-                <h3 data-text="Dolphin Rush">Dolphin Rush</h3>
-                <p>Conservation Game</p>
-                <div class="card-tags">
-                    <span class="card-tag unity">Made with Unity</span>
+            <!-- Dolphin Rush (Game) -->
+            <div class="card category-games" onclick="openModal('dolphinrush')" style="border: 1px solid var(--accent-color);">
+                <div class="placeholder-3d" style="background: #111;">
+                    <span style="font-size: 1.5rem; color: var(--accent-color);">DOLPHIN RUSH</span>
+                </div>
+                <div class="info">
+                    <h3 data-text="Dolphin Rush">Dolphin Rush</h3>
+                    <p>Conservation Game</p>
+                    <div class="card-tags">
+                        <span class="card-tag unity">Made with Unity</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- BF -->
-        <div class="card" onclick="openModal('bf')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/BF.png" alt="BF" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="BF">BF</h3>
-                <p>3D Composition</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- BF (Art) -->
+            <div class="card category-art" onclick="openModal('bf')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/BF.png" alt="BF" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="BF">BF</h3>
+                    <p>3D Composition</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Blender</span>
+                        <span class="card-tag">Cycles</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- FBDNL -->
-        <div class="card" onclick="openModal('fbdnl')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/FBDNL.png" alt="FBDNL" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="FBDNL">FBDNL</h3>
-                <p>Digital Art</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- FBDNL (Art) -->
+            <div class="card category-art" onclick="openModal('fbdnl')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/FBDNL.png" alt="FBDNL" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="FBDNL">FBDNL</h3>
+                    <p>Digital Art</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Photoshop</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Fridom -->
-        <div class="card" onclick="openModal('fridom')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/Fridom.png" alt="Fridom" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="Fridom">Fridom</h3>
-                <p>Concept Art</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- Fridom (Art) -->
+            <div class="card category-art" onclick="openModal('fridom')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/Fridom.png" alt="Fridom" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="Fridom">Fridom</h3>
+                    <p>Concept Art</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Photoshop</span>
+                        <span class="card-tag">Midjourney</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- FYS 02 -->
-        <div class="card" onclick="openModal('fys02')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/fys02.png" alt="FYS 02" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="FYS 02">FYS 02</h3>
-                <p>Abstract Design</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- FYS 02 (Art) -->
+            <div class="card category-art" onclick="openModal('fys02')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/fys02.png" alt="FYS 02" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="FYS 02">FYS 02</h3>
+                    <p>Abstract Design</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Illustrator</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Gone -->
-        <div class="card" onclick="openModal('gone')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/Gone.png" alt="Gone" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="Gone">Gone</h3>
-                <p>Atmospheric Render</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- Gone (Art) -->
+            <div class="card category-art" onclick="openModal('gone')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/Gone.png" alt="Gone" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="Gone">Gone</h3>
+                    <p>Atmospheric Render</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Blender</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Sunshine -->
-        <div class="card" onclick="openModal('sunshine')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/Sunshine.png" alt="Sunshine" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="Sunshine">Sunshine</h3>
-                <p>Lighting Study</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- Sunshine (Art) -->
+            <div class="card category-art" onclick="openModal('sunshine')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/Sunshine.png" alt="Sunshine" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="Sunshine">Sunshine</h3>
+                    <p>Lighting Study</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Unreal Engine 5</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Thoughts -->
-        <div class="card" onclick="openModal('thoughts')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/Thoughts.png" alt="Thoughts" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="Thoughts">Thoughts</h3>
-                <p>Surreal Composition</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- Thoughts (Art) -->
+            <div class="card category-art" onclick="openModal('thoughts')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/Thoughts.png" alt="Thoughts" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="Thoughts">Thoughts</h3>
+                    <p>Surreal Composition</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Blender</span>
+                        <span class="card-tag">Photoshop</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Under The Bridge -->
-        <div class="card" onclick="openModal('underthebridge')">
-            <div class="placeholder-3d">
-                <img src="images/portfolio/UnderTheBridge.png" alt="Under The Bridge" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <div class="info">
-                <h3 data-text="Under The Bridge">Under The Bridge</h3>
-                <p>Environment Art</p>
-                <div class="card-tags">
-                    <span class="card-tag">Maya</span>
-                    <span class="card-tag">Substance Painter</span>
+            <!-- Under The Bridge (Art) -->
+            <div class="card category-art" onclick="openModal('underthebridge')">
+                <div class="placeholder-3d">
+                    <img src="images/portfolio/UnderTheBridge.png" alt="Under The Bridge" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="info">
+                    <h3 data-text="Under The Bridge">Under The Bridge</h3>
+                    <p>Environment Art</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Maya</span>
+                        <span class="card-tag">Substance Painter</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -254,12 +260,39 @@
 
 <!-- Modal Structure -->
 <div id="project-modal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-content">
+    <div class="modal-content modern-modal">
         <span class="close-btn" onclick="closeModal(event)">&times;</span>
-        <div class="modal-image" id="modal-img">[ Interactive 3D Viewer or Video Here ]</div>
-        <div class="modal-body">
-            <h2 id="modal-title">Project Title</h2>
-            <p id="modal-desc">Project description goes here.</p>
+        
+        <div class="modal-grid">
+            <!-- Media Section -->
+            <div class="modal-media-section">
+                <div class="modal-main-media" id="modal-main-media">
+                    <!-- Main Image/Video injected here -->
+                </div>
+                <div class="modal-gallery-strip" id="modal-gallery-strip">
+                    <!-- Thumbnails injected here -->
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="modal-info-section">
+                <div class="modal-header">
+                    <h2 id="modal-title">Project Title</h2>
+                    <span id="modal-subtitle" class="modal-subtitle">Subtitle</span>
+                </div>
+                
+                <div class="modal-meta" id="modal-meta">
+                    <!-- Tools/Year injected here -->
+                </div>
+
+                <div class="modal-description">
+                    <div id="modal-desc">Description</div>
+                </div>
+                
+                <div class="modal-links" id="modal-links">
+                    <!-- Links injected here -->
+                </div>
+            </div>
         </div>
     </div>
 </div>
