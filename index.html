@@ -57,9 +57,14 @@
                 <span class="role-badge">Co-Founder & Game Designer</span>
                 <h3>Moonflux Interactive</h3>
                 <p>Co-founding Moonflux Interactive, an indie game studio dedicated to narrative-driven experiences. Currently developing our debut title <em>Aphonia</em>.</p>
-                <a href="https://moonflux-interactive.com" target="_blank" class="live-link-btn">
-                    <span class="status-dot"></span> moonflux-interactive.com
-                </a>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                    <a href="https://moonflux-interactive.com" target="_blank" class="live-link-btn">
+                        <span class="status-dot"></span> moonflux-interactive.com
+                    </a>
+                    <a href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" target="_blank" class="live-link-btn" style="border-color: #66c0f4; color: #66c0f4;">
+                        <i class="fab fa-steam"></i> Wishlist on Steam
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -191,16 +196,19 @@
 <section id="work">
     <div class="content-box">
         <div style="text-align: left; margin-bottom: 2rem;">
-            <span class="role-badge"><i class="fas fa-cubes"></i> Portfolio</span>
-            <h2 style="margin: 0.5rem 0 0 0;" data-text="Selected Works">Selected Works</h2>
+            <span class="role-badge"><i class="fas fa-cubes"></i> Projects</span>
+            <h2 style="margin: 0.5rem 0 0 0;" data-text="Portfolio">Portfolio</h2>
         </div>
         
-        <!-- Gallery Tabs -->
-        <div class="gallery-tabs">
-            <button class="tab-btn active" onclick="filterGallery('all')">All</button>
-            <button class="tab-btn" onclick="filterGallery('games')">Interactive / Games</button>
-            <button class="tab-btn" onclick="filterGallery('art')">3D Art & Design</button>
-            <button class="tab-btn" onclick="filterGallery('videos')">Videos</button>
+        <!-- Gallery Filter -->
+        <div class="gallery-filter-container" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: #fff; font-family: 'Space Mono', monospace; text-transform: uppercase;">Selected Works</h3>
+            <div class="gallery-tabs" style="margin-bottom: 0;">
+                <button class="tab-btn active" onclick="filterGallery('all')">All</button>
+                <button class="tab-btn" onclick="filterGallery('games')">Interactive / Games</button>
+                <button class="tab-btn" onclick="filterGallery('art')">3D Art & Design</button>
+                <button class="tab-btn" onclick="filterGallery('videos')">Videos</button>
+            </div>
         </div>
 
         <div class="gallery-grid">
@@ -360,7 +368,7 @@
 <section id="b2b" class="b2b">
     <div class="content-box">
         <div style="text-align: left; margin-bottom: 2rem;">
-            <span class="role-badge"><i class="fas fa-handshake"></i> Services</span>
+            <span class="role-badge"><i class="fas fa-handshake"></i> B2B Solutions</span>
             <h2 style="margin: 0.5rem 0 0 0;" data-text="Services">Services</h2>
         </div>
         <p style="color: #ccc; margin-top: 10px; margin-bottom: 3rem;">From technical game development to creative education and artwork. Explore the different ways we can work together.</p>
@@ -414,6 +422,19 @@
 <!-- Contact Section Removed -->
 
 <!-- Contact Section Removed (Moved to Modal) -->
+
+<!-- Final CTA Section -->
+<section id="final-cta" style="text-align: center; padding: 4rem 0;">
+    <h2 style="margin-bottom: 2rem; font-size: 2rem;">Ready to Collaborate?</h2>
+    <div class="cta-group" style="justify-content: center;">
+        <a href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" target="_blank" class="cta-btn steam-btn">
+            <i class="fab fa-steam"></i> Wishlist Aphonia
+        </a>
+        <button onclick="openContactModal()" class="cta-btn outline-btn">
+            <i class="fas fa-terminal"></i> Initialize Contact
+        </button>
+    </div>
+</section>
 
 <footer>
     <p>&copy; 2025 Lazybox. All rights reserved.</p>
@@ -486,7 +507,7 @@
             <div class="term-line term-gray">Establishing secure connection... <span class="term-green">Done.</span></div>
             <div class="term-line term-gray">Target: <span class="term-blue">Micael G. Fernandes</span></div>
             
-            <form action="https://formsubmit.co/micael@gomes-fernandes.ch" method="POST" class="terminal-form">
+            <form id="secure-contact-form" method="POST" class="terminal-form" onsubmit="handleContactSubmit(event)">
                 <input type="text" name="_honey" style="display:none">
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_next" value="https://lazyboxdude.github.io/portfolio/index.html">

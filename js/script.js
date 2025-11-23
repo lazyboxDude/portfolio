@@ -550,3 +550,31 @@ function maximizeTerminal(e) {
         document.body.style.overflow = 'hidden';
     }
 }
+
+// Secure Form Handling (Obfuscation)
+function handleContactSubmit(e) {
+    e.preventDefault(); // Stop default submission
+    
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+    
+    // Visual Feedback
+    const originalText = btn.innerText;
+    btn.innerText = "> ENCRYPTING_DATA...";
+    btn.style.opacity = "0.7";
+    
+    // Reconstruct Email (Split to hide from simple scrapers)
+    const part1 = 'micael';
+    const part2 = 'gomes-fernandes';
+    const part3 = 'ch';
+    const target = `${part1}@${part2}.${part3}`;
+    
+    // Set the action dynamically
+    form.action = `https://formsubmit.co/${target}`;
+    
+    // Submit after a short "processing" delay for effect
+    setTimeout(() => {
+        btn.innerText = "> TRANSMITTING...";
+        form.submit();
+    }, 1000);
+}
