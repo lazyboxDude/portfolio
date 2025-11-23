@@ -38,59 +38,144 @@
         <i class="fas fa-bars"></i>
     </div>
     <nav id="main-nav">
-        <a href="#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="About">About</span></a>
-        <a href="#work" onclick="closeMobileMenu()"><i class="fas fa-briefcase"></i> <span data-text="Work">Work</span></a>
+        <a href="#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
+        <a href="#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
         <a href="#b2b" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
         <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="resume-link" onclick="closeMobileMenu()"><i class="fas fa-file-download"></i> <span data-text="Resume">Resume</span></a>
         <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
     </nav>
 </header>
 
+<main>
 <!-- Hero / About Section -->
 <section id="about" class="hero">
-    <div class="hero-intro-box">
-        <span class="role-badge">Who I am</span>
-        <h1 data-text="Forging Digital Worlds">Forging Digital Worlds</h1>
-        <p>3D Generalist & Game Developer. Crafting immersive real-time experiences and high-fidelity assets for the next generation of interactive entertainment.</p>
-        
-        <div class="social-links">
+    <div class="content-box">
+        <div class="hero-intro">
+            <span class="role-badge"><i class="fas fa-user"></i> Who I am</span>
+            <h1 data-text="Forging Digital Worlds">Forging Digital Worlds</h1>
+            <p>3D Generalist & Game Developer. Crafting immersive real-time experiences and high-fidelity assets for the next generation of interactive entertainment.</p>
+        </div>
+
+        <div class="venture-showcase">
+            <div class="venture-info">
+                <span class="role-badge">Co-Founder & Game Lead</span>
+                <h3>Moonflux Interactive</h3>
+                <p>Co-founding Moonflux Interactive, an indie game studio dedicated to narrative-driven experiences. Currently developing our debut title <em>Aphonia</em>.</p>
+                <a href="https://moonflux-interactive.com" target="_blank" class="live-link-btn">
+                    <span class="status-dot"></span> moonflux-interactive.com
+                </a>
+            </div>
+        </div>
+
+        <div class="social-links" style="justify-content: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #333;">
             <!-- Links are now loaded from js/socials.js -->
         </div>
     </div>
-    <div class="venture-showcase">
-        <div class="venture-info">
-            <span class="role-badge">Co-Founder & Game Lead</span>
-            <h3>Moonflux Interactive</h3>
-            <p>Co-founding Moonflux Interactive, an indie game studio dedicated to narrative-driven experiences. Currently developing our debut title <em>Aphonia</em>.</p>
-            <a href="https://moonflux-interactive.com" target="_blank" class="live-link-btn">
-                <span class="status-dot"></span> moonflux-interactive.com
-            </a>
-        </div>
-    </div>
+</section>
 
-    <div class="skills">
-        <span class="skill-tag">Blender</span>
-        <span class="skill-tag">Unreal Engine 5</span>
-        <span class="skill-tag">Substance Painter</span>
-        <span class="skill-tag">ZBrush</span>
+<!-- Skills Section -->
+<section id="skills">
+    <div class="content-box">
+        <div style="text-align: left; margin-bottom: 2rem;">
+            <span class="role-badge"><i class="fas fa-tools"></i> Arsenal</span>
+            <h2 style="margin: 0.5rem 0 0 0;" data-text="Skills & Tools">Skills & Tools</h2>
+        </div>
+        
+        <div class="skills-grid">
+            <!-- Game Engines -->
+            <div class="skill-category">
+                <h3><i class="fas fa-gamepad"></i> Game Engines</h3>
+                <div class="skill-list">
+                    <div class="skill-item">
+                        <span class="skill-name">Unity</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Unreal Engine 5</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D & Art -->
+            <div class="skill-category">
+                <h3><i class="fas fa-cube"></i> 3D & Art</h3>
+                <div class="skill-list">
+                    <div class="skill-item">
+                        <span class="skill-name">Blender</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 95%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">ZBrush</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 80%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Substance Painter</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Maya</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 75%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programming -->
+            <div class="skill-category">
+                <h3><i class="fas fa-code"></i> Programming</h3>
+                <div class="skill-list">
+                    <div class="skill-item">
+                        <span class="skill-name">C#</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Blueprints</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creative Suite -->
+            <div class="skill-category">
+                <h3><i class="fas fa-pen-nib"></i> Creative Suite</h3>
+                <div class="skill-list">
+                    <div class="skill-item">
+                        <span class="skill-name">Photoshop</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Premiere Pro</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 80%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Illustrator</span>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 70%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- Portfolio Grid -->
 <section id="work">
-    <h2 style="margin-bottom: 2rem;" data-text="Selected Works">Selected Works</h2>
-    
-    <div class="gallery-container-box">
+    <div class="content-box">
+        <div style="text-align: left; margin-bottom: 2rem;">
+            <span class="role-badge"><i class="fas fa-cubes"></i> Portfolio</span>
+            <h2 style="margin: 0.5rem 0 0 0;" data-text="Selected Works">Selected Works</h2>
+        </div>
+        
         <!-- Gallery Tabs -->
         <div class="gallery-tabs">
             <button class="tab-btn active" onclick="filterGallery('all')">All</button>
             <button class="tab-btn" onclick="filterGallery('games')">Interactive / Games</button>
             <button class="tab-btn" onclick="filterGallery('art')">3D Art & Design</button>
+            <button class="tab-btn" onclick="filterGallery('videos')">Videos</button>
         </div>
 
         <div class="gallery-grid">
             <!-- Aphonia (Game) -->
-            <div class="card category-games" onclick="openModal('aphonia')" style="border: 1px solid var(--accent-color);">
+            <div class="card category-games category-videos" onclick="openModal('aphonia')" style="border: 1px solid var(--accent-color);">
                 <div class="placeholder-3d" style="background: #111;">
                     <span style="font-size: 1.5rem; color: var(--accent-color);">APHONIA</span>
                 </div>
@@ -223,35 +308,61 @@
                     </div>
                 </div>
             </div>
+            <!-- YouTube Channel (Video) -->
+            <div class="card category-videos" onclick="openModal('youtube_channel')">
+                <div class="placeholder-3d" style="background: #111; display: flex; align-items: center; justify-content: center;">
+                    <i class="fab fa-youtube" style="font-size: 4rem; color: #FF0000;"></i>
+                </div>
+                <div class="info">
+                    <h3 data-text="YouTube Channel">YouTube Channel</h3>
+                    <p>Devlogs & Tutorials</p>
+                    <div class="card-tags">
+                        <span class="card-tag">Video Editing</span>
+                        <span class="card-tag">Premiere Pro</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- B2B / Services Section -->
 <section id="b2b" class="b2b">
-    <h2 data-text="Game Development Services">Game Development Services</h2>
-    <p style="color: #ccc; margin-top: 10px;">Looking for assets for your game or technical expertise for your studio? I offer tailored B2B services.</p>
-    <div class="services-list">
-        <div class="service-item">
-            <h3 data-text="Asset Creation">Asset Creation</h3>
-            <p>High-quality, optimized 3D assets ready for game engines (Unity/Unreal) or AR/VR applications.</p>
+    <div class="content-box">
+        <div style="text-align: left; margin-bottom: 2rem;">
+            <span class="role-badge"><i class="fas fa-handshake"></i> Services</span>
+            <h2 style="margin: 0.5rem 0 0 0;" data-text="Game Development Services">Game Development Services</h2>
         </div>
-        <div class="service-item">
-            <h3 data-text="Level Design & Lighting">Level Design & Lighting</h3>
-            <p>Creating atmospheric game worlds with a focus on environmental storytelling and performance.</p>
-        </div>
-        <div class="service-item">
-            <h3 data-text="Technical Art">Technical Art</h3>
-            <p>Optimization, shader creation, and pipeline tools to ensure your game runs as good as it looks.</p>
+        <p style="color: #ccc; margin-top: 10px; margin-bottom: 2rem;">Looking for assets for your game or technical expertise for your studio? I offer tailored B2B services.</p>
+        <div class="services-list">
+            <div class="service-item">
+                <h3 data-text="Asset Creation">Asset Creation</h3>
+                <p>High-quality, optimized 3D assets ready for game engines (Unity/Unreal) or AR/VR applications.</p>
+            </div>
+            <div class="service-item">
+                <h3 data-text="Level Design & Lighting">Level Design & Lighting</h3>
+                <p>Creating atmospheric game worlds with a focus on environmental storytelling and performance.</p>
+            </div>
+            <div class="service-item">
+                <h3 data-text="Technical Art">Technical Art</h3>
+                <p>Optimization, shader creation, and pipeline tools to ensure your game runs as good as it looks.</p>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Contact / Footer -->
-<section id="contact" style="text-align: center;">
-    <h2 data-text="Let's Build Something">Let's Build Something</h2>
-    <p>Available for freelance and contract work.</p>
-    <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="contact-btn">Get in Touch</a>
+<section id="contact">
+    <div class="content-box" style="max-width: 600px; margin: 0 auto;">
+        <div style="text-align: left; margin-bottom: 2rem;">
+            <span class="role-badge"><i class="fas fa-envelope"></i> Contact</span>
+            <h2 style="margin: 0.5rem 0 0 0;" data-text="Let's Build Something">Let's Build Something</h2>
+        </div>
+        <p style="margin-bottom: 2rem; text-align: left;">Available for freelance and contract work.</p>
+        <div style="text-align: left;">
+            <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="contact-btn">Get in Touch</a>
+        </div>
+    </div>
 </section>
 
 <footer>
@@ -259,6 +370,8 @@
 </footer>
 
 <!-- Modal Structure -->
+</main>
+
 <div id="project-modal" class="modal-overlay" onclick="closeModal(event)">
     <div class="modal-content modern-modal">
         <span class="close-btn" onclick="closeModal(event)">&times;</span>

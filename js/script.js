@@ -223,9 +223,11 @@ function filterGallery(category) {
     // Update Active Button
     buttons.forEach(btn => {
         btn.classList.remove('active');
-        if (btn.innerText.toLowerCase().includes(category === 'all' ? 'all' : (category === 'games' ? 'interactive' : '3d'))) {
-            btn.classList.add('active');
-        }
+        const btnText = btn.innerText.toLowerCase();
+        if (category === 'all' && btnText.includes('all')) btn.classList.add('active');
+        else if (category === 'games' && btnText.includes('interactive')) btn.classList.add('active');
+        else if (category === 'art' && btnText.includes('3d')) btn.classList.add('active');
+        else if (category === 'videos' && btnText.includes('videos')) btn.classList.add('active');
     });
 
     // Filter Cards

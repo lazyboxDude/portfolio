@@ -4,7 +4,7 @@ const projects = {
         title: 'Aphonia',
         subtitle: 'Narrative Puzzle Game',
         desc: 'A narrative puzzle game about the erosion of sound and the act of listening. Players accompany Leelo, a mute being with an extraordinary sensitivity to what others no longer notice. Currently in development by Moonflux Interactive.',
-        heroMedia: '<img src="images/portfolio/aphonia_cover.jpg" onerror="this.src=\'https://placehold.co/800x450?text=Aphonia+Game\'" style="width:100%; height:100%; object-fit:cover;">',
+        heroMedia: '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE" title="Aphonia Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
         gallery: [],
         tools: ['Unity', 'C#', 'Blender'],
         year: '2025',
@@ -87,5 +87,16 @@ const projects = {
         heroMedia: '<img src="images/portfolio/UnderTheBridge.png" alt="Under The Bridge" style="width:100%; height:100%; object-fit:contain;">',
         tools: ['Maya', 'Substance Painter'],
         year: '2024'
+    },
+    'youtube_channel': {
+        title: 'YouTube Channel',
+        subtitle: 'Devlogs & Tutorials',
+        desc: 'Check out my latest game development logs, tutorials, and project showcases on YouTube.',
+        heroMedia: '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/videoseries?list=YOUR_PLAYLIST_ID" title="YouTube Channel" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
+        tools: ['Video Editing', 'Premiere Pro'],
+        year: 'Ongoing',
+        links: [
+            { text: 'Visit Channel', url: 'https://www.youtube.com/@YourChannelHandle' }
+        ]
     }
 };

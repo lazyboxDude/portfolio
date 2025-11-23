@@ -47,24 +47,46 @@ body.cyber-mode .contact-btn {
 
 body.cyber-mode .logo span { color: var(--accent-secondary); text-shadow: 0 0 5px var(--accent-secondary), 0 0 15px var(--accent-secondary); }
 
-body.cyber-mode .hero { background: transparent; border-bottom: 1px solid var(--accent-color); box-shadow: 0 0 30px rgba(0, 243, 255, 0.1); }
+body.cyber-mode .hero { background: transparent; border: none; box-shadow: none; }
 body.cyber-mode .hero h1 { color: var(--accent-color); }
 
-/* Fix Icons in Cyber Mode */
-body.cyber-mode nav a i,
-body.cyber-mode .resume-link i {
+/* Fix Icons in Cyber Mode - Global Override */
+body.cyber-mode .fas,
+body.cyber-mode .fa-solid {
     font-family: "Font Awesome 6 Free", "FontAwesome", sans-serif !important;
     font-weight: 900 !important;
+}
+
+body.cyber-mode .fab,
+body.cyber-mode .fa-brands {
+    font-family: "Font Awesome 6 Brands", "FontAwesome", sans-serif !important;
+    font-weight: 400 !important;
+}
+
+body.cyber-mode .far,
+body.cyber-mode .fa-regular {
+    font-family: "Font Awesome 6 Free", "FontAwesome", sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Common Icon Styles for Cyber Mode */
+body.cyber-mode i {
     font-style: normal;
     font-variant: normal;
     text-rendering: auto;
     line-height: 1;
     letter-spacing: normal;
     text-transform: none;
-    margin-right: 5px;
     color: var(--accent-color);
     text-shadow: 0 0 8px var(--accent-color);
     -webkit-font-smoothing: antialiased;
+    margin-right: 5px; /* Default spacing */
+}
+
+/* Remove margin for icons that are alone or centered */
+body.cyber-mode .social-btn i,
+body.cyber-mode .hamburger-menu i {
+    margin-right: 0;
 }
 
 body.cyber-mode .skill-tag { 
@@ -96,8 +118,23 @@ body.cyber-mode .card::before {
     text-shadow: 0 0 5px var(--accent-secondary);
 }
 
+/* Content Box Cyber Style */
+body.cyber-mode .content-box {
+    border-radius: 0;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+    background: rgba(5, 10, 15, 0.7);
+    clip-path: polygon(
+        0 0, 
+        100% 0, 
+        100% calc(100% - 20px), 
+        calc(100% - 20px) 100%, 
+        0 100%
+    );
+}
+
 /* B2B Section */
-body.cyber-mode .b2b { background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 0; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+body.cyber-mode .b2b { background: transparent; border: none; box-shadow: none; }
 body.cyber-mode .service-item { border-left: 3px solid var(--accent-secondary); background: rgba(255, 255, 255, 0.02); }
 body.cyber-mode .service-item:hover { background: rgba(255, 0, 85, 0.05); box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.1); }
 
@@ -147,4 +184,24 @@ body.cyber-mode .hero-intro-box {
     border-color: var(--accent-color);
     background: rgba(0, 243, 255, 0.05);
     box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+/* Ensure Role Badges use Space Mono in Cyber Mode */
+body.cyber-mode .role-badge {
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid var(--accent-color);
+    background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 5px var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Explicitly target icons inside role badges to ensure they don't inherit Space Mono */
+body.cyber-mode .role-badge i {
+    font-family: "Font Awesome 6 Free", "FontAwesome", sans-serif !important;
+    font-weight: 900 !important;
+    margin-right: 8px;
+    color: var(--accent-color);
+    text-shadow: 0 0 8px var(--accent-color);
 }
