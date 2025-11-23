@@ -184,3 +184,31 @@ function toggleCyberMode() {
         btn.innerText = "ENTER THE VOID";
     }
 }
+
+// --- MOBILE MENU ---
+function toggleMobileMenu() {
+    const nav = document.getElementById('main-nav');
+    const hamburger = document.querySelector('.hamburger-menu i');
+    
+    nav.classList.toggle('active');
+    
+    // Toggle icon between bars and times (X)
+    if (nav.classList.contains('active')) {
+        hamburger.classList.remove('fa-bars');
+        hamburger.classList.add('fa-times');
+    } else {
+        hamburger.classList.remove('fa-times');
+        hamburger.classList.add('fa-bars');
+    }
+}
+
+function closeMobileMenu() {
+    const nav = document.getElementById('main-nav');
+    const hamburger = document.querySelector('.hamburger-menu i');
+    
+    if (nav.classList.contains('active')) {
+        nav.classList.remove('active');
+        hamburger.classList.remove('fa-times');
+        hamburger.classList.add('fa-bars');
+    }
+}

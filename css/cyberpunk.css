@@ -50,6 +50,17 @@ body.cyber-mode .logo span { color: var(--accent-secondary); text-shadow: 0 0 5p
 body.cyber-mode .hero { background: transparent; border-bottom: 1px solid var(--accent-color); box-shadow: 0 0 30px rgba(0, 243, 255, 0.1); }
 body.cyber-mode .hero h1 { color: var(--accent-color); }
 
+/* Fix Icons in Cyber Mode */
+body.cyber-mode nav a i,
+body.cyber-mode .resume-link i {
+    font-family: "Font Awesome 6 Free", sans-serif !important;
+    font-weight: 900;
+    letter-spacing: normal;
+    margin-right: 5px;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px var(--accent-color);
+}
+
 body.cyber-mode .skill-tag { 
     border-radius: 0; 
     border: 1px solid var(--accent-color); 

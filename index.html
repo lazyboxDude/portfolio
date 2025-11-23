@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lazybox | Game Art & Development</title>
+    
+    <!-- SEO & Social Media Tags -->
+    <meta name="description" content="3D Generalist & Game Developer. Crafting immersive real-time experiences and high-fidelity assets.">
+    <meta property="og:title" content="Lazybox | Game Art & Development">
+    <meta property="og:description" content="3D Generalist & Game Developer. Crafting immersive real-time experiences.">
+    <meta property="og:image" content="images/portfolio/BF.png"> <!-- Placeholder: Replace with a dedicated social preview image -->
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/icons/favicon.png">
+
     <!-- Load Google Fonts for the effect -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
@@ -22,11 +34,15 @@
 <!-- Navigation -->
 <header>
     <div class="logo" data-text="Lazybox">Lazy<span>box</span></div>
-    <nav>
-        <a href="#about" data-text="About">About</a>
-        <a href="#work" data-text="Work">Work</a>
-        <a href="#b2b" data-text="Services">Services</a>
-        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode()">ENTER THE VOID</button>
+    <div class="hamburger-menu" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <nav id="main-nav">
+        <a href="#about" data-text="About" onclick="closeMobileMenu()"><i class="fas fa-user"></i> About</a>
+        <a href="#work" data-text="Work" onclick="closeMobileMenu()"><i class="fas fa-briefcase"></i> Work</a>
+        <a href="#b2b" data-text="Services" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> Services</a>
+        <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" data-text="Resume" class="resume-link" onclick="closeMobileMenu()"><i class="fas fa-file-download"></i> Resume</a>
+        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
     </nav>
 </header>
 
