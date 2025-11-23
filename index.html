@@ -3,56 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Artist Portfolio</title>
+    <title>Lazybox Studio | 3D Artist & Design</title>
     <style>
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #f0f0f0; }
-        header { padding: 2rem; text-align: center; background: #252525; }
-        h1 { margin: 0; font-size: 2.5rem; color: #00d2ff; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; padding: 2rem; max-width: 1200px; margin: 0 auto; }
-        .card { background: #333; border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .placeholder-3d { height: 200px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; }
-        .info { padding: 1rem; }
-        .contact { text-align: center; padding: 4rem 1rem; background: #222; }
-        button { background: #00d2ff; border: none; padding: 10px 20px; color: #000; font-weight: bold; cursor: pointer; }
+        /* Base Styles */
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #f0f0f0; line-height: 1.6; }
+        a { color: #00d2ff; text-decoration: none; }
+        section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        header { background: #252525; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; }
+        .logo span { color: #00d2ff; }
+        nav a { margin-left: 20px; color: #ccc; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #00d2ff; }
+
+        /* Hero / About */
+        .hero { text-align: center; padding: 6rem 2rem; background: linear-gradient(45deg, #1a1a1a, #2a2a2a); }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 0 auto 2rem; }
+        .skills { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .skill-tag { background: #333; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #444; }
+
+        /* Gallery */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .card { background: #333; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .placeholder-3d { height: 250px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; position: relative; }
+        .info { padding: 1.5rem; }
+        .info h3 { margin: 0 0 0.5rem 0; color: #fff; }
+        .info p { margin: 0; color: #bbb; font-size: 0.9rem; }
+
+        /* B2B Section */
+        .b2b { background: #222; border-radius: 10px; margin-top: 2rem; }
+        .b2b h2 { color: #00d2ff; border-bottom: 2px solid #444; padding-bottom: 10px; display: inline-block; }
+        .services-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .service-item { background: #2a2a2a; padding: 1.5rem; border-left: 3px solid #00d2ff; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: #252525; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 8px; position: relative; padding: 0; display: flex; flex-direction: column; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #fff; z-index: 101; }
+        .modal-body { padding: 2rem; }
+        .modal-image { width: 100%; height: 400px; background: #000; display: flex; align-items: center; justify-content: center; color: #666; }
+
+        /* Footer */
+        footer { background: #111; padding: 3rem 2rem; text-align: center; color: #666; margin-top: 4rem; }
+        .contact-btn { background: #00d2ff; color: #000; padding: 10px 25px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 1rem; }
     </style>
 </head>
 <body>
 
+<!-- Navigation -->
 <header>
-    <h1>My 3D Portfolio</h1>
-    <p>Character Artist | Environment Design | Animation</p>
+    <div class="logo">Lazybox<span>Studio</span></div>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#b2b">Services</a>
+        <a href="#contact">Contact</a>
+    </nav>
 </header>
 
-<div class="gallery">
-    <!-- Project 1 -->
-    <div class="card">
-        <div class="placeholder-3d">[ 3D Model Viewer Placeholder ]</div>
-        <div class="info">
-            <h3>Sci-Fi Helmet</h3>
-            <p>High poly model modeled in Blender, textured in Substance.</p>
+<!-- Hero / About Section -->
+<section id="about" class="hero">
+    <h1>Visualizing the Imaginary</h1>
+    <p>I'm a 3D Generalist specializing in hard-surface modeling and real-time environments. I turn concepts into production-ready assets.</p>
+    <div class="skills">
+        <span class="skill-tag">Blender</span>
+        <span class="skill-tag">Unreal Engine 5</span>
+        <span class="skill-tag">Substance Painter</span>
+        <span class="skill-tag">ZBrush</span>
+    </div>
+</section>
+
+<!-- Portfolio Grid -->
+<section id="work">
+    <h2 style="margin-bottom: 2rem;">Selected Works</h2>
+    <div class="gallery-grid">
+        <!-- Item 1 -->
+        <div class="card" onclick="openModal('project1')">
+            <div class="placeholder-3d">
+                <span>Click to View</span>
+            </div>
+            <div class="info">
+                <h3>Cyberpunk Vehicle</h3>
+                <p>Automotive Design / Rendering</p>
+            </div>
+        </div>
+        <!-- Item 2 -->
+        <div class="card" onclick="openModal('project2')">
+            <div class="placeholder-3d">
+                <span>Click to View</span>
+            </div>
+            <div class="info">
+                <h3>Ancient Ruins</h3>
+                <p>Environment Art / Level Design</p>
+            </div>
+        </div>
+        <!-- Item 3 -->
+        <div class="card" onclick="openModal('project3')">
+            <div class="placeholder-3d">
+                <span>Click to View</span>
+            </div>
+            <div class="info">
+                <h3>Mecha Pilot</h3>
+                <p>Character Sculpting</p>
+            </div>
         </div>
     </div>
+</section>
 
-    <!-- Project 2 -->
-    <div class="card">
-        <div class="placeholder-3d">[ 3D Model Viewer Placeholder ]</div>
-        <div class="info">
-            <h3>Forest Environment</h3>
-            <p>Real-time environment running in Unreal Engine 5.</p>
+<!-- B2B / Services Section -->
+<section id="b2b" class="b2b">
+    <h2>Business Solutions</h2>
+    <p style="color: #ccc; margin-top: 10px;">Looking for assets for your game or product visualization for your brand? I offer tailored B2B services.</p>
+    <div class="services-list">
+        <div class="service-item">
+            <h3>Asset Creation</h3>
+            <p>High-quality, optimized 3D assets ready for game engines (Unity/Unreal) or AR/VR applications.</p>
+        </div>
+        <div class="service-item">
+            <h3>Product Visualization</h3>
+            <p>Photorealistic renders of your physical products for marketing, packaging, and e-commerce.</p>
+        </div>
+        <div class="service-item">
+            <h3>3D Printing Prep</h3>
+            <p>Watertight modeling and optimization for additive manufacturing processes.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Contact / Footer -->
+<section id="contact" style="text-align: center;">
+    <h2>Let's Build Something</h2>
+    <p>Available for freelance and contract work.</p>
+    <a href="mailto:contact@lazyboxstudio.com" class="contact-btn">Get in Touch</a>
+</section>
+
+<footer>
+    <p>&copy; 2025 Lazybox Studio. All rights reserved.</p>
+</footer>
+
+<!-- Modal Structure -->
+<div id="project-modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal(event)">&times;</span>
+        <div class="modal-image" id="modal-img">[ Interactive 3D Viewer or Video Here ]</div>
+        <div class="modal-body">
+            <h2 id="modal-title">Project Title</h2>
+            <p id="modal-desc">Project description goes here.</p>
         </div>
     </div>
 </div>
 
-<div class="contact">
-    <h2>Interested in working together?</h2>
-    <!-- Formspree Contact Form -->
-    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" style="max-width: 400px; margin: 20px auto; display: flex; flex-direction: column; gap: 10px;">
-        <input type="email" name="email" placeholder="Your Email" required style="padding: 10px;">
-        <textarea name="message" placeholder="Your Message" required style="padding: 10px; min-height: 100px;"></textarea>
-        <button type="submit">Send Message</button>
-    </form>
-</div>
+<script>
+    // Project Data
+    const projects = {
+        'project1': {
+            title: 'Cyberpunk Vehicle',
+            desc: 'A fully rigged vehicle model created for a short film. Modeled in Blender, textured in Substance Painter. Polycount: 45k tris.',
+            content: 'Content/Viewer for Vehicle'
+        },
+        'project2': {
+            title: 'Ancient Ruins',
+            desc: 'Modular environment kit created for a fantasy RPG. Includes 20+ unique assets sharing a single trim sheet for optimization.',
+            content: 'Content/Viewer for Ruins'
+        },
+        'project3': {
+            title: 'Mecha Pilot',
+            desc: 'Character sculpt for a personal project. Focus on hard surface integration with organic cloth simulation.',
+            content: 'Content/Viewer for Mecha'
+        }
+    };
+
+    function openModal(projectId) {
+        const modal = document.getElementById('project-modal');
+        const data = projects[projectId];
+        
+        if(data) {
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.desc;
+            // Here you would load your 3D viewer or image
+            document.getElementById('modal-img').innerText = data.content; 
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+    }
+
+    function closeModal(e) {
+        // Close if clicked on overlay or close button
+        if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn')) {
+            document.getElementById('project-modal').classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+    }
+</script>
 
 </body>
 </html>
