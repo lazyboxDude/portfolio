@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume | Lazybox</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/icons/favicon.png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/sections.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/cyberpunk.css">
+</head>
+<body>
+
+<!-- BACKGROUND ANIMATION -->
+<canvas id="bg-canvas"></canvas>
+<div class="texture-overlay"></div>
+
+<!-- Navigation -->
+<header>
+    <div class="logo"><span data-text="Lazy">Lazy</span><span data-text="box">box</span></div>
+    <div class="hamburger-menu" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <nav id="main-nav">
+        <a href="index.html" onclick="closeMobileMenu()"><i class="fas fa-home"></i> <span data-text="Home">Home</span></a>
+        <a href="index.html#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
+        <a href="index.html#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Skills">Skills</span></a>
+        <a href="index.html#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
+        <a href="services.html" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
+        <a href="resume.html" class="active" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> <span data-text="Resume">Resume</span></a>
+    
+        <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
+
+        <div class="sidebar-footer">
+            <div class="social-links"></div>
+            <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="cta-btn">Get in Touch</a>
+        </div>
+    </nav>
+</header>
+
+<main class="fade-in-page">
+    <section class="services-hero">
+        <div class="content-box" style="text-align: center;">
+            <h1 data-text="Interactive Resume">Interactive Resume</h1>
+            <p class="subtitle">Experience, Skills, and Journey</p>
+            <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="cta-btn" style="margin-top: 1rem;"><i class="fas fa-download"></i> Download PDF Version</a>
+        </div>
+    </section>
+
+    <!-- Experience Timeline -->
+    <section class="resume-section">
+        <div class="content-box">
+            <div class="section-header">
+                <h2 data-text="Experience">Experience</h2>
+            </div>
+            
+            <div class="timeline">
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2023 - Present</div>
+                    <div class="timeline-content">
+                        <h3>Freelance Game Developer</h3>
+                        <span class="company">Lazybox Studio</span>
+                        <p>Developing indie games, creating 3D assets for clients, and teaching game development workflows. Specializing in Godot and Unity pipelines.</p>
+                        <div class="tech-stack">
+                            <span>Godot</span>
+                            <span>Blender</span>
+                            <span>C#</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2021 - 2023</div>
+                    <div class="timeline-content">
+                        <h3>3D Artist & Level Designer</h3>
+                        <span class="company">Freelance / Contract</span>
+                        <p>Worked with various indie teams to produce environment art, props, and level layouts. Optimized assets for mobile and VR platforms.</p>
+                        <div class="tech-stack">
+                            <span>Maya</span>
+                            <span>Substance Painter</span>
+                            <span>Unity</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">2019 - 2021</div>
+                    <div class="timeline-content">
+                        <h3>Junior Developer</h3>
+                        <span class="company">Tech Solutions Inc. (Placeholder)</span>
+                        <p>Assisted in the development of internal tools and maintained legacy codebases. Gained strong foundation in software architecture.</p>
+                        <div class="tech-stack">
+                            <span>Python</span>
+                            <span>JavaScript</span>
+                            <span>Git</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Matrix -->
+    <section class="resume-section">
+        <div class="content-box">
+            <div class="section-header">
+                <h2 data-text="Technical Arsenal">Technical Arsenal</h2>
+            </div>
+            
+            <div class="skills-grid-advanced">
+                <!-- Skill Category 1 -->
+                <div class="skill-category">
+                    <h3><i class="fas fa-gamepad"></i> Game Engines</h3>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Godot</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 90%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Unity</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 85%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Unreal Engine</span>
+                            <span>70%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 70%;"></div></div>
+                    </div>
+                </div>
+
+                <!-- Skill Category 2 -->
+                <div class="skill-category">
+                    <h3><i class="fas fa-cube"></i> 3D & Art</h3>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Blender</span>
+                            <span>95%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 95%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Substance Painter</span>
+                            <span>80%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 80%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Photoshop</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 75%;"></div></div>
+                    </div>
+                </div>
+
+                <!-- Skill Category 3 -->
+                <div class="skill-category">
+                    <h3><i class="fas fa-code"></i> Programming</h3>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>GDScript</span>
+                            <span>95%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 95%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>C#</span>
+                            <span>80%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 80%;"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="skill-info">
+                            <span>Python</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="skill-bar"><div class="skill-fill" style="width: 75%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Lazybox. All rights reserved.</p>
+    </footer>
+</main>
+
+<script src="js/socials.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>

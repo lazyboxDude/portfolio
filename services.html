@@ -18,66 +18,12 @@
     <link rel="stylesheet" href="css/sections.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/cyberpunk.css">
-    
-    <style>
-        /* Page Specific Overrides */
-        .service-detail-section {
-            padding: 4rem 2rem;
-            border-bottom: 1px solid #333;
-        }
-        .service-detail-section:last-child {
-            border-bottom: none;
-        }
-        .service-header {
-            margin-bottom: 2rem;
-        }
-        .service-header h2 {
-            font-size: 2.5rem;
-            color: var(--accent-color);
-            margin-bottom: 0.5rem;
-        }
-        .service-header i {
-            margin-right: 10px;
-        }
-        .service-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-        }
-        .service-text p {
-            color: #ccc;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-        }
-        .service-visual {
-            height: 300px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid #333;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #555;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Cyber Mode Overrides */
-        body.cyber-mode .service-visual {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-        }
-
-        @media (max-width: 900px) {
-            .service-content {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
+
+<!-- BACKGROUND ANIMATION -->
+<canvas id="bg-canvas"></canvas>
+<div class="texture-overlay"></div>
 
 <!-- Sidebar Navigation (Modified for Sub-page) -->
 <header>
@@ -90,130 +36,317 @@
         <a href="index.html#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
         <a href="index.html#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Skills">Skills</span></a>
         <a href="index.html#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Portfolio">Portfolio</span></a>
-        <a href="index.html#contact" onclick="closeMobileMenu()"><i class="fas fa-envelope"></i> <span data-text="Contact">Contact</span></a>
-        <a href="docs/Lebenslauf_Micael_GomesFernandes.pdf" target="_blank" class="resume-link" onclick="closeMobileMenu()"><i class="fas fa-file-download"></i> <span data-text="Resume">Resume</span></a>
+        <a href="services.html" class="active" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="Services">Services</span></a>
+        <a href="resume.html" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> <span data-text="Resume">Resume</span></a>
+    
         <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
+
+        <div class="sidebar-footer">
+            <div class="social-links"></div>
+            <a href="mailto:contact@lazyboxstudio.com?subject=Project%20Inquiry" class="cta-btn">Get in Touch</a>
+        </div>
     </nav>
 </header>
 
-<main>
-    <section class="hero" style="padding-bottom: 2rem;">
-        <div class="content-box">
+<main class="fade-in-page">
+    <section class="services-hero">
+        <div class="content-box" style="text-align: center;">
             <h1 data-text="Services">Services</h1>
-            <p>Detailed breakdown of technical and creative services offered.</p>
+            <p class="subtitle">Professional solutions for your digital needs</p>
         </div>
     </section>
 
-    <div class="content-box">
-        <!-- Service 1 -->
-        <section id="asset-creation" class="service-detail-section">
-            <div class="service-header">
+    <!-- Interactive Services Layout -->
+    <section>
+        <div class="services-interactive-layout">
+        <!-- Menu (Left Side) -->
+        <div class="services-menu">
+            <button class="service-menu-btn active" onclick="showService('assets')">
+                <i class="fas fa-cube"></i> 3D Asset Creation
+            </button>
+            <button class="service-menu-btn" onclick="showService('level')">
+                <i class="fas fa-map"></i> Level Design
+            </button>
+            <button class="service-menu-btn" onclick="showService('tech')">
+                <i class="fas fa-microchip"></i> Technical Art
+            </button>
+            <button class="service-menu-btn" onclick="showService('courses')">
+                <i class="fas fa-graduation-cap"></i> Courses
+            </button>
+            <button class="service-menu-btn" onclick="showService('commissions')">
+                <i class="fas fa-palette"></i> Art Commissions
+            </button>
+        </div>
+
+        <!-- Display Area (Right Side) -->
+        <div class="services-display">
+            
+            <!-- 1. 3D Assets -->
+            <div class="service-detail-view active" id="service-view-assets">
                 <h2><i class="fas fa-cube"></i> 3D Asset Creation</h2>
-            </div>
-            <div class="service-content">
-                <div class="service-text">
-                    <p>I provide high-quality, game-ready 3D assets tailored to your project's specific art style and technical requirements. From hard-surface props to organic environments, every asset is optimized for real-time rendering.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <strong>Modeling:</strong> High-poly to Low-poly workflow with clean topology.</li>
-                        <li><i class="fas fa-check"></i> <strong>Texturing:</strong> PBR workflow (Substance Painter) for realistic or stylized materials.</li>
-                        <li><i class="fas fa-check"></i> <strong>Optimization:</strong> LOD generation, collision meshes, and UV packing.</li>
-                    </ul>
-                </div>
-                <div class="service-visual">
-                    <!-- Placeholder for Asset Image -->
-                    <i class="fas fa-cube"></i>
+                <p>High-quality, game-ready 3D assets tailored to your project's specific art style and technical requirements. From hard-surface props to organic environments, every asset is optimized for real-time rendering.</p>
+                <div class="service-detail-features">
+                    <div class="feature-item"><i class="fas fa-check"></i> High-poly to Low-poly workflow</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> PBR Texturing (Substance)</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Optimization & LODs</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> UV Packing & Collisions</div>
                 </div>
             </div>
-        </section>
 
-        <!-- Service 2 -->
-        <section id="level-design" class="service-detail-section">
-            <div class="service-header">
-                <h2><i class="fas fa-map"></i> Level Design & Lighting</h2>
-            </div>
-            <div class="service-content">
-                <div class="service-visual" style="order: 2;">
-                    <!-- Placeholder for Level Image -->
-                    <i class="fas fa-map"></i>
-                </div>
-                <div class="service-text" style="order: 1;">
-                    <p>Creating immersive worlds that guide the player and tell a story. I focus on flow, composition, and atmosphere to ensure the environment supports the gameplay loop.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <strong>Greyboxing:</strong> Rapid prototyping of level layouts for gameplay testing.</li>
-                        <li><i class="fas fa-check"></i> <strong>Set Dressing:</strong> Environmental storytelling using modular kits and props.</li>
-                        <li><i class="fas fa-check"></i> <strong>Lighting:</strong> Baked and real-time lighting setups for mood and visibility.</li>
-                    </ul>
+            <!-- 2. Level Design -->
+            <div class="service-detail-view" id="service-view-level">
+                <h2><i class="fas fa-map"></i> Level Design</h2>
+                <p>Creating immersive worlds that guide the player and tell a story. I focus on flow, composition, and atmosphere to ensure the environment supports the gameplay loop effectively.</p>
+                <div class="service-detail-features">
+                    <div class="feature-item"><i class="fas fa-check"></i> Greyboxing & Prototyping</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Environmental Storytelling</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Set Dressing</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Lighting (Baked & Real-time)</div>
                 </div>
             </div>
-        </section>
 
-        <!-- Service 3 -->
-        <section id="tech-art" class="service-detail-section">
-            <div class="service-header">
+            <!-- 3. Tech Art -->
+            <div class="service-detail-view" id="service-view-tech">
                 <h2><i class="fas fa-microchip"></i> Technical Art</h2>
-            </div>
-            <div class="service-content">
-                <div class="service-text">
-                    <p>Bridging the gap between art and code. I help optimize pipelines and create visual effects that run smoothly on your target hardware.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <strong>Shaders:</strong> Custom shaders using HLSL or Shader Graph (Unity/Unreal).</li>
-                        <li><i class="fas fa-check"></i> <strong>Profiling:</strong> Identifying and fixing performance bottlenecks (Draw calls, Overdraw).</li>
-                        <li><i class="fas fa-check"></i> <strong>Tools:</strong> Creating editor scripts to speed up the art workflow.</li>
-                    </ul>
-                </div>
-                <div class="service-visual">
-                    <!-- Placeholder for Tech Art Image -->
-                    <i class="fas fa-magic"></i>
+                <p>Bridging the gap between art and code. I help optimize pipelines and create visual effects that run smoothly on your target hardware without sacrificing visual fidelity.</p>
+                <div class="service-detail-features">
+                    <div class="feature-item"><i class="fas fa-check"></i> Custom Shaders (HLSL)</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Performance Profiling</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Editor Tools & Scripts</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Pipeline Optimization</div>
                 </div>
             </div>
-        </section>
 
-        <!-- Service 4 -->
-        <section id="courses" class="service-detail-section">
-            <div class="service-header">
+            <!-- 4. Courses -->
+            <div class="service-detail-view" id="service-view-courses">
                 <h2><i class="fas fa-graduation-cap"></i> Courses</h2>
-            </div>
-            <div class="service-content">
-                <div class="service-visual" style="order: 2;">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div class="service-text" style="order: 1;">
-                    <p>Comprehensive courses designed to take you from beginner to pro. Learn industry-standard workflows with practical, project-based lessons.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <strong>Godot Engine Course:</strong> Master the open-source engine. From GDScript basics to advanced systems.</li>
-                        <li><i class="fas fa-check"></i> <strong>3D Modeling Course:</strong> Learn the full pipeline: Modeling, UVs, Texturing, and Engine Implementation.</li>
-                        <li><i class="fas fa-check"></i> <strong>Mentorship:</strong> 1-on-1 guidance and code reviews to accelerate your learning.</li>
-                    </ul>
+                <p>Comprehensive courses designed to take you from beginner to pro. Learn industry-standard workflows with practical, project-based lessons that you can apply immediately.</p>
+                <div class="service-detail-features">
+                    <div class="feature-item"><i class="fas fa-check"></i> Godot Engine Mastery</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> 3D Modeling Pipeline</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> 1-on-1 Mentorship</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Code Reviews</div>
                 </div>
             </div>
-        </section>
 
-        <!-- Service 5 -->
-        <section id="commissions" class="service-detail-section">
-            <div class="service-header">
+            <!-- 5. Commissions -->
+            <div class="service-detail-view" id="service-view-commissions">
                 <h2><i class="fas fa-palette"></i> Art Commissions</h2>
-            </div>
-            <div class="service-content">
-                <div class="service-text">
-                    <p>Unique digital artwork for your creative projects or personal collection.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> <strong>Music Cover Art:</strong> Eye-catching visuals for your singles, EPs, and albums. Tailored to your genre.</li>
-                        <li><i class="fas fa-check"></i> <strong>Art Prints:</strong> High-quality prints of my personal work available for purchase.</li>
-                        <li><i class="fas fa-check"></i> <strong>Custom Illustration:</strong> Character art and stylized environments.</li>
-                    </ul>
-                </div>
-                <div class="service-visual">
-                    <i class="fas fa-paint-brush"></i>
+                <p>Unique digital artwork for your creative projects or personal collection. Whether it's for an album cover, a book, or just a personal piece, I tailor the style to your needs.</p>
+                <div class="service-detail-features">
+                    <div class="feature-item"><i class="fas fa-check"></i> Music Cover Art</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> High-quality Art Prints</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Character Illustration</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Stylized Environments</div>
                 </div>
             </div>
-        </section>
-    </div>
+
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section">
+        <div class="content-box">
+            <div class="section-header">
+                <h2 data-text="Workflow & Process">Workflow & Process</h2>
+                <p>Transparent, step-by-step approach for every service.</p>
+            </div>
+
+            <!-- Process Tabs -->
+            <div class="process-tabs">
+                <button class="process-tab-btn active" onclick="switchProcess('assets')">3D Assets</button>
+                <button class="process-tab-btn" onclick="switchProcess('level')">Level Design</button>
+                <button class="process-tab-btn" onclick="switchProcess('tech')">Tech Art</button>
+                <button class="process-tab-btn" onclick="switchProcess('courses')">Courses</button>
+                <button class="process-tab-btn" onclick="switchProcess('commissions')">Commissions</button>
+            </div>
+
+            <!-- 1. 3D Assets Workflow -->
+            <div class="process-steps active" id="process-assets">
+                <div class="process-step">
+                    <span class="step-number">01</span>
+                    <div class="process-icon"><i class="fas fa-file-image"></i></div>
+                    <h3>Briefing</h3>
+                    <p>Gathering references, poly-count limits, and style guides to ensure the asset fits your game.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">02</span>
+                    <div class="process-icon"><i class="fas fa-cube"></i></div>
+                    <h3>Modeling</h3>
+                    <p>Creating the high-poly mesh for detail and optimizing the low-poly game mesh for performance.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">03</span>
+                    <div class="process-icon"><i class="fas fa-paint-brush"></i></div>
+                    <h3>Texturing</h3>
+                    <p>Baking maps and painting realistic or stylized PBR textures using Substance Painter.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">04</span>
+                    <div class="process-icon"><i class="fas fa-file-export"></i></div>
+                    <h3>Integration</h3>
+                    <p>Setting up LODs, collisions, and importing the final asset into your engine of choice.</p>
+                </div>
+            </div>
+
+            <!-- 2. Level Design Workflow -->
+            <div class="process-steps" id="process-level">
+                <div class="process-step">
+                    <span class="step-number">01</span>
+                    <div class="process-icon"><i class="fas fa-pencil-alt"></i></div>
+                    <h3>Layout</h3>
+                    <p>Sketching the map layout and defining key gameplay beats and player flow.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">02</span>
+                    <div class="process-icon"><i class="fas fa-shapes"></i></div>
+                    <h3>Greyboxing</h3>
+                    <p>Building rough geometry to test scale, cover, and mechanics before committing to art.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">03</span>
+                    <div class="process-icon"><i class="fas fa-tree"></i></div>
+                    <h3>Set Dressing</h3>
+                    <p>Replacing greybox with final assets, adding props, and environmental storytelling.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">04</span>
+                    <div class="process-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Lighting</h3>
+                    <p>Baking lightmaps, setting up post-processing, and optimizing for mood and visibility.</p>
+                </div>
+            </div>
+
+            <!-- 3. Tech Art Workflow -->
+            <div class="process-steps" id="process-tech">
+                <div class="process-step">
+                    <span class="step-number">01</span>
+                    <div class="process-icon"><i class="fas fa-search"></i></div>
+                    <h3>Analysis</h3>
+                    <p>Identifying performance bottlenecks or specific visual goals (e.g., "We need water physics").</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">02</span>
+                    <div class="process-icon"><i class="fas fa-flask"></i></div>
+                    <h3>Prototyping</h3>
+                    <p>Creating quick shader or script prototypes to test feasibility and performance cost.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">03</span>
+                    <div class="process-icon"><i class="fas fa-code"></i></div>
+                    <h3>Implementation</h3>
+                    <p>Building the final tool, shader, or pipeline script and integrating it into the project.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">04</span>
+                    <div class="process-icon"><i class="fas fa-book"></i></div>
+                    <h3>Docs</h3>
+                    <p>Writing clear documentation for artists on how to use the new tools or shaders effectively.</p>
+                </div>
+            </div>
+
+            <!-- 4. Courses Workflow -->
+            <div class="process-steps" id="process-courses">
+                <div class="process-step">
+                    <span class="step-number">01</span>
+                    <div class="process-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Assessment</h3>
+                    <p>Determining your current skill level and defining your specific learning goals.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">02</span>
+                    <div class="process-icon"><i class="fas fa-road"></i></div>
+                    <h3>Curriculum</h3>
+                    <p>Creating a custom roadmap of projects and topics tailored to your needs.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">03</span>
+                    <div class="process-icon"><i class="fas fa-video"></i></div>
+                    <h3>Live Sessions</h3>
+                    <p>Weekly 1-on-1 calls for code reviews, theory, and troubleshooting.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">04</span>
+                    <div class="process-icon"><i class="fas fa-check-circle"></i></div>
+                    <h3>Review</h3>
+                    <p>Final analysis of your capstone project and advice for your next steps.</p>
+                </div>
+            </div>
+
+            <!-- 5. Commissions Workflow -->
+            <div class="process-steps" id="process-commissions">
+                <div class="process-step">
+                    <span class="step-number">01</span>
+                    <div class="process-icon"><i class="fas fa-comment-dots"></i></div>
+                    <h3>Idea</h3>
+                    <p>Discussing the theme, colors, and emotion of the piece. Creating a moodboard.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">02</span>
+                    <div class="process-icon"><i class="fas fa-pencil-ruler"></i></div>
+                    <h3>Sketch</h3>
+                    <p>Providing rough composition sketches for approval before starting detailed work.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">03</span>
+                    <div class="process-icon"><i class="fas fa-paint-roller"></i></div>
+                    <h3>Render</h3>
+                    <p>Detailed painting/modeling and lighting work. Regular updates for feedback.</p>
+                </div>
+                <div class="process-step">
+                    <span class="step-number">04</span>
+                    <div class="process-icon"><i class="fas fa-star"></i></div>
+                    <h3>Polish</h3>
+                    <p>Color grading, final touches, and formatting for print or digital use.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="content-box">
+            <div class="section-header">
+                <h2 data-text="Frequently Asked Questions">Frequently Asked Questions</h2>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>What software do you use?</h3>
+                    <p>My primary stack includes Blender for modeling, Substance Painter for texturing, and Unity/Unreal/Godot for engine implementation.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Do you offer revisions?</h3>
+                    <p>Yes! All packages include 2 rounds of revisions to ensure the final result matches your vision perfectly.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Can you work with existing teams?</h3>
+                    <p>Absolutely. I'm comfortable using Git/Perforce and adapting to established style guides and pipelines.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How do payments work?</h3>
+                    <p>Typically, I require a 50% deposit to start, with the remaining balance due upon final delivery.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="content-box" style="text-align: center;">
+            <div class="cta-content">
+                <h2 data-text="Ready to Level Up?">Ready to Level Up?</h2>
+                <p>Whether you need a single hero asset or a full level design, I'm here to help you build something amazing.</p>
+                <a href="mailto:contact@lazyboxstudio.com" class="big-cta-btn">Start a Project <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
 
     <footer>
         <p>&copy; 2025 Lazybox. All rights reserved.</p>
     </footer>
 </main>
 
+<script src="js/socials.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

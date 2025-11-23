@@ -248,3 +248,113 @@ function filterGallery(category) {
         }
     });
 }
+
+// --- HOBBY EASTER EGG ---
+function openHobby(type) {
+    const modal = document.getElementById('hobby-modal');
+    const content = document.getElementById('hobby-content');
+    
+    if (type === 'gaming') {
+        content.innerHTML = `
+            <i class="fab fa-steam" style="font-size: 4rem; color: #fff; margin-bottom: 1rem; text-shadow: 0 0 15px #00d2ff;"></i>
+            <h2 style="margin-bottom: 0.5rem;">Steam Profile</h2>
+            <p style="color: #ccc; margin-bottom: 2rem;">Check out my library and achievements.</p>
+            <a href="https://steamcommunity.com/profiles/76561199041287248/" target="_blank" class="cta-btn" style="display: inline-block; background: #171a21; border: 1px solid #00d2ff; color: #00d2ff;">Visit Profile</a>
+        `;
+    } else if (type === 'movies') {
+        content.innerHTML = `
+            <i class="fas fa-film" style="font-size: 4rem; color: #fff; margin-bottom: 1rem; text-shadow: 0 0 15px #40bcf4;"></i>
+            <h2 style="margin-bottom: 0.5rem;">Letterboxd</h2>
+            <p style="color: #ccc; margin-bottom: 2rem;">See what I've been watching lately.</p>
+            <a href="https://boxd.it/ebP01" target="_blank" class="cta-btn" style="display: inline-block; background: #14181c; border: 1px solid #40bcf4; color: #40bcf4;">Visit Profile</a>
+        `;
+    }
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHobbyModal(e) {
+    if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn')) {
+        document.getElementById('hobby-modal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/* --- Service Page Logic --- */
+function switchProcess(processId) {
+    // Hide all process steps
+    const allSteps = document.querySelectorAll('.process-steps');
+    allSteps.forEach(step => {
+        step.classList.remove('active');
+    });
+
+    // Show the selected process step
+    const selectedStep = document.getElementById('process-' + processId);
+    if (selectedStep) {
+        selectedStep.classList.add('active');
+    }
+
+    // Update tab buttons
+    const allBtns = document.querySelectorAll('.process-tab-btn');
+    allBtns.forEach(btn => {
+        btn.classList.remove('active');
+        // Check if this button's onclick matches the processId
+        if (btn.getAttribute('onclick').includes(`'${processId}'`)) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Sync with Service View (if not already active)
+    const serviceView = document.getElementById('service-view-' + processId);
+    if (serviceView && !serviceView.classList.contains('active')) {
+        showService(processId);
+    }
+}
+
+/* --- Service Master-Detail Logic --- */
+function showService(serviceId) {
+    // 1. Update Menu Buttons
+    const allBtns = document.querySelectorAll('.service-menu-btn');
+    allBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(`'${serviceId}'`)) {
+            btn.classList.add('active');
+        }
+    });
+
+    // 2. Update Display Content
+    const allViews = document.querySelectorAll('.service-detail-view');
+    allViews.forEach(view => {
+        view.classList.remove('active');
+    });
+
+    const selectedView = document.getElementById('service-view-' + serviceId);
+    if (selectedView) {
+        selectedView.classList.add('active');
+    }
+
+    // Sync with Process View (if not already active)
+    const processStep = document.getElementById('process-' + serviceId);
+    if (processStep && !processStep.classList.contains('active')) {
+        switchProcess(serviceId);
+    }
+}
+
+// Handle Hash on Load (for Services Page Deep Linking)
+window.addEventListener('DOMContentLoaded', () => {
+    // Check if we are on the services page
+    if (window.location.pathname.includes('services.html')) {
+        const hash = window.location.hash.replace('#', '');
+        if (hash) {
+            // If hash exists (e.g. #assets), show that service
+            showService(hash);
+            // Also switch process tab if it exists
+            switchProcess(hash);
+        } else {
+            // Default to first one
+            showService('assets');
+            switchProcess('assets');
+        }
+    }
+});
