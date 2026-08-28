@@ -564,9 +564,9 @@ function handleContactSubmit(e) {
     btn.style.opacity = "0.7";
     
     // Reconstruct Email (Split to hide from simple scrapers)
-    const part1 = 'micael';
-    const part2 = 'gomes-fernandes';
-    const part3 = 'ch';
+    const part1 = 'contact';
+    const part2 = 'lazyboxstudio';
+    const part3 = 'com';
     const target = `${part1}@${part2}.${part3}`;
     
     // Set the action dynamically
