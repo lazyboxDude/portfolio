@@ -253,6 +253,7 @@
       <button class="secondary" id="csv">Notion (.csv)</button>
       <button class="secondary" id="copy">Kopieren</button>
     </div>
+    <p class="cap" id="gcalHint" style="display:none">📅 iPhone → Google Kalender: iOS öffnet .ics-Dateien immer über die Apple-Kalender-App — das lässt sich von der Website aus nicht umgehen. Einmalig einrichten: <b>Einstellungen → Kalender → Accounts → Account hinzufügen → Google</b>. Beim Öffnen der Datei dann oben bei „Kalender" deinen Google-Kalender statt iCloud auswählen — die Schichten landen direkt synchronisiert in Google Kalender.</p>
   </section>
 
   <footer>
@@ -335,7 +336,7 @@ async function loadPDF(file){
     [...names].sort((a,b)=>a.localeCompare(b,'de')).forEach(n=>{
       const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);
     });
-    const guess=[...names].find(n=>/gomes/i.test(n)); if(guess)sel.value=guess;
+    sel.selectedIndex=-1;
     $('found').textContent=names.size+' Mitarbeiter · '+PAGES.length+' Seiten';
     msg.style.display='none';
     $('controls').classList.add('show');
@@ -545,6 +546,8 @@ const fmtDec=min=>(min/60).toFixed(2);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||'plan';
 let inFrame=false; try{ inFrame=window.self!==window.top; }catch(e){ inFrame=true; }
+const isIOS=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if(isIOS) $('gcalHint').style.display='block';
 function download(text,fn,type,okMsg){
   if(inFrame){ showSaveModal(text,fn); return; }
   try{
