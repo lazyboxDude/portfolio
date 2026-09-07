@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Apps | Micael G. Fernandes</title>
+
+    <meta name="description" content="Small, self-contained web apps and tools built by Micael G. Fernandes.">
+    <meta property="og:title" content="Web Apps | Micael G. Fernandes">
+    <meta property="og:description" content="Small, self-contained web apps and tools — no installs, runs in the browser.">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/png" href="images/icons/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/hub.css">
+</head>
+<body class="hub">
+
+<div class="hub-shell">
+
+    <header class="hub-header">
+        <a href="index.html" class="hub-logo">
+            <b>Micael G. Fernandes</b>
+            <span>lazyboxdude · gomes-fernandes.ch</span>
+        </a>
+        <nav>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="webapps.html">Web Apps</a>
+            <a href="resume.html">Resume</a>
+        </nav>
+    </header>
+
+    <a href="index.html" class="hub-back"><i class="fas fa-arrow-left"></i> Back to hub</a>
+
+    <section class="hub-hero" style="padding-top:0;">
+        <span class="hub-eyebrow"><span class="dot"></span> Side projects</span>
+        <h1>Web Apps &amp; <em>Tools</em></h1>
+        <p>Small, focused apps I build to solve a real problem — no installs, no accounts, everything runs client-side in your browser.</p>
+    </section>
+
+    <div class="app-list">
+        <a href="dienstplan.html" class="app-card">
+            <div class="ic"><i class="fas fa-calendar-days"></i></div>
+            <div class="body">
+                <h3>Dienstplan</h3>
+                <p>Drop a monthly shift-schedule PDF, pick your name, and get your shifts, hours and a ready-made calendar (.ics) or Notion (.csv) export. Interface is in German — built for a real cinema staff roster.</p>
+            </div>
+            <div class="meta">
+                <span class="badge">PWA</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="hub-note">
+        <b>More on the way.</b> This page grows as new tools ship — check back for updates.
+    </div>
+
+    <footer class="hub-footer">
+        <p>&copy; 2025 Micael G. Fernandes.</p>
+        <div class="hub-social"></div>
+    </footer>
+
+</div>
+
+<script src="js/socials.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.hub-social');
+        if (!container || typeof socialLinks === 'undefined') return;
+        container.innerHTML = socialLinks.map(link => {
+            const content = link.customHtml ? link.customHtml : `<i class="${link.icon}"></i>`;
+            return `<a href="${link.url}" target="_blank" rel="noopener" title="${link.platform}">${content}</a>`;
+        }).join('');
+    });
+</script>
+</body>
+</html>

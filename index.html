@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lazybox | Game Art & Development</title>
-    
+    <title>Micael G. Fernandes | Hub</title>
+
     <!-- SEO & Social Media Tags -->
-    <meta name="description" content="3D Generalist & Game Developer. Crafting immersive real-time experiences and high-fidelity assets.">
-    <meta property="og:title" content="Lazybox | Game Art & Development">
-    <meta property="og:description" content="3D Generalist & Game Developer. Crafting immersive real-time experiences.">
-    <meta property="og:image" content="images/portfolio/BF.png"> <!-- Placeholder: Replace with a dedicated social preview image -->
+    <meta name="description" content="Hub for Micael G. Fernandes — Game Art & Development portfolio and independent web apps & tools.">
+    <meta property="og:title" content="Micael G. Fernandes | Hub">
+    <meta property="og:description" content="Game Art & Development portfolio and independent web apps & tools.">
+    <meta property="og:image" content="images/portfolio/BF.png">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
 
@@ -20,525 +20,78 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Load Google Fonts for the effect -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/sections.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/cyberpunk.css">
+
+    <link rel="stylesheet" href="css/hub.css">
 </head>
-<body>
+<body class="hub">
 
-<!-- BACKGROUND ANIMATION -->
-<canvas id="bg-canvas"></canvas>
-<div class="texture-overlay"></div>
+<div class="hub-shell">
 
-<!-- Navigation -->
-<header>
-    <!-- Sidebar loaded dynamically by js/loader.js -->
-</header>
-
-<main>
-<!-- Hero / About Section -->
-<section id="about" class="hero">
-    <div class="content-box">
-        <div class="hero-intro">
-            <span class="role-badge"><i class="fas fa-user"></i> Who I am</span>
-            <h1 data-text="Forging Digital Worlds">Forging Digital Worlds</h1>
-            <p>3D Generalist & Game Developer. Crafting immersive real-time experiences and high-fidelity assets for the next generation of interactive entertainment.</p>
-        </div>
-
-        <div class="venture-showcase">
-            <div class="venture-info">
-                <span class="role-badge">Co-Founder & Game Designer</span>
-                <h3>Moonflux Interactive</h3>
-                <p>Co-founding Moonflux Interactive, an indie game studio dedicated to narrative-driven experiences. Currently developing our debut title <em>Aphonia</em>.</p>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
-                    <a href="https://moonflux-interactive.com" target="_blank" class="live-link-btn">
-                        <span class="status-dot"></span> moonflux-interactive.com
-                    </a>
-                    <a href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" target="_blank" class="live-link-btn" style="border-color: #66c0f4; color: #66c0f4;">
-                        <i class="fab fa-steam"></i> Wishlist on Steam
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Skills Section -->
-<section id="skills">
-    <div class="content-box">
-        <div style="text-align: left; margin-bottom: 2rem;">
-            <span class="role-badge"><i class="fas fa-tools"></i> Arsenal</span>
-            <h2 style="margin: 0.5rem 0 0 0;" data-text="Skills & Tools">Skills & Tools</h2>
-        </div>
-        
-        <div class="skills-grid">
-            <!-- Game Engines -->
-            <div class="skill-category">
-                <h3><i class="fas fa-gamepad"></i> Game Engines</h3>
-                <div class="skill-list">
-                    <div class="skill-item">
-                        <span class="skill-name">Unity</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 70%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Unreal Engine 5</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3D & Art -->
-            <div class="skill-category">
-                <h3><i class="fas fa-cube"></i> 3D & Art</h3>
-                <div class="skill-list">
-                    <div class="skill-item">
-                        <span class="skill-name">Blender</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 20%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">ZBrush</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 50%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Substance Painter</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Maya</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Programming -->
-            <div class="skill-category">
-                <h3><i class="fas fa-code"></i> Programming</h3>
-                <div class="skill-list">
-                    <div class="skill-item">
-                        <span class="skill-name">C#</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 50%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Blueprints</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 70%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Creative Suite -->
-            <div class="skill-category">
-                <h3><i class="fas fa-pen-nib"></i> Creative Suite</h3>
-                <div class="skill-list">
-                    <div class="skill-item">
-                        <span class="skill-name">Photoshop</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Premiere Pro</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 80%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Illustrator</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 70%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Social Skills -->
-            <div class="skill-category">
-                <h3><i class="fas fa-users"></i> Social Skills</h3>
-                <div class="skill-list">
-                    <div class="skill-item">
-                        <span class="skill-name">Teamwork</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 95%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Communication</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Problem Solving</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hobbies -->
-            <div class="skill-category">
-                <h3><i class="fas fa-heart"></i> Hobbies</h3>
-                <div class="skill-list">
-                    <div class="skill-item easter-egg" onclick="openHobby('gaming')" title="Discover my Steam Profile">
-                        <span class="skill-name">Gaming <i class="fas fa-gamepad" style="font-size: 0.8rem; opacity: 0.5;"></i></span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 100%"></div></div>
-                    </div>
-                    <div class="skill-item easter-egg" onclick="openHobby('movies')" title="Discover my Letterboxd">
-                        <span class="skill-name">Movies <i class="fas fa-film" style="font-size: 0.8rem; opacity: 0.5;"></i></span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Technology</span>
-                        <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Portfolio Grid -->
-<section id="work">
-    <div class="content-box">
-        <div style="text-align: left; margin-bottom: 2rem;">
-            <span class="role-badge"><i class="fas fa-cubes"></i> Projects</span>
-            <h2 style="margin: 0.5rem 0 0 0;" data-text="Portfolio">Portfolio</h2>
-        </div>
-        
-        <!-- Gallery Filter -->
-        <div class="gallery-filter-container" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">
-            <h3 style="margin: 0; font-size: 1.1rem; color: #fff; font-family: 'Space Mono', monospace; text-transform: uppercase;">Selected Works</h3>
-            <div class="gallery-tabs" style="margin-bottom: 0;">
-                <button class="tab-btn active" onclick="filterGallery('all')">All</button>
-                <button class="tab-btn" onclick="filterGallery('games')">Interactive / Games</button>
-                <button class="tab-btn" onclick="filterGallery('art')">3D Art & Design</button>
-                <button class="tab-btn" onclick="filterGallery('videos')">Videos</button>
-            </div>
-        </div>
-
-        <div class="gallery-grid">
-            <!-- Aphonia (Game) -->
-            <div class="card category-games category-videos" onclick="openModal('aphonia')" style="border: 1px solid var(--accent-color);">
-                <div class="placeholder-3d" style="background: #111;">
-                    <span style="font-size: 1.5rem; color: var(--accent-color);">APHONIA</span>
-                </div>
-                <div class="info">
-                    <h3 data-text="Aphonia">Aphonia</h3>
-                    <p>Narrative Puzzle Game</p>
-                    <div class="card-tags">
-                        <span class="card-tag unity">Made with Unity</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Dolphin Rush (Game) -->
-            <div class="card category-games" onclick="openModal('dolphinrush')" style="border: 1px solid var(--accent-color);">
-                <div class="placeholder-3d" style="background: #111;">
-                    <span style="font-size: 1.5rem; color: var(--accent-color);">DOLPHIN RUSH</span>
-                </div>
-                <div class="info">
-                    <h3 data-text="Dolphin Rush">Dolphin Rush</h3>
-                    <p>Conservation Game</p>
-                    <div class="card-tags">
-                        <span class="card-tag unity">Made with Unity</span>
-                    </div>
-                </div>
-            </div>
-            <!-- BF (Art) -->
-            <div class="card category-art" onclick="openModal('bf')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/BF.png" alt="BF" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="BF">BF</h3>
-                    <p>3D Composition</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Blender</span>
-                        <span class="card-tag">Cycles</span>
-                    </div>
-                </div>
-            </div>
-            <!-- FBDNL (Art) -->
-            <div class="card category-art" onclick="openModal('fbdnl')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/FBDNL.png" alt="FBDNL" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="FBDNL">FBDNL</h3>
-                    <p>Digital Art</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Photoshop</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Fridom (Art) -->
-            <div class="card category-art" onclick="openModal('fridom')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/Fridom.png" alt="Fridom" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="Fridom">Fridom</h3>
-                    <p>Concept Art</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Photoshop</span>
-                        <span class="card-tag">Midjourney</span>
-                    </div>
-                </div>
-            </div>
-            <!-- FYS 02 (Art) -->
-            <div class="card category-art" onclick="openModal('fys02')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/fys02.png" alt="FYS 02" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="FYS 02">FYS 02</h3>
-                    <p>Abstract Design</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Illustrator</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Gone (Art) -->
-            <div class="card category-art" onclick="openModal('gone')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/Gone.png" alt="Gone" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="Gone">Gone</h3>
-                    <p>Atmospheric Render</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Blender</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Sunshine (Art) -->
-            <div class="card category-art" onclick="openModal('sunshine')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/Sunshine.png" alt="Sunshine" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="Sunshine">Sunshine</h3>
-                    <p>Lighting Study</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Unreal Engine 5</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Thoughts (Art) -->
-            <div class="card category-art" onclick="openModal('thoughts')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/Thoughts.png" alt="Thoughts" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="Thoughts">Thoughts</h3>
-                    <p>Surreal Composition</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Blender</span>
-                        <span class="card-tag">Photoshop</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Under The Bridge (Art) -->
-            <div class="card category-art" onclick="openModal('underthebridge')">
-                <div class="placeholder-3d">
-                    <img src="images/portfolio/UnderTheBridge.png" alt="Under The Bridge" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <div class="info">
-                    <h3 data-text="Under The Bridge">Under The Bridge</h3>
-                    <p>Environment Art</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Maya</span>
-                        <span class="card-tag">Substance Painter</span>
-                    </div>
-                </div>
-            </div>
-            <!-- YouTube Channel (Video) -->
-            <div class="card category-videos" onclick="openModal('youtube_channel')">
-                <div class="placeholder-3d" style="background: #111; display: flex; align-items: center; justify-content: center;">
-                    <i class="fab fa-youtube" style="font-size: 4rem; color: #FF0000;"></i>
-                </div>
-                <div class="info">
-                    <h3 data-text="YouTube Channel">YouTube Channel</h3>
-                    <p>Devlogs & Tutorials</p>
-                    <div class="card-tags">
-                        <span class="card-tag">Video Editing</span>
-                        <span class="card-tag">Premiere Pro</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- B2B / Services Section -->
-<section id="b2b" class="b2b">
-    <div class="content-box">
-        <div style="text-align: left; margin-bottom: 2rem;">
-            <span class="role-badge"><i class="fas fa-handshake"></i> B2B Solutions</span>
-            <h2 style="margin: 0.5rem 0 0 0;" data-text="Services">Services</h2>
-        </div>
-        <p style="color: #ccc; margin-top: 10px; margin-bottom: 3rem;">From technical game development to creative education and artwork. Explore the different ways we can work together.</p>
-        
-        <div class="compact-services-grid">
-            <a href="services.html#assets" class="compact-service-card">
-                <i class="fas fa-cube"></i>
-                <span>3D Assets</span>
-            </a>
-            <a href="services.html#level" class="compact-service-card">
-                <i class="fas fa-map"></i>
-                <span>Level Design</span>
-            </a>
-            <a href="services.html#tech" class="compact-service-card">
-                <i class="fas fa-microchip"></i>
-                <span>Tech Art</span>
-            </a>
-            <a href="services.html#courses" class="compact-service-card">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Courses</span>
-            </a>
-            <a href="services.html#commissions" class="compact-service-card">
-                <i class="fas fa-palette"></i>
-                <span>Commissions</span>
-            </a>
-        </div>
-
-        <div style="text-align: center; margin-top: 1rem;">
-             <a href="services.html" class="cta-btn" style="padding: 1rem 3rem; font-size: 1.1rem;">View Full Details <i class="fas fa-arrow-right"></i></a>
-        </div>
-
-        <!-- Trusted By Section -->
-        <div class="trusted-by-container" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
-            <p style="font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #666; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">Trusted By & Collaborating With</p>
-            <div class="trusted-logos" style="display: flex; justify-content: center; align-items: center; gap: 4rem; flex-wrap: wrap;">
-                <!-- IBW Chur -->
-                <a href="https://www.ibw.ch" target="_blank" rel="noopener noreferrer" class="trusted-logo" style="filter: grayscale(100%) brightness(200%); transition: all 0.3s; opacity: 0.7; display: block; text-decoration: none;">
-                    <img src="https://logo.clearbit.com/ibw.ch" alt="IBW Chur" style="height: 40px; width: auto;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                    <span style="display:none; font-weight:bold; font-size:1.5rem; color:#ccc;">IBW Chur</span>
-                </a>
-                <!-- WDC -->
-                <a href="https://whales.org" target="_blank" rel="noopener noreferrer" class="trusted-logo" style="filter: grayscale(100%) brightness(200%); transition: all 0.3s; opacity: 0.7; display: block; text-decoration: none;">
-                    <img src="https://logo.clearbit.com/whales.org" alt="WDC Whale and Dolphin Conservation" style="height: 50px; width: auto;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                    <span style="display:none; font-weight:bold; font-size:1.5rem; color:#ccc;">WDC</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Contact Section Removed -->
-
-<!-- Contact Section Removed (Moved to Modal) -->
-
-<!-- Final CTA Section -->
-<section id="final-cta" style="text-align: center; padding: 4rem 0;">
-    <h2 style="margin-bottom: 2rem; font-size: 2rem;">Ready to Collaborate?</h2>
-    <div class="cta-group" style="justify-content: center;">
-        <a href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" target="_blank" class="cta-btn steam-btn">
-            <i class="fab fa-steam"></i> Wishlist Aphonia
+    <header class="hub-header">
+        <a href="index.html" class="hub-logo">
+            <b>Micael G. Fernandes</b>
+            <span>lazyboxdude · gomes-fernandes.ch</span>
         </a>
-        <button onclick="openContactModal()" class="cta-btn outline-btn">
-            <i class="fas fa-terminal"></i> Initialize Contact
-        </button>
-    </div>
-</section>
+        <nav>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="webapps.html">Web Apps</a>
+            <a href="resume.html">Resume</a>
+        </nav>
+    </header>
 
-<footer>
-    <p>&copy; 2025 Lazybox. All rights reserved.</p>
-</footer>
+    <section class="hub-hero">
+        <span class="hub-eyebrow"><span class="dot"></span> Currently building on two fronts</span>
+        <h1>Game worlds by day,<br><em>web apps</em> on the side.</h1>
+        <p>3D Generalist &amp; Game Developer, co-founding Moonflux Interactive — and lately building small, focused web apps and tools. Pick a direction below.</p>
+    </section>
 
-<!-- Modal Structure -->
-</main>
-
-<div id="project-modal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-content modern-modal">
-        <span class="close-btn" onclick="closeModal(event)">&times;</span>
-        
-        <div class="modal-grid">
-            <!-- Media Section -->
-            <div class="modal-media-section">
-                <div class="modal-main-media" id="modal-main-media">
-                    <!-- Main Image/Video injected here -->
-                </div>
-                <div class="modal-gallery-strip" id="modal-gallery-strip">
-                    <!-- Thumbnails injected here -->
-                </div>
+    <div class="hub-grid">
+        <a href="portfolio.html" class="hub-card">
+            <div class="ic"><i class="fas fa-cubes"></i></div>
+            <h2>Game Dev &amp; 3D Art</h2>
+            <p>Games, real-time 3D art, and B2B services — level design, tech art, courses and commissions.</p>
+            <div class="tags">
+                <span class="tag">Unreal Engine 5</span>
+                <span class="tag">Unity</span>
+                <span class="tag">Blender</span>
             </div>
+            <span class="go">View portfolio <i class="fas fa-arrow-right"></i></span>
+        </a>
 
-            <!-- Info Section -->
-            <div class="modal-info-section">
-                <div class="modal-header">
-                    <h2 id="modal-title">Project Title</h2>
-                    <span id="modal-subtitle" class="modal-subtitle">Subtitle</span>
-                </div>
-                
-                <div class="modal-meta" id="modal-meta">
-                    <!-- Tools/Year injected here -->
-                </div>
-
-                <div class="modal-description">
-                    <div id="modal-desc">Description</div>
-                </div>
-                
-                <div class="modal-links" id="modal-links">
-                    <!-- Links injected here -->
-                </div>
+        <a href="webapps.html" class="hub-card">
+            <div class="ic"><i class="fas fa-laptop-code"></i></div>
+            <h2>Web Apps &amp; Tools</h2>
+            <p>Small, self-contained web apps I build to solve real problems — no installs, runs in the browser.</p>
+            <div class="tags">
+                <span class="tag">JavaScript</span>
+                <span class="tag">PWA</span>
+                <span class="tag">Tools</span>
             </div>
-        </div>
+            <span class="go">Browse apps <i class="fas fa-arrow-right"></i></span>
+        </a>
     </div>
+
+    <footer class="hub-footer">
+        <p>&copy; 2025 Micael G. Fernandes.</p>
+        <div class="hub-social"></div>
+    </footer>
+
 </div>
 
-<!-- Hobby Modal (Easter Egg) -->
-<div id="hobby-modal" class="modal-overlay" onclick="closeHobbyModal(event)">
-    <div class="modal-content modern-modal" style="max-width: 400px; text-align: center; padding: 3rem 2rem; border: 1px solid var(--accent-color);">
-        <span class="close-btn" onclick="closeHobbyModal(event)">&times;</span>
-        <div id="hobby-content">
-            <!-- Content injected via JS -->
-        </div>
-    </div>
-</div>
-
-<!-- Contact Modal (Terminal Style) -->
-<div id="contact-modal" class="modal-overlay" onclick="closeContactModal(event)">
-    <div class="terminal-window" onclick="event.stopPropagation()">
-        <div class="terminal-header">
-            <div class="terminal-buttons">
-                <span class="term-btn close" onclick="closeContactModal(event)"></span>
-                <span class="term-btn minimize" onclick="minimizeTerminal(event)"></span>
-                <span class="term-btn maximize" onclick="maximizeTerminal(event)"></span>
-            </div>
-            <div class="terminal-title">guest@lazybox: ~/contact-uplink</div>
-        </div>
-        <div class="terminal-body">
-            <div class="term-line"><span class="term-green">guest@lazybox:~$</span> ./init_uplink.sh</div>
-            <div class="term-line term-gray">Establishing secure connection... <span class="term-green">Done.</span></div>
-            <div class="term-line term-gray">Target: <span class="term-blue">Micael G. Fernandes</span></div>
-            
-            <form id="secure-contact-form" method="POST" class="terminal-form" onsubmit="handleContactSubmit(event)">
-                <input type="text" name="_honey" style="display:none">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_next" value="https://lazyboxdude.github.io/portfolio/index.html">
-
-                <div class="term-input-group">
-                    <span class="term-prompt">name:</span>
-                    <input type="text" name="name" class="term-input" required placeholder="_" autocomplete="off">
-                </div>
-                
-                <div class="term-input-group">
-                    <span class="term-prompt">email:</span>
-                    <input type="email" name="email" class="term-input" required placeholder="_" autocomplete="off">
-                </div>
-                
-                <div class="term-input-group">
-                    <span class="term-prompt">message:</span>
-                    <textarea name="message" class="term-textarea" required placeholder="_"></textarea>
-                </div>
-                
-                <button type="submit" class="term-submit">
-                    > EXECUTE_SEND
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script src="js/socials.js" defer></script>
-<script src="js/loader.js" defer></script>
-<script src="js/projects-data.js" defer></script>
-<script src="js/script.js" defer></script>
-
+<script src="js/socials.js"></script>
+<script>
+    // Re-target the shared social config into the hub's own footer markup.
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.hub-social');
+        if (!container || typeof socialLinks === 'undefined') return;
+        container.innerHTML = socialLinks.map(link => {
+            const content = link.customHtml ? link.customHtml : `<i class="${link.icon}"></i>`;
+            return `<a href="${link.url}" target="_blank" rel="noopener" title="${link.platform}">${content}</a>`;
+        }).join('');
+    });
+</script>
 </body>
 </html>

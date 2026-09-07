@@ -4,14 +4,18 @@
 This is a static portfolio website built with HTML, CSS, and Vanilla JavaScript. It features a "Cyber Mode" theme toggle that drastically changes the visual aesthetic using CSS variables and canvas effects.
 
 ## Architecture & Structure
-- **Entry Point**: `index.html` contains the main structure and loads all resources.
+- **Entry Point**: `index.html` is a lightweight **hub** page — it does not use the Cyber Mode theme. It just links out to the site's sections: `portfolio.html` (Game Dev & 3D Art) and `webapps.html` (standalone web apps/tools). Keep it minimal; don't add portfolio content here.
+- **Game Dev Portfolio**: `portfolio.html` contains the main hero/skills/projects/B2B/contact structure (this used to be `index.html`). `services.html` and `resume.html` are sub-pages of this section and share its sidebar nav via `js/loader.js`.
+- **Web Apps**: `webapps.html` lists standalone tools (e.g. `dienstplan.html`). Each app is a fully self-contained HTML file with its own inline `<style>`/`<script>` and its own visual identity — it does not use the portfolio's Cyber Mode styling. Add new apps as a new self-contained `.html` file plus a card in `webapps.html`.
 - **Styling**:
-  - `css/base.css`: Core variables, reset, typography, and layout.
-  - `css/components.css`: Reusable UI elements (cards, buttons).
+  - `css/hub.css`: Shared neutral styles for `index.html` and `webapps.html` only. Do not mix with the Cyber Mode files below.
+  - `css/base.css`: Core variables, reset, typography, and layout for the Cyber Mode portfolio (`portfolio.html`, `services.html`, `resume.html`).
+  - `css/components.css`: Reusable UI elements (cards, buttons) for the Cyber Mode portfolio.
   - `css/cyberpunk.css`: Specific overrides and effects for the "Cyber Mode" theme.
 - **Logic**:
-  - `js/script.js`: Main application logic, event listeners, and the `projects` data object.
-  - `js/socials.js`: Handles dynamic injection of social media links.
+  - `js/loader.js`: Renders the shared sidebar nav (with active-link highlighting) on `portfolio.html`, `services.html`, and `resume.html`. Not used on `index.html`/`webapps.html`.
+  - `js/script.js`: Main application logic, event listeners, and the `projects` data object (used on `portfolio.html`).
+  - `js/socials.js`: Defines the shared `socialLinks` config; `initSocials()` auto-populates a `.social-links` container (Cyber Mode sidebar). `index.html`/`webapps.html` render the same `socialLinks` data into their own `.hub-social` footer markup instead.
 - **Assets**: Images are stored in `images/portfolio/` and referenced directly in JS data or HTML.
 
 ## Development Conventions
@@ -44,5 +48,5 @@ This is a static portfolio website built with HTML, CSS, and Vanilla JavaScript.
   - Update `css/cyberpunk.css` for the "Void/Cyber" look.
 
 ## External Dependencies
-- **Fonts**: Google Fonts (Space Mono) loaded in `index.html`.
-- **Icons**: Font Awesome loaded via CDN in `index.html`.
+- **Fonts**: Google Fonts (Space Mono) loaded in `portfolio.html`/`services.html`/`resume.html`; the hub pages (`index.html`, `webapps.html`) also load Inter for their neutral look.
+- **Icons**: Font Awesome loaded via CDN on every page that needs icons.
