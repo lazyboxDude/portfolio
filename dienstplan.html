@@ -12,6 +12,7 @@
 <link rel="manifest" id="manifest">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%232e4bc7'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='26' stroke-linecap='round'%3E%3Ccircle cx='256' cy='256' r='150'/%3E%3Cpath d='M256 168v92l60 40'/%3E%3C/g%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root{
     --paper:#f5f6f9; --surface:#ffffff; --ink:#181a20; --muted:#767c88;
@@ -249,11 +250,12 @@
     </div>
 
     <div class="actions">
-      <button class="primary" id="dl">Kalender (.ics)</button>
+      <button class="primary" id="gcal">In Google Kalender speichern</button>
+      <button class="secondary" id="dl">Kalender (.ics)</button>
       <button class="secondary" id="csv">Notion (.csv)</button>
       <button class="secondary" id="copy">Kopieren</button>
     </div>
-    <p class="cap" id="gcalHint" style="display:none">📅 iPhone → Google Kalender: iOS öffnet .ics-Dateien immer über die Apple-Kalender-App — das lässt sich von der Website aus nicht umgehen. Einmalig einrichten: <b>Einstellungen → Kalender → Accounts → Account hinzufügen → Google</b>. Beim Öffnen der Datei dann oben bei „Kalender" deinen Google-Kalender statt iCloud auswählen — die Schichten landen direkt synchronisiert in Google Kalender.</p>
+    <p class="cap" id="gcalHint" style="display:none">📅 iPhone-Tipp: „In Google Kalender speichern" meldet dich direkt bei Google an und trägt alle Schichten in dein Google-Kalender-Konto ein — ganz ohne die Apple-Kalender-App. Die .ics-Datei bleibt als Alternative für andere Kalender-Apps.</p>
   </section>
 
   <footer>
@@ -537,6 +539,79 @@ function makeICS(ev,name){
   L.push('END:VCALENDAR');
   return L.join('\r\n')+'\r\n';
 }
+
+/* ---------- Google Kalender (direkt, per OAuth) ---------- */
+// Eigene Google-Cloud-OAuth-Client-ID hier eintragen (siehe README/Setup-Hinweis).
+const GOOGLE_CLIENT_ID='DEINE-CLIENT-ID.apps.googleusercontent.com';
+const GCAL_SCOPE='https://www.googleapis.com/auth/calendar.events';
+let gcalToken=null, gcalTokenClient=null;
+
+function ensureGcalClient(){
+  if(gcalTokenClient) return gcalTokenClient;
+  if(!window.google||!google.accounts||!google.accounts.oauth2) throw new Error('google-lib-missing');
+  gcalTokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:GCAL_SCOPE,callback:()=>{}});
+  return gcalTokenClient;
+}
+function getGcalToken(){
+  return new Promise((resolve,reject)=>{
+    let client;
+    try{ client=ensureGcalClient(); }catch(e){ reject(e); return; }
+    client.callback=resp=>{ if(resp.error) reject(resp); else { gcalToken=resp.access_token; resolve(gcalToken); } };
+    client.error_callback=err=>reject(err);
+    client.requestAccessToken({prompt:gcalToken?'':'consent'});
+  });
+}
+function hashId(s){
+  let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+  return 'dp'+h.toString(16).padStart(8,'0');
+}
+function evToGcalBody(e,name){
+  const[d,mo,y]=e.date.split('.');
+  const start=`${y}-${mo}-${d}T${pad(e.sh)}:${pad(e.sm)}:00`;
+  let ey=+y,em2=+mo,ed=+d;
+  if((e.eh*60+e.em)<=(e.sh*60+e.sm)){const nd=new Date(+y,+mo-1,+d+1);ey=nd.getFullYear();em2=nd.getMonth()+1;ed=nd.getDate();}
+  const end=`${ey}-${pad(em2)}-${pad(ed)}T${pad(e.eh)}:${pad(e.em)}:00`;
+  return{
+    id:hashId(slug(name)+'-'+y+mo+d+pad(e.sh)+pad(e.sm)),
+    summary:`Arbeit Kino (${e.code})`+(e.note?' '+e.note:''),
+    description:`Schicht ${e.code}${e.note?' '+e.note:''} – Die Cinema 8 AG, Schöftland`,
+    location:'Die Cinema 8 AG, 5040 Schöftland',
+    start:{dateTime:start,timeZone:'Europe/Zurich'},
+    end:{dateTime:end,timeZone:'Europe/Zurich'}
+  };
+}
+async function upsertGcalEvent(body){
+  const put=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${body.id}`,{
+    method:'PUT',headers:{Authorization:'Bearer '+gcalToken,'Content-Type':'application/json'},body:JSON.stringify(body)
+  });
+  if(put.ok) return true;
+  if(put.status!==404) return false;
+  const post=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
+    method:'POST',headers:{Authorization:'Bearer '+gcalToken,'Content-Type':'application/json'},body:JSON.stringify(body)
+  });
+  return post.ok;
+}
+async function pushToGoogleCalendar(){
+  if(GOOGLE_CLIENT_ID.startsWith('DEINE-')){ toast('Google Kalender ist noch nicht eingerichtet (Client-ID fehlt)'); return; }
+  if(!CURRENT.length) return;
+  const btn=$('gcal'), orig=btn.textContent, name=$('name').value.trim();
+  btn.disabled=true; btn.textContent='Verbinde …';
+  try{
+    await getGcalToken();
+    let ok=0,fail=0;
+    for(const e of CURRENT){
+      btn.textContent=`Speichere … (${ok+fail+1}/${CURRENT.length})`;
+      const done=await upsertGcalEvent(evToGcalBody(e,name));
+      if(done)ok++; else fail++;
+    }
+    toast(`${ok} Termin${ok===1?'':'e'} in Google Kalender gespeichert`+(fail?`, ${fail} fehlgeschlagen`:''));
+  }catch(e){
+    toast('Google-Anmeldung fehlgeschlagen oder abgebrochen');
+  }finally{
+    btn.disabled=false; btn.textContent=orig;
+  }
+}
+$('gcal').onclick=pushToGoogleCalendar;
 
 /* ---------- helpers ---------- */
 const pad=n=>String(n).padStart(2,'0');
