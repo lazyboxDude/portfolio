@@ -7,13 +7,14 @@ const sidebarHTML = `
         <i class="fas fa-bars"></i>
     </div>
     <nav id="main-nav">
-        <a href="index.html" onclick="closeMobileMenu()"><i class="fas fa-home"></i> <span data-text="Home">Home</span></a>
-        <a href="index.html#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
-        <a href="index.html#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Arsenal">Arsenal</span></a>
-        <a href="index.html#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Projects">Projects</span></a>
+        <a href="index.html" onclick="closeMobileMenu()"><i class="fas fa-house"></i> <span data-text="Hub">Hub</span></a>
+        <a href="portfolio.html#about" onclick="closeMobileMenu()"><i class="fas fa-user"></i> <span data-text="Who I am">Who I am</span></a>
+        <a href="portfolio.html#skills" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> <span data-text="Arsenal">Arsenal</span></a>
+        <a href="portfolio.html#work" onclick="closeMobileMenu()"><i class="fas fa-cubes"></i> <span data-text="Projects">Projects</span></a>
         <a href="services.html" onclick="closeMobileMenu()"><i class="fas fa-handshake"></i> <span data-text="B2B Solutions">B2B Solutions</span></a>
         <a href="resume.html" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> <span data-text="Resume">Resume</span></a>
-    
+        <a href="webapps.html" onclick="closeMobileMenu()"><i class="fas fa-laptop-code"></i> <span data-text="Web Apps">Web Apps</span></a>
+
         <button id="modeBtn" class="funky-btn" onclick="toggleCyberMode(); closeMobileMenu()">ENTER THE VOID</button>
 
         <div class="sidebar-footer">
@@ -54,18 +55,18 @@ function highlightActiveLink() {
     // Find the link that matches the current page
     let activeLink = null;
 
-    // 1. Exact match on filename (e.g. services.html, resume.html)
+    // 1. Exact match on filename (e.g. services.html, resume.html, webapps.html)
     activeLink = document.querySelector(`#main-nav a[href="${page}"]`);
 
-    // 2. If no exact match, check for index.html special case
-    if (!activeLink && (page === 'index.html' || page === '')) {
-        // If we have a hash, try to match the hash link (e.g. index.html#about)
+    // 2. If no exact match, check for portfolio.html special case (hash-based sections)
+    if (!activeLink && page === 'portfolio.html') {
+        // If we have a hash, try to match the hash link (e.g. portfolio.html#about)
         if (hash) {
-            activeLink = document.querySelector(`#main-nav a[href="index.html${hash}"]`);
+            activeLink = document.querySelector(`#main-nav a[href="portfolio.html${hash}"]`);
         }
-        // If still no match (or no hash), default to Home
+        // If still no match (or no hash), default to the top section
         if (!activeLink) {
-            activeLink = document.querySelector(`#main-nav a[href="index.html"]`);
+            activeLink = document.querySelector(`#main-nav a[href="portfolio.html#about"]`);
         }
     }
 

@@ -1,0 +1,153 @@
+/* ==========================================================================
+   Hub — shared neutral styles for index.html (landing hub) and webapps.html
+   Deliberately independent from base.css / cyberpunk.css: the hub is the
+   calm "roof" that links out to differently-themed sections of the site.
+   ========================================================================== */
+
+:root{
+  --hub-bg:#0b0c0f;
+  --hub-bg-soft:#111319;
+  --hub-surface:#15171e;
+  --hub-surface-hover:#1b1e27;
+  --hub-line:#242732;
+  --hub-text:#eef0f4;
+  --hub-muted:#9aa0ad;
+  --hub-accent:#00d2ff;
+  --hub-accent-soft:rgba(0,210,255,.12);
+  --hub-font:'Inter','Segoe UI',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --hub-mono:'Space Mono',ui-monospace,Menlo,monospace;
+  --hub-radius:18px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body.hub{
+  background:var(--hub-bg);
+  color:var(--hub-text);
+  font-family:var(--hub-font);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+body.hub::before{
+  content:"";
+  position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(60vw 60vw at 15% -10%, rgba(0,210,255,.08), transparent 60%),
+    radial-gradient(50vw 50vw at 110% 10%, rgba(0,210,255,.05), transparent 55%);
+  pointer-events:none;
+}
+
+.hub-shell{max-width:960px;margin:0 auto;padding:0 24px 80px}
+
+/* header */
+.hub-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 0;
+}
+.hub-logo{display:flex;flex-direction:column;line-height:1.1;text-decoration:none;color:inherit}
+.hub-logo b{font-family:var(--hub-mono);font-size:16px;letter-spacing:.02em}
+.hub-logo span{font-size:12px;color:var(--hub-muted)}
+.hub-header nav{display:flex;gap:22px}
+.hub-header nav a{
+  color:var(--hub-muted);text-decoration:none;font-size:13.5px;font-weight:500;
+  transition:color .15s;
+}
+.hub-header nav a:hover{color:var(--hub-text)}
+
+/* hero */
+.hub-hero{padding:56px 0 44px}
+.hub-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--hub-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--hub-accent);background:var(--hub-accent-soft);
+  padding:6px 12px;border-radius:999px;margin-bottom:20px;
+}
+.hub-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--hub-accent);
+  box-shadow:0 0 8px var(--hub-accent)}
+.hub-hero h1{
+  font-size:clamp(30px,5.4vw,46px);line-height:1.08;letter-spacing:-.02em;
+  margin:0 0 16px;font-weight:700;
+}
+.hub-hero h1 em{font-style:normal;color:var(--hub-accent)}
+.hub-hero p{font-size:16px;color:var(--hub-muted);max-width:56ch;margin:0}
+
+/* card grid */
+.hub-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:8px;
+}
+@media (max-width:680px){.hub-grid{grid-template-columns:1fr}}
+
+.hub-card{
+  position:relative;display:block;text-decoration:none;color:inherit;
+  background:var(--hub-surface);border:1px solid var(--hub-line);border-radius:var(--hub-radius);
+  padding:28px 26px;overflow:hidden;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease;
+}
+.hub-card:hover{transform:translateY(-3px);border-color:var(--hub-accent);background:var(--hub-surface-hover)}
+.hub-card .ic{
+  width:44px;height:44px;border-radius:12px;background:var(--hub-accent-soft);color:var(--hub-accent);
+  display:grid;place-items:center;font-size:18px;margin-bottom:18px;
+}
+.hub-card h2{font-size:19px;margin:0 0 8px;letter-spacing:-.01em;font-weight:650}
+.hub-card p{font-size:14px;color:var(--hub-muted);margin:0 0 18px;max-width:40ch}
+.hub-card .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+.hub-card .tag{
+  font-family:var(--hub-mono);font-size:11px;color:var(--hub-muted);
+  border:1px solid var(--hub-line);border-radius:999px;padding:4px 10px;
+}
+.hub-card .go{
+  display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--hub-accent);
+}
+.hub-card .go i{transition:transform .18s ease}
+.hub-card:hover .go i{transform:translateX(3px)}
+
+/* small note card (e.g. "more soon") */
+.hub-note{
+  border:1px dashed var(--hub-line);border-radius:var(--hub-radius);
+  padding:22px 24px;color:var(--hub-muted);font-size:13.5px;margin-top:18px;
+}
+.hub-note b{color:var(--hub-text)}
+
+/* app cards (webapps.html) */
+.app-list{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.app-card{
+  display:flex;align-items:center;gap:18px;
+  background:var(--hub-surface);border:1px solid var(--hub-line);border-radius:16px;
+  padding:20px 22px;text-decoration:none;color:inherit;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
+}
+.app-card:hover{transform:translateY(-2px);border-color:var(--hub-accent);background:var(--hub-surface-hover)}
+.app-card .ic{
+  flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:var(--hub-accent-soft);
+  color:var(--hub-accent);display:grid;place-items:center;font-size:19px;
+}
+.app-card .body{flex:1 1 auto;min-width:0}
+.app-card h3{margin:0 0 4px;font-size:16.5px;font-weight:640;letter-spacing:-.01em}
+.app-card p{margin:0;font-size:13.5px;color:var(--hub-muted)}
+.app-card .meta{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.app-card .badge{
+  font-family:var(--hub-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--hub-accent);background:var(--hub-accent-soft);padding:3px 9px;border-radius:999px;
+}
+.app-card i.fa-arrow-right{color:var(--hub-muted);font-size:14px}
+
+/* footer */
+.hub-footer{
+  margin-top:64px;padding-top:24px;border-top:1px solid var(--hub-line);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.hub-footer p{font-size:12.5px;color:var(--hub-muted);margin:0}
+.hub-social{display:flex;gap:10px}
+.hub-social a{
+  width:34px;height:34px;border-radius:10px;border:1px solid var(--hub-line);
+  display:grid;place-items:center;color:var(--hub-muted);text-decoration:none;
+  transition:color .15s,border-color .15s;
+}
+.hub-social a:hover{color:var(--hub-accent);border-color:var(--hub-accent)}
+
+.hub-back{
+  display:inline-flex;align-items:center;gap:8px;color:var(--hub-muted);text-decoration:none;
+  font-size:13.5px;font-weight:500;margin-bottom:28px;transition:color .15s;
+}
+.hub-back:hover{color:var(--hub-text)}
