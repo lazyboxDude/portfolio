@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datenschutzerklärung | Micael G. Fernandes</title>
+
+    <meta name="description" content="Datenschutzerklärung für gomes-fernandes.ch und die Web-Apps, inklusive der Google-Kalender-Integration im Dienstplan-Tool.">
+    <meta name="robots" content="noindex">
+
+    <link rel="icon" type="image/png" href="images/icons/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/hub.css">
+    <style>
+      .legal{background:var(--hub-surface);border:1px solid var(--hub-line);border-radius:var(--hub-radius);
+        padding:32px 30px;margin-top:8px}
+      .legal h2{font-size:18px;margin:28px 0 10px;letter-spacing:-.01em}
+      .legal h2:first-child{margin-top:0}
+      .legal p,.legal li{font-size:14.5px;color:var(--hub-muted);line-height:1.7}
+      .legal ul{margin:6px 0;padding-left:20px}
+      .legal a{color:var(--hub-accent)}
+      .legal .updated{font-family:var(--hub-mono);font-size:11.5px;color:var(--hub-muted);
+        text-transform:uppercase;letter-spacing:.08em;margin-bottom:0}
+    </style>
+</head>
+<body class="hub">
+
+<div class="hub-shell">
+
+    <header class="hub-header">
+        <a href="index.html" class="hub-logo">
+            <b>Micael G. Fernandes</b>
+            <span>lazyboxdude · gomes-fernandes.ch</span>
+        </a>
+        <nav>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="webapps.html">Web Apps</a>
+            <a href="resume.html">Resume</a>
+        </nav>
+    </header>
+
+    <a href="webapps.html" class="hub-back"><i class="fas fa-arrow-left"></i> Zurück zu Web Apps</a>
+
+    <section class="hub-hero" style="padding-top:0;padding-bottom:8px;">
+        <span class="hub-eyebrow"><span class="dot"></span> Rechtliches</span>
+        <h1>Datenschutz&shy;erklärung</h1>
+        <p>Gilt für gomes-fernandes.ch und die darauf gehosteten Web-Apps, insbesondere für den <a href="dienstplan.html" style="color:var(--hub-accent)">Dienstplan</a>.</p>
+    </section>
+
+    <div class="legal">
+      <p class="updated">Stand: September 2026</p>
+
+      <h2>Verantwortlicher</h2>
+      <p>Micael G. Fernandes · gomes-fernandes.ch · <a href="mailto:micael@gomes-fernandes.ch">micael@gomes-fernandes.ch</a></p>
+
+      <h2>Grundsatz: lokal statt Server</h2>
+      <p>Die Web-Apps auf dieser Seite (u.&nbsp;a. der Dienstplan) laufen vollständig im Browser. Hochgeladene Dateien wie der Dienstplan-PDF werden clientseitig verarbeitet und nicht an einen Server übertragen oder gespeichert. Es werden keine Cookies gesetzt und keine Analyse- oder Tracking-Dienste eingesetzt.</p>
+
+      <h2>Google-Kalender-Integration (Dienstplan)</h2>
+      <p>Der Dienstplan bietet optional den Button „In Google Kalender speichern". Dabei gilt:</p>
+      <ul>
+        <li>Die Anmeldung erfolgt über Google Identity Services direkt im Browser. Es werden keine Zugangsdaten oder Tokens an einen eigenen Server übermittelt oder dort gespeichert — der Zugriffstoken bleibt ausschliesslich im Arbeitsspeicher des Browsers, für die Dauer der Sitzung.</li>
+        <li>Angefordert wird nur der Google-Berechtigungsbereich <code>calendar.events</code> (Termine erstellen/aktualisieren). Es wird nicht auf bestehende Kalendereinträge, Kontakte, E-Mails oder andere Google-Daten zugegriffen.</li>
+        <li>Mit diesem Zugriff werden die aus dem PDF erkannten Schichten direkt per Google-Calendar-API als Termine in den primären Kalender des angemeldeten Google-Kontos geschrieben (Titel, Datum/Uhrzeit, Ort, kurze Beschreibung). Es werden keine Daten an Dritte weitergegeben.</li>
+        <li>Ein erneuter Import überschreibt vorhandene, zuvor so erstellte Termine (Update statt Duplikat) anhand einer aus Name, Datum und Uhrzeit gebildeten Kennung.</li>
+      </ul>
+      <p>Die Verwendung und Weitergabe von Informationen, die über Google-APIs empfangen werden, durch diese App hält sich an die <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, einschliesslich der Bestimmungen zur eingeschränkten Nutzung (Limited Use).</p>
+
+      <h2>Alternative Exporte</h2>
+      <p>Wer sich nicht mit Google anmelden möchte, kann die Schichten stattdessen als <code>.ics</code>-Datei (für Apple Kalender, Outlook u.&nbsp;a.) oder als <code>.csv</code> exportieren, oder als Text kopieren — ganz ohne Anmeldung.</p>
+
+      <h2>Hosting</h2>
+      <p>Die Seite wird als statische Website gehostet. Beim Aufruf verarbeitet der Hosting-Anbieter automatisch technische Zugriffsdaten (z.&nbsp;B. IP-Adresse, Zeitpunkt, angeforderte Datei), wie das bei jedem Webserver-Betrieb technisch notwendig ist.</p>
+
+      <h2>Kontakt</h2>
+      <p>Fragen zum Datenschutz gerne per E-Mail an <a href="mailto:micael@gomes-fernandes.ch">micael@gomes-fernandes.ch</a>.</p>
+    </div>
+
+    <footer class="hub-footer">
+        <p>&copy; 2025 Micael G. Fernandes.</p>
+        <div class="hub-social"></div>
+    </footer>
+
+</div>
+
+<script src="js/socials.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.hub-social');
+        if (!container || typeof socialLinks === 'undefined') return;
+        container.innerHTML = socialLinks.map(link => {
+            const content = link.customHtml ? link.customHtml : `<i class="${link.icon}"></i>`;
+            return `<a href="${link.url}" target="_blank" rel="noopener" title="${link.platform}">${content}</a>`;
+        }).join('');
+    });
+</script>
+</body>
+</html>
