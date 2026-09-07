@@ -154,6 +154,8 @@
   .primary:hover{background:#2740ad}
   .secondary{background:var(--surface);color:var(--ink);border-color:var(--line)}
   .secondary:hover{border-color:#cfd4e4;background:#fafbfc}
+  select.secondary{font-family:inherit;font-size:14px;font-weight:550;border-radius:11px;cursor:pointer;
+    padding:12px 14px;border:1px solid var(--line);max-width:220px}
 
   footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);
     font-size:12.5px;color:var(--muted);line-height:1.6}
@@ -251,11 +253,12 @@
 
     <div class="actions">
       <button class="primary" id="gcal">In Google Kalender speichern</button>
+      <select class="secondary" id="gcalSel" style="display:none"></select>
       <button class="secondary" id="dl">Kalender (.ics)</button>
       <button class="secondary" id="csv">Notion (.csv)</button>
       <button class="secondary" id="copy">Kopieren</button>
     </div>
-    <p class="cap" id="gcalHint" style="display:none">📅 iPhone-Tipp: „In Google Kalender speichern" meldet dich direkt bei Google an und trägt alle Schichten in dein Google-Kalender-Konto ein — ganz ohne die Apple-Kalender-App. Die .ics-Datei bleibt als Alternative für andere Kalender-Apps.</p>
+    <p class="cap" id="gcalHint" style="display:none">📅 iPhone-Tipp: „In Google Kalender speichern" meldet dich direkt bei Google an. Nach der Anmeldung erscheint eine Auswahl, in welchen deiner Google-Kalender die Schichten eingetragen werden sollen — dann nochmal auf den Button klicken, um zu speichern. Ganz ohne die Apple-Kalender-App. Die .ics-Datei bleibt als Alternative für andere Kalender-Apps.</p>
   </section>
 
   <footer>
@@ -543,8 +546,9 @@ function makeICS(ev,name){
 
 /* ---------- Google Kalender (direkt, per OAuth) ---------- */
 const GOOGLE_CLIENT_ID='894649432118-i4tbo5kgrotgsv4aij5953lori8qh1sh.apps.googleusercontent.com';
-const GCAL_SCOPE='https://www.googleapis.com/auth/calendar.events';
-let gcalToken=null, gcalTokenClient=null;
+const GCAL_SCOPE='https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.calendarlist.readonly';
+const GCAL_LAST_KEY='dienstplan_gcal_calendar_id';
+let gcalToken=null, gcalTokenClient=null, gcalCalendars=null;
 
 function ensureGcalClient(){
   if(gcalTokenClient) return gcalTokenClient;
@@ -560,6 +564,21 @@ function getGcalToken(){
     client.error_callback=err=>reject(err);
     client.requestAccessToken({prompt:gcalToken?'':'consent'});
   });
+}
+async function loadGcalCalendars(){
+  const res=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=writer&fields=items(id,summary,primary)',{
+    headers:{Authorization:'Bearer '+gcalToken}
+  });
+  if(!res.ok) throw new Error('calendarList-failed');
+  const data=await res.json();
+  return (data.items||[]).sort((a,b)=>(b.primary?1:0)-(a.primary?1:0));
+}
+function fillGcalSelect(cals){
+  const sel=$('gcalSel');
+  sel.innerHTML=cals.map(c=>`<option value="${esc(c.id)}">${esc(c.summary)}${c.primary?' (Standard)':''}</option>`).join('');
+  let last=null; try{ last=localStorage.getItem(GCAL_LAST_KEY); }catch(e){}
+  if(last&&cals.some(c=>c.id===last)) sel.value=last;
+  sel.style.display='inline-block';
 }
 function hashId(s){
   let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
@@ -580,13 +599,14 @@ function evToGcalBody(e,name){
     end:{dateTime:end,timeZone:'Europe/Zurich'}
   };
 }
-async function upsertGcalEvent(body){
-  const put=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${body.id}`,{
+async function upsertGcalEvent(calId,body){
+  const base=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`;
+  const put=await fetch(`${base}/${body.id}`,{
     method:'PUT',headers:{Authorization:'Bearer '+gcalToken,'Content-Type':'application/json'},body:JSON.stringify(body)
   });
   if(put.ok) return true;
   if(put.status!==404) return false;
-  const post=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
+  const post=await fetch(base,{
     method:'POST',headers:{Authorization:'Bearer '+gcalToken,'Content-Type':'application/json'},body:JSON.stringify(body)
   });
   return post.ok;
@@ -594,21 +614,33 @@ async function upsertGcalEvent(body){
 async function pushToGoogleCalendar(){
   if(GOOGLE_CLIENT_ID.startsWith('DEINE-')){ toast('Google Kalender ist noch nicht eingerichtet (Client-ID fehlt)'); return; }
   if(!CURRENT.length) return;
-  const btn=$('gcal'), orig=btn.textContent, name=$('name').value.trim();
-  btn.disabled=true; btn.textContent='Verbinde …';
+  const btn=$('gcal'), name=$('name').value.trim();
+  btn.disabled=true;
   try{
-    await getGcalToken();
+    if(!gcalCalendars){
+      btn.textContent='Verbinde …';
+      await getGcalToken();
+      btn.textContent='Lade Kalenderliste …';
+      gcalCalendars=await loadGcalCalendars();
+      fillGcalSelect(gcalCalendars);
+      toast('Kalender ausgewählt lassen oder wechseln, dann nochmal klicken');
+      btn.disabled=false; btn.textContent='Kalender wählen, dann hier klicken';
+      return;
+    }
+    const calId=$('gcalSel').value;
+    try{ localStorage.setItem(GCAL_LAST_KEY,calId); }catch(e){}
     let ok=0,fail=0;
     for(const e of CURRENT){
       btn.textContent=`Speichere … (${ok+fail+1}/${CURRENT.length})`;
-      const done=await upsertGcalEvent(evToGcalBody(e,name));
+      const done=await upsertGcalEvent(calId,evToGcalBody(e,name));
       if(done)ok++; else fail++;
     }
-    toast(`${ok} Termin${ok===1?'':'e'} in Google Kalender gespeichert`+(fail?`, ${fail} fehlgeschlagen`:''));
+    toast(`${ok} Termin${ok===1?'':'e'} in „${$('gcalSel').selectedOptions[0].textContent}“ gespeichert`+(fail?`, ${fail} fehlgeschlagen`:''));
+    btn.disabled=false; btn.textContent='In gewählten Kalender speichern';
   }catch(e){
     toast('Google-Anmeldung fehlgeschlagen oder abgebrochen');
-  }finally{
-    btn.disabled=false; btn.textContent=orig;
+    gcalCalendars=null; $('gcalSel').style.display='none';
+    btn.disabled=false; btn.textContent='In Google Kalender speichern';
   }
 }
 $('gcal').onclick=pushToGoogleCalendar;
