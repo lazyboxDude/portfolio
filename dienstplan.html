@@ -361,7 +361,11 @@ function parsePage(items){
   let header=null;
   for(const k in byTop){
     const sorted=byTop[k].slice().sort((a,b)=>a.x-b.x);
-    if(sorted.length>=7&&WD.every((d,idx)=>sorted[idx]&&sorted[idx].s===d)){header=sorted.slice(0,7);break;}
+    if(sorted.length<2)continue;
+    // weekday header can start on any day and cover any number of columns
+    // (e.g. an 11-day plan starting on a Thursday), not just a Mon–Sun week
+    const seq=sorted.every((it,idx)=>idx===0||(WD.indexOf(it.s)-WD.indexOf(sorted[idx-1].s)+7)%7===1);
+    if(seq&&(!header||sorted.length>header.length))header=sorted;
   }
   if(!header)return null;
   const colX=header.map(i=>i.x), headerTop=header[0].top;
