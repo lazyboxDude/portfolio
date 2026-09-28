@@ -23,6 +23,9 @@
     --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --mono:ui-monospace,'SF Mono','SFMono-Regular',Menlo,'Roboto Mono','Liberation Mono',monospace;
     --shadow:0 1px 2px rgba(24,26,32,.04),0 8px 24px -12px rgba(24,26,32,.14);
+    --shadow-lift:0 2px 6px rgba(24,26,32,.06),0 16px 32px -14px rgba(24,26,32,.22);
+    --spring:cubic-bezier(.32,.72,0,1);
+    --spring-bounce:cubic-bezier(.34,1.56,.64,1);
     --r:16px;
   }
   *{box-sizing:border-box}
@@ -30,18 +33,20 @@
   body{
     background:var(--paper); color:var(--ink); font-family:var(--sans);
     line-height:1.5; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    font-optical-sizing:auto;
   }
   .app{max-width:780px;margin:0 auto;padding:0 20px 72px}
 
   /* top bar */
   header.bar{
-    position:sticky;top:0;z-index:20;background:rgba(245,246,249,.82);
-    backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);
-    border-bottom:1px solid var(--line);
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(245,246,249,.78);
+    backdrop-filter:saturate(180%) blur(16px);-webkit-backdrop-filter:saturate(180%) blur(16px);
+    box-shadow:inset 0 -1px 0 rgba(255,255,255,.6),0 1px 0 var(--line),0 12px 24px -20px rgba(24,26,32,.25);
     display:flex;align-items:center;gap:12px;padding:14px 0;margin-bottom:26px;
+    transition:box-shadow .2s var(--spring);
   }
   .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);flex:0 0 auto;
-    display:grid;place-items:center;box-shadow:var(--shadow)}
+    display:grid;place-items:center;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.35)}
   .mark svg{display:block}
   .brand{display:flex;flex-direction:column;line-height:1.05}
   .brand b{font-size:15px;letter-spacing:-.01em}
@@ -56,10 +61,14 @@
   .drop{
     background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
     box-shadow:var(--shadow);padding:40px 24px;text-align:center;cursor:pointer;
-    transition:border-color .15s,background .15s,transform .06s;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    transition:border-color .18s var(--spring),background .18s var(--spring),
+      box-shadow .18s var(--spring),transform .12s var(--spring);
   }
-  .drop:hover{border-color:#cfd4e4}
-  .drop.hot{border-color:var(--accent);background:var(--accent-weak)}
+  .drop:hover{border-color:#cfd4e4;box-shadow:var(--shadow-lift);transform:translateY(-1px)}
+  .drop:active{transform:scale(.99);transition-duration:.08s}
+  .drop:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .drop.hot{border-color:var(--accent);background:var(--accent-weak);transform:scale(1.01)}
   .drop .ic{width:38px;height:38px;margin:0 auto 12px;color:var(--accent)}
   .drop .t{font-size:16px;font-weight:560}
   .drop .s{font-size:13.5px;color:var(--muted);margin-top:4px}
@@ -78,11 +87,13 @@
   select{
     width:100%;font-family:inherit;font-size:15.5px;color:var(--ink);
     background:var(--surface);border:1px solid var(--line);border-radius:11px;
-    padding:11px 40px 11px 13px;cursor:pointer;appearance:none;
+    padding:11px 40px 11px 13px;cursor:pointer;appearance:none;touch-action:manipulation;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23767c88' stroke-width='1.7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:right 14px center;
+    transition:border-color .15s var(--spring),box-shadow .15s var(--spring);
   }
   select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+  select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .found{flex:0 0 auto;font-size:12.5px;color:var(--muted);padding-bottom:11px}
 
   /* result */
@@ -148,10 +159,13 @@
   /* actions */
   .actions{display:flex;gap:10px;flex-wrap:wrap}
   button{font-family:inherit;font-size:14px;font-weight:550;border-radius:11px;cursor:pointer;
-    padding:12px 18px;border:1px solid transparent;transition:background .13s,border-color .13s,transform .06s}
-  button:active{transform:translateY(1px)}
+    padding:12px 18px;border:1px solid transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    transition:background .13s var(--spring),border-color .13s var(--spring),
+      transform .15s var(--spring),box-shadow .15s var(--spring)}
+  button:active{transform:scale(.96);transition-duration:.08s}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .primary{background:var(--accent);color:#fff}
-  .primary:hover{background:#2740ad}
+  .primary:hover{background:#2740ad;box-shadow:0 6px 16px -8px rgba(46,75,199,.5)}
   .secondary{background:var(--surface);color:var(--ink);border-color:var(--line)}
   .secondary:hover{border-color:#cfd4e4;background:#fafbfc}
   select.secondary{font-family:inherit;font-size:14px;font-weight:550;border-radius:11px;cursor:pointer;
@@ -161,30 +175,40 @@
     font-size:12.5px;color:var(--muted);line-height:1.6}
   footer b{color:var(--ink);font-weight:560}
 
-  .modal{position:fixed;inset:0;background:rgba(20,22,28,.45);display:none;
-    align-items:flex-end;justify-content:center;z-index:40}
-  .modal.show{display:flex}
+  .modal{position:fixed;inset:0;background:rgba(20,22,28,0);display:flex;
+    align-items:flex-end;justify-content:center;z-index:40;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .2s var(--spring),background-color .2s var(--spring),visibility 0s linear .2s}
+  .modal.show{opacity:1;visibility:visible;pointer-events:auto;background:rgba(20,22,28,.45);
+    transition:opacity .2s var(--spring),background-color .2s var(--spring)}
   .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:18px 18px 0 0;
     padding:18px 20px 22px;box-shadow:0 -8px 40px -12px rgba(0,0,0,.3);
-    animation:sheetup .26s cubic-bezier(.2,.7,.3,1)}
+    transform:translateY(16px);opacity:0;transition:transform .32s var(--spring-bounce),opacity .22s var(--spring)}
+  .modal.show .sheet{transform:translateY(0);opacity:1}
   .sheet-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
   .sheet-h b{font-size:15px;font-family:var(--mono)}
-  .x{background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 6px;line-height:1}
+  .x{background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 6px;line-height:1;
+    border-radius:8px;transition:background .13s var(--spring),transform .12s var(--spring)}
+  .x:hover{background:var(--paper)} .x:active{transform:scale(.9)}
   .sheet-note{font-size:13px;color:var(--muted);margin:2px 0 12px;line-height:1.5}
   textarea{width:100%;height:180px;font-family:var(--mono);font-size:11.5px;line-height:1.5;
     color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;
     padding:12px;resize:none;white-space:pre;overflow:auto}
   .sheet-actions{display:flex;gap:10px;margin-top:12px}
-  @keyframes sheetup{from{transform:translateY(16px);opacity:.5}to{transform:none;opacity:1}}
   @media(min-width:560px){.modal{align-items:center}.sheet{border-radius:18px}}
 
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(14px);
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%) translateY(10px) scale(.94);
     background:var(--ink);color:#fff;font-size:13.5px;font-weight:500;padding:11px 17px;
-    border-radius:11px;opacity:0;transition:.22s;box-shadow:var(--shadow);pointer-events:none}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    border-radius:11px;opacity:0;transition:opacity .22s var(--spring),transform .28s var(--spring-bounce);
+    box-shadow:var(--shadow);pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 
   @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (prefers-reduced-transparency:reduce){
+    header.bar{background:var(--paper);backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
   @media (max-width:560px){
     .shift,.ruler{grid-template-columns:96px 1fr 66px}
     .bignum .v{font-size:32px}
@@ -210,7 +234,7 @@
   <h1 class="hero">Vom Plan zu deinen Stunden.</h1>
   <p class="lede">Zieh den Monats-Dienstplan als PDF herein, wähl deinen Namen und du bekommst deine Schichten, die Soll-Zeit und einen Export für Kalender oder Notion.</p>
 
-  <div class="drop" id="drop">
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Dienstplan-PDF auswählen oder hierher ziehen">
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 16V4m0 0L8 8m4-4l4 4"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
     </svg>
@@ -316,6 +340,7 @@ const $=id=>document.getElementById(id);
 /* ---------- file loading ---------- */
 const drop=$('drop');
 drop.onclick=()=>$('file').click();
+drop.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();$('file').click();} });
 ['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot')}));
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot')}));
 drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)loadPDF(f)});
