@@ -58,11 +58,11 @@ Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Sc
   - Code: `js/cursors.js` (`CursorSwarm` mit gemeinsamem rAF-Loop, `Cursor` mit `moveTo`/`follow`/`wander`/`click`),
     `js/intro.js` (der Intro-Job als `async`-Ablauf), `js/main.js` (Verdrahtung).
     Neue Jobs sind einfach weitere `async`-Abläufe auf diesen Bausteinen.
-  - Der Satz steht als echter Text in `index.html`. Ohne JS ist er sofort sichtbar (Button ausgeblendet),
-    mit JS tippen ihn die Bots. Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
+  - Der Satz steht als Text in einem `<noscript>` in `index.html`. Ohne JS ist er sofort sichtbar (Button ausgeblendet).
+    Mit JS liest `js/intro.js` ihn und entfernt das Element: vor dem Klick ist die Karte komplett leer, den Text tippen erst die Bots. Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
   - `prefers-reduced-motion`: kein Anlauf, keine Ripples. Karte und Text sind sofort da, die Cursors stehen still daneben, kein Replay.
   - Die Obergrenze von 40 Cursors bleibt als Sicherung im `CursorSwarm`. Die Zähler-Anzeige ("Enough!") aus Schritt 1 entfällt.
-  - Der Intro-Satz ist vorläufig: "Hi, welcome to my personal website". Er steht in `index.html` im `#typed`-Element. Name und Handle (Micael Gomes Fernandes, ._lazybox_) kommen später dazu.
+  - Der Intro-Satz ist vorläufig: "Hi, welcome to my personal website". Er steht in `index.html` im `<noscript id="intro-text">`. Name und Handle (Micael Gomes Fernandes, ._lazybox_) kommen später dazu.
 
 ## Offene Fragen an Micael
 

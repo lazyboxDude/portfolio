@@ -17,10 +17,11 @@
                 <span class="box-label">Build Website</span>
             </button>
 
-            <!-- Built live by the bot cursors (js/intro.js). The text is real content: it
-                 stays here for no-JS, and js/intro.js empties and retypes it. -->
+            <!-- Built live by the bot cursors (js/intro.js). The card is empty until the box is
+                 clicked. The sentence lives in the <noscript>: it is the no-JS fallback and the
+                 single source that js/intro.js reads and types. -->
             <section id="card" class="card" aria-label="Introduction">
-                <p class="card-text"><span id="typed">Hi, welcome to my personal website</span><span id="caret" class="caret" aria-hidden="true"></span><span id="rest" class="rest" aria-hidden="true"></span></p>
+                <p class="card-text"><noscript id="intro-text">Hi, welcome to my personal website</noscript><span id="typed"></span><span id="caret" class="caret" aria-hidden="true"></span><span id="rest" class="rest" aria-hidden="true"></span></p>
             </section>
         </div>
     </main>

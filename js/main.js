@@ -8,6 +8,7 @@ const intro = new Intro({
     swarm,
     label: box.querySelector('.box-label'),
     card: document.getElementById('card'),
+    source: document.getElementById('intro-text'),
     typed: document.getElementById('typed'),
     caret: document.getElementById('caret'),
     rest: document.getElementById('rest'),
