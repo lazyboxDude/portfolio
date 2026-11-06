@@ -5,36 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
     <title>Micael G. Fernandes</title>
+    <meta name="description" content="Micael Gomes Fernandes (._lazybox_): a personal website that builds itself.">
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-    <!-- Marks that JS runs: the no-JS page shows the card right away and hides the button. -->
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Marks that JS runs: without it the whole page is shown right away and the buttons below are hidden. -->
     <script>document.documentElement.classList.add('js');</script>
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <main class="stage">
-        <!-- Start box: vanishes after the first click and never spawns anything again. -->
-        <button id="box" class="box" type="button">
-            <span class="box-label">Build Website</span>
-        </button>
+    <!-- Background glow: the design-bot switches it on (js/build.js). -->
+    <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
 
-        <!-- Built live by the bot cursors (js/build.js), one section per click. The cards are
-             empty until built. Each sentence lives in a <noscript>: it is the no-JS fallback
-             and the single source that js/build.js reads and types.
-             data-prompt = pill label while that section is the next one to build. -->
-        <div id="build" class="build" tabindex="-1">
-            <div id="cards" class="cards">
-                <section class="card" aria-label="Introduction">
-                    <p class="card-text"><noscript>Hi, welcome to my personal website</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
-                </section>
-                <section class="card" aria-label="About me" data-prompt="Who are you?">
-                    <p class="card-text"><noscript>I'm Micael Gomes Fernandes, or online ._lazybox_.</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
-                </section>
+    <!-- Start box: vanishes after the first click and never comes back. -->
+    <button id="box" class="box" type="button">
+        <span class="box-label">Build Website</span>
+    </button>
+
+    <!-- The page itself. With JS it is built live by the bot cursors (js/build.js):
+         data-box   = a shape the layout-bot drags out (hidden until then)
+         data-type  = text the copy-bot types, character by character
+         Without JS everything is simply visible. Screen readers get all text at once. -->
+    <div id="site" class="site" tabindex="-1">
+        <header>
+            <nav id="nav" class="nav" data-box aria-label="Main">
+                <a class="nav-logo" href="./" data-type>._lazybox_</a>
+                <ul class="nav-links">
+                    <li><a href="dienstplan.html" data-type>Dienstplan</a></li>
+                    <li><a href="archive/v1-2026-11/index.html" data-type>Archive</a></li>
+                    <li><a href="https://github.com/lazyboxDude" data-type>GitHub</a></li>
+                    <li><a href="https://www.linkedin.com/in/micael-gomes-fernandes" data-type>LinkedIn</a></li>
+                </ul>
+                <a id="nav-cta" class="btn btn-solid btn-small" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>Contact</span></a>
+            </nav>
+        </header>
+
+        <main class="hero">
+            <p class="eyebrow" data-type>Micael Gomes Fernandes · ._lazybox_</p>
+            <h1 id="headline" data-type>I build interfaces that <em class="accent">build themselves.<span class="underline" aria-hidden="true"></span></em></h1>
+            <p class="lede" data-type>This page builds itself: a small team of cursor bots lays it out, writes it and draws it, live. Everything is plain HTML, CSS and JavaScript.</p>
+            <div class="actions">
+                <a id="cv" class="btn btn-solid" href="archive/v1-2026-11/docs/Lebenslauf_Micael_GomesFernandes.pdf" download data-box><span data-type>Download CV</span></a>
+                <a id="hello" class="btn btn-ghost" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>Say hello</span></a>
             </div>
+        </main>
+    </div>
 
-            <!-- Builds the next section; label is set by js/build.js -->
-            <button id="next" class="next" type="button"><span class="next-label"></span></button>
-        </div>
-    </main>
+    <!-- Builds everything again; label is set by js/build.js -->
+    <button id="next" class="next" type="button"><span class="next-label"></span></button>
 
     <!-- Announces build progress to screen readers -->
     <p id="status" class="sr-only" role="status"></p>

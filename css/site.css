@@ -1,25 +1,46 @@
 /* ==========================================================================
-   Site — styles for the new interactive homepage (index.html).
+   Site — styles for the interactive homepage (index.html).
    Independent from hub.css, which is only used by the legal pages now.
+   Look: dark, one blue accent, a serif italic accent word (see the mockup in PLAN.md).
    ========================================================================== */
 
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-latin-var.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Instrument Serif';
+    src: url('../fonts/instrument-serif-italic-latin.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
 :root {
-    --bg: #0b0c10;
-    --fg: #f2f3f7;
-    --muted: #8b90a0;
+    --bg: #07090f;
+    --fg: #f2f5ff;
+    --muted: #a3adc8;
+    --subtle: #8f9bba;
+    --line: #222d4c;
     --accent: #6c8cff;
+    --accent-soft: #9fb4ff;
     --accent-2: #b36cff;
     --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
     --font-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
-    --card-radius: 20px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html, body { height: 100%; }
+html { background: var(--bg); }
 
 body {
     margin: 0;
+    min-height: 100svh;
     background: var(--bg);
     color: var(--fg);
     font-family: var(--font-sans);
@@ -27,12 +48,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-.stage {
-    position: relative;
-    min-height: 100%;
-    display: grid;
-    place-items: center;
-}
+a { color: inherit; }
 
 .sr-only {
     position: absolute;
@@ -46,11 +62,54 @@ body {
     border: 0;
 }
 
-/* ---- The box ------------------------------------------------------------ */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---- Background glow (the design-bot switches it on) --------------------- */
+
+.glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+}
+
+.glow.is-on,
+html:not(.js) .glow { opacity: 1; }
+
+.glow-a,
+.glow-b {
+    position: absolute;
+    border-radius: 50%;
+}
+
+.glow-a {
+    left: -10%;
+    top: 4%;
+    width: min(640px, 100vw);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgba(79, 107, 255, 0.35), rgba(79, 107, 255, 0));
+}
+
+.glow-b {
+    right: -8%;
+    top: 26%;
+    width: min(520px, 90vw);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgba(95, 212, 240, 0.18), rgba(95, 212, 240, 0));
+}
+
+/* ---- The start box ------------------------------------------------------- */
 
 .box {
-    position: relative;
-    width: clamp(140px, 22vmin, 200px);
+    --box-size: clamp(140px, 22vmin, 200px);
+    position: fixed;
+    z-index: 5;
+    left: calc(50% - var(--box-size) / 2);
+    top: calc(50% - var(--box-size) / 2);
+    width: var(--box-size);
     aspect-ratio: 1;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 28px;
@@ -81,12 +140,7 @@ body {
     transition-duration: 0.08s;
 }
 
-.box:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 6px;
-}
-
-.box[aria-disabled="true"] { cursor: progress; }
+.box:focus-visible { outline-offset: 6px; }
 
 .box-label { pointer-events: none; }
 
@@ -98,63 +152,183 @@ body {
     transition: transform 0.4s cubic-bezier(0.5, 0, 0.8, 0.4), opacity 0.35s ease;
 }
 
+@keyframes float {
+    0%, 100% { translate: 0 -6px; }
+    50%      { translate: 0 6px; }
+}
+
 /* Without JS the buttons do nothing, so hide them. */
 html:not(.js) .box,
 html:not(.js) .next { display: none; }
 
-/* ---- The cards (built live by the bots) --------------------------------- */
+/* ---- The page ------------------------------------------------------------ */
 
-/* Starts where the box was and grows downwards, so earlier cards never move when a new one is built. */
-.build {
-    position: absolute;
-    top: calc(50% - 64px);
-    left: 50%;
-    translate: -50% 0;
-    width: min(560px, calc(100vw - 32px));
-    display: grid;
-    gap: 16px;
+.site {
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 20px 64px;
     outline: none; /* only receives programmatic focus while building */
 }
 
-.cards {
-    display: grid;
-    gap: 16px;
-}
+/* With JS nothing of the page is shown (or focusable) before the first click. */
+.js .site:not(.is-live) { visibility: hidden; }
 
-.card {
+.nav {
     position: relative;
-    padding: 22px 26px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: var(--card-radius);
-    background:
-        radial-gradient(120% 140% at 0% 0%, rgba(108, 140, 255, 0.16), transparent 60%),
-        #14161d;
-    box-shadow: 0 20px 60px -24px rgba(108, 140, 255, 0.4);
-    font: 500 clamp(18px, 2.2vw + 10px, 22px)/1.55 var(--font-sans);
-    /* The bot drags the bottom-right corner, so scale grows from the top-left. */
-    transform-origin: 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 16px;
+    width: min(980px, 100%);
+    min-height: 56px;
+    margin: 0 auto;
+    padding: 6px 8px 6px 24px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: rgba(18, 25, 46, 0.72);
+    backdrop-filter: blur(22px) saturate(1.7);
+    -webkit-backdrop-filter: blur(22px) saturate(1.7);
 }
 
-.card-text { margin: 0; }
-
-/* Invisible tail of the sentence: reserves the final layout while the rest is typed. */
-.rest { visibility: hidden; }
-
-.caret {
-    margin-left: 1px;
-    border-left: 2px solid var(--accent);
-    opacity: 0;
+.nav-logo {
+    font: 600 16px/1 var(--font-sans);
+    letter-spacing: -0.01em;
+    text-decoration: none;
 }
 
-.card.is-typing .caret {
-    opacity: 1;
-    animation: blink 1s steps(1) infinite;
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-@keyframes blink { 50% { opacity: 0; } }
+.nav-links a {
+    display: block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    color: #c9d2ea;
+    font-size: 14px;
+    text-decoration: none;
+}
 
-/* Selection frame with handles: shown while the layout-bot drags the card out. */
-.card-frame {
+.nav-links a:hover { background: #1a2340; color: #fff; }
+
+@media (max-width: 720px) {
+    .nav { padding-left: 20px; }
+    .nav-links { order: 3; width: 100%; gap: 0; }
+    .nav-links a { padding: 8px 9px; }
+}
+
+.hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: min(1100px, 100%);
+    margin: 0 auto;
+    padding: 56px 0 24px;
+}
+
+.eyebrow {
+    margin: 0;
+    color: var(--subtle);
+    font: 500 12px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+h1 {
+    max-width: 980px;
+    margin: 28px 0 0;
+    font: 600 clamp(42px, 7.4vw, 96px)/1 var(--font-sans);
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+}
+
+/* The serif italic accent word; its underline is drawn by the design-bot. */
+.accent {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+    color: var(--accent-soft);
+    font: italic 400 1.08em/1 var(--font-serif);
+    letter-spacing: 0;
+}
+
+.underline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.02em;
+    height: max(2px, 0.035em);
+    border-radius: 2px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+}
+
+.js .underline { scale: 0 1; }
+
+.lede {
+    max-width: 620px;
+    margin: 36px 0 0;
+    color: var(--muted);
+    font-size: clamp(17px, 1.2vw + 12px, 20px);
+    line-height: 1.5;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 44px;
+}
+
+.btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 24px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font: 500 15px/1 var(--font-sans);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-small { min-height: 40px; padding: 0 18px; font-size: 14px; }
+
+.btn-solid { background: #eaf0ff; color: #07090f; }
+.btn-solid:hover { background: #fff; }
+
+/* The outline of the ghost button is drawn by the design-bot (see .corner/.edge below). */
+.btn-ghost { color: var(--fg); }
+.btn-ghost:hover { background: rgba(108, 140, 255, 0.14); }
+html:not(.js) .btn-ghost { border-color: var(--accent); }
+
+/* ---- Built live: shapes and characters ----------------------------------- */
+
+/* Shapes the layout-bot drags out: the bot holds the bottom-right corner, so scale grows from the top-left. */
+[data-box] { transform-origin: 0 0; }
+.js [data-box]:not(.is-shown) { visibility: hidden; }
+
+/* Typed text: one span per character, revealed by the copy-bot (layout never shifts). */
+.ch { opacity: 0; }
+.ch.on { opacity: 1; }
+
+/* Selection frame with handles: shown while the layout-bot drags a shape out. */
+.sel-frame {
     position: absolute;
     inset: -6px;
     border: 1px solid var(--accent);
@@ -163,7 +337,7 @@ html:not(.js) .next { display: none; }
     pointer-events: none;
 }
 
-.card.is-selected .card-frame { opacity: 1; }
+.is-selected > .sel-frame { opacity: 1; }
 
 .handle {
     position: absolute;
@@ -178,8 +352,8 @@ html:not(.js) .next { display: none; }
 .handle-bl { left: -5px;  bottom: -5px; }
 .handle-br { right: -5px; bottom: -5px; }
 
-/* The accent border the design-bot draws: 4 corner arcs fade in, 4 edges grow along their side.
-   Hidden by default; js/build.js sets scale/opacity while drawing. */
+/* An outline the design-bot draws: 4 corner arcs fade in, 4 edges grow along their side.
+   --piece-r is the corner radius, set per element by js/build.js. Hidden until drawn. */
 .corner,
 .edge {
     position: absolute;
@@ -187,35 +361,32 @@ html:not(.js) .next { display: none; }
 }
 
 .corner {
-    width: var(--card-radius);
-    height: var(--card-radius);
+    width: var(--piece-r);
+    height: var(--piece-r);
     border: 0 solid var(--accent);
     opacity: 0;
 }
 
-.corner-tl { left: -1px;  top: -1px;    border-width: 1.5px 0 0 1.5px; border-top-left-radius: var(--card-radius); }
-.corner-tr { right: -1px; top: -1px;    border-width: 1.5px 1.5px 0 0; border-top-right-radius: var(--card-radius); }
-.corner-br { right: -1px; bottom: -1px; border-width: 0 1.5px 1.5px 0; border-bottom-right-radius: var(--card-radius); }
-.corner-bl { left: -1px;  bottom: -1px; border-width: 0 0 1.5px 1.5px; border-bottom-left-radius: var(--card-radius); }
+.corner-tl { left: -1px;  top: -1px;    border-width: 1.5px 0 0 1.5px; border-top-left-radius: var(--piece-r); }
+.corner-tr { right: -1px; top: -1px;    border-width: 1.5px 1.5px 0 0; border-top-right-radius: var(--piece-r); }
+.corner-br { right: -1px; bottom: -1px; border-width: 0 1.5px 1.5px 0; border-bottom-right-radius: var(--piece-r); }
+.corner-bl { left: -1px;  bottom: -1px; border-width: 0 0 1.5px 1.5px; border-bottom-left-radius: var(--piece-r); }
 
 .edge { background: var(--accent); }
 
-.edge-top    { left: calc(var(--card-radius) - 1px); right: calc(var(--card-radius) - 1px); top: -1px;    height: 1.5px; transform-origin: 0 50%;    scale: 0 1; }
-.edge-bottom { left: calc(var(--card-radius) - 1px); right: calc(var(--card-radius) - 1px); bottom: -1px; height: 1.5px; transform-origin: 100% 50%; scale: 0 1; }
-.edge-right  { top: calc(var(--card-radius) - 1px); bottom: calc(var(--card-radius) - 1px); right: -1px; width: 1.5px;  transform-origin: 50% 0;    scale: 1 0; }
-.edge-left   { top: calc(var(--card-radius) - 1px); bottom: calc(var(--card-radius) - 1px); left: -1px;  width: 1.5px;  transform-origin: 50% 100%; scale: 1 0; }
+.edge-top    { left: calc(var(--piece-r) - 1px); right: calc(var(--piece-r) - 1px); top: -1px;    height: 1.5px; transform-origin: 0 50%;    scale: 0 1; }
+.edge-bottom { left: calc(var(--piece-r) - 1px); right: calc(var(--piece-r) - 1px); bottom: -1px; height: 1.5px; transform-origin: 100% 50%; scale: 0 1; }
+.edge-right  { top: calc(var(--piece-r) - 1px); bottom: calc(var(--piece-r) - 1px); right: -1px; width: 1.5px;  transform-origin: 50% 0;    scale: 1 0; }
+.edge-left   { top: calc(var(--piece-r) - 1px); bottom: calc(var(--piece-r) - 1px); left: -1px;  width: 1.5px;  transform-origin: 50% 100%; scale: 1 0; }
 
-/* With JS a card takes no space until a build starts (is-reserved), and stays invisible until
-   the layout-bot starts dragging it out (is-shown). */
-.js .card { display: none; }
-.js .card.is-reserved,
-.js .card.is-shown { display: block; }
-.js .card:not(.is-shown) { visibility: hidden; }
-
-/* ---- The pill that builds the next section ------------------------------ */
+/* ---- The pill that builds everything again ------------------------------- */
 
 .next {
-    justify-self: center;
+    position: fixed;
+    z-index: 3;
+    left: 50%;
+    bottom: 24px;
+    translate: -50% 0;
     padding: 13px 24px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 999px;
@@ -227,29 +398,15 @@ html:not(.js) .next { display: none; }
     font: 600 16px/1 var(--font-sans);
     cursor: pointer;
     box-shadow: 0 14px 40px -16px rgba(108, 140, 255, 0.55);
-    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
+    transition: scale 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
-.next:hover { transform: scale(1.06); border-color: rgba(255, 255, 255, 0.35); }
-.next:active { transform: scale(0.96); transition-duration: 0.08s; }
-.next:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.next:hover { scale: 1.06; border-color: rgba(255, 255, 255, 0.35); }
+.next:active { scale: 0.96; transition-duration: 0.08s; }
 
 /* Only offered while no build is running. */
 .js .next:not(.is-ready) { visibility: hidden; }
-
-/* Without JS: plain blocks, centred. */
-html:not(.js) .build {
-    position: static;
-    translate: none;
-    margin: 0 auto;
-    padding: 24px 0;
-}
-
-@keyframes float {
-    0%, 100% { translate: 0 -6px; }
-    50%      { translate: 0 6px; }
-}
 
 /* ---- Fake cursors ------------------------------------------------------- */
 
@@ -339,9 +496,7 @@ html:not(.js) .build {
 
 @media (prefers-reduced-motion: reduce) {
     .box { animation: none; transition: none; }
-    .next { transition: none; }
+    .next, .btn, .glow, .sel-frame, .inspector-tag { transition: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
-    .card.is-typing .caret { animation: none; }
-    .card-frame, .inspector-tag { transition: none; }
 }

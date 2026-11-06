@@ -8,9 +8,9 @@ const swarm = new CursorSwarm(document.getElementById('cursor-layer'), { max: 40
 const builder = new SiteBuilder({
     swarm,
     box,
-    build: document.getElementById('build'),
+    site: document.getElementById('site'),
+    glow: document.getElementById('glow'),
     next,
-    cards: [...document.querySelectorAll('#cards .card')],
     status: document.getElementById('status'),
 });
 
