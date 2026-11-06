@@ -12,15 +12,16 @@
 </head>
 <body>
     <main class="stage">
-        <div class="hero">
-            <button id="box" class="box" type="button">
-                <span class="box-label">Build Website</span>
-            </button>
+        <!-- Start box: vanishes after the first click and never spawns anything again. -->
+        <button id="box" class="box" type="button">
+            <span class="box-label">Build Website</span>
+        </button>
 
-            <!-- Built live by the bot cursors (js/build.js), one section per click. The cards are
-                 empty until built. Each sentence lives in a <noscript>: it is the no-JS fallback
-                 and the single source that js/build.js reads and types.
-                 data-prompt = button label while that section is the next one to build. -->
+        <!-- Built live by the bot cursors (js/build.js), one section per click. The cards are
+             empty until built. Each sentence lives in a <noscript>: it is the no-JS fallback
+             and the single source that js/build.js reads and types.
+             data-prompt = pill label while that section is the next one to build. -->
+        <div id="build" class="build" tabindex="-1">
             <div id="cards" class="cards">
                 <section class="card" aria-label="Introduction">
                     <p class="card-text"><noscript>Hi, welcome to my personal website</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
@@ -29,6 +30,9 @@
                     <p class="card-text"><noscript>I'm Micael Gomes Fernandes, or online ._lazybox_.</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
                 </section>
             </div>
+
+            <!-- Builds the next section; label is set by js/build.js -->
+            <button id="next" class="next" type="button"><span class="next-label"></span></button>
         </div>
     </main>
 
