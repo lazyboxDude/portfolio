@@ -71,6 +71,7 @@ class InspectorTag {
         this.el.style.setProperty('--cursor-color', color);
         layer.appendChild(this.el);
         this.text = '';
+        this.visible = false;
     }
 
     show(text, x, y) {
@@ -80,9 +81,13 @@ class InspectorTag {
         }
         this.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
         this.el.classList.add('is-visible');
+        this.visible = true;
     }
 
-    hide() { this.el.classList.remove('is-visible'); }
+    hide() {
+        this.el.classList.remove('is-visible');
+        this.visible = false;
+    }
 }
 
 class Cursor {
@@ -98,6 +103,7 @@ class Cursor {
         this.retarget = 0;
         this.arrival = null;
         this.tag = null;
+        this.tagAt = null; // () => {x, y}: where the inspector tag sits (re-evaluated every frame)
 
         this.personality = {
             shyness: rand(0, 1), curiosity: rand(0, 1), sociability: rand(0, 1), ...personality,
@@ -165,6 +171,18 @@ class Cursor {
         this.swarm.start();
     }
 
+    /**
+     * Like follow(), but resolves once the cursor is close and slow enough (see moveTo). Use it
+     * for targets that are measured against the page: they keep up when the visitor scrolls.
+     */
+    chase(getPoint, { damping = DAMPING, tolerance = 4, settleSpeed = 40, timeout = 5000 } = {}) {
+        this.follow(getPoint, { damping });
+        if (REDUCED_MOTION.matches) return Promise.resolve();
+        return new Promise((resolve) => {
+            this.arrival = { resolve, tolerance, settleSpeed, deadline: performance.now() + timeout };
+        });
+    }
+
     /** Go off duty: roam around and react to the real pointer and to other idle cursors. */
     idle() {
         this.settle();
@@ -196,14 +214,22 @@ class Cursor {
         await sleep(120);
     }
 
-    /** Show an inspector tag in the bot's colour at (x, y). Call again to move or change it. */
-    inspect(text, x, y) {
+    /**
+     * Show an inspector tag in the bot's colour. `at` is a point {x, y} or a function returning one;
+     * a function is re-evaluated every frame, so the tag stays on its element while the page scrolls.
+     */
+    inspect(text, at) {
         if (REDUCED_MOTION.matches) return;
         this.tag ??= new InspectorTag(this.swarm.layer, this.color);
-        this.tag.show(text, x, y);
+        this.tagAt = typeof at === 'function' ? at : () => at;
+        const p = this.tagAt();
+        this.tag.show(text, p.x, p.y);
     }
 
-    hideTag() { this.tag?.hide(); }
+    hideTag() {
+        this.tag?.hide();
+        this.tagAt = null;
+    }
 
     /** Aim at (x, y), kept inside the viewport. */
     aim(x, y) {
@@ -308,6 +334,10 @@ class Cursor {
         this.x += this.vx * dt;
         this.y += this.vy * dt;
         this.render();
+        if (this.tagAt && this.tag?.visible) {
+            const p = this.tagAt();
+            this.tag.show(this.tag.text, p.x, p.y);
+        }
 
         const a = this.arrival;
         if (a) {

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>CV · Micael Gomes Fernandes</title>
+    <link rel="icon" type="image/png" href="images/icons/favicon.png">
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/cv.css">
+</head>
+<body>
+    <!-- The CV is a page, not a PDF file: the visitor saves it as a PDF from the print dialog.
+         One <article class="cv"> per language. To add a language, copy an article, translate it,
+         give it its own id (the language code) and add a link to the toolbar.
+         Without JS the language switch works through :target (see css/cv.css).
+         Deliberately NOT on this page: address, phone, date of birth, marital status, nationality,
+         and the contact details of references. They are available on request. -->
+    <nav class="cv-toolbar" aria-label="CV options">
+        <a class="cv-back" href="./">← Back to the site</a>
+        <ul class="cv-langs">
+            <li><a href="#en" lang="en" hreflang="en">English</a></li>
+            <li><a href="#de" lang="de" hreflang="de">Deutsch</a></li>
+        </ul>
+        <button id="print" class="cv-print" type="button" hidden>Save as PDF / Als PDF speichern</button>
+    </nav>
+
+    <main>
+        <!-- ============================== English ============================== -->
+        <article id="en" class="cv" lang="en" data-title="CV Micael Gomes Fernandes">
+            <header class="cv-head">
+                <h1>Micael Gomes Fernandes</h1>
+                <p class="cv-role">Game Designer · 3D Artist · Operator</p>
+                <p class="cv-contact">
+                    <a href="mailto:micael@gomes-fernandes.ch">micael@gomes-fernandes.ch</a> ·
+                    <a href="https://gomes-fernandes.ch">gomes-fernandes.ch</a> ·
+                    <a href="https://www.linkedin.com/in/micael-gomes-fernandes">linkedin.com/in/micael-gomes-fernandes</a> ·
+                    <a href="https://github.com/lazyboxDude">github.com/lazyboxDude</a>
+                </p>
+            </header>
+
+            <section>
+                <h2>Experience</h2>
+                <ol class="cv-list">
+                    <li class="cv-item">
+                        <p class="cv-when">11.2024 – today</p>
+                        <div>
+                            <h3>Game Designer &amp; Co-founder <span>Moonflux Interactive, Zürich</span></h3>
+                            <p>Co-design, concept and strategic planning of the whole player experience.</p>
+                            <p>Structured documentation of technical and game design as the interface to development.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">03.2025 – today</p>
+                        <div>
+                            <h3>Operator <span>Cinema 8, Schöftland</span></h3>
+                            <p>Responsible for fixing system faults and for the smooth running of the cinema technology in live operation.</p>
+                            <p>Coordinating the entry team and logging operational and system data.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">01.2023 – 02.2024</p>
+                        <div>
+                            <h3>Operations Assistant <span>Läbesruum, Winterthur</span></h3>
+                            <p>Technical work converting ticket machines for the Winterthur city bus.</p>
+                            <p>Support with logistics, storage, packing, company moves and disposal.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">04.2019 – 07.2019</p>
+                        <div>
+                            <h3>3D Artist <span>Raumgleiter AG, Zürich</span></h3>
+                            <p>3D modelling of assets in Blender for interactive applications (AR architecture viewer).</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">09.2017 – 07.2018</p>
+                        <div>
+                            <h3>Intern, Trade Marketing <span>Luxottica (Switzerland) AG, Zürich</span></h3>
+                            <p>Maintaining the internal advertising-material app and the central contact mailbox.</p>
+                            <p>Ordering and managing digital assets via Contentlab.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">08.2016 – 07.2019</p>
+                        <div>
+                            <h3>Commercial apprenticeship (Kaufmann EFZ) <span>gustello GmbH, Winterthur</span></h3>
+                            <p>Running the e-commerce website, buying and selling goods on online platforms.</p>
+                            <p>Designing digital and print advertising material.</p>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Education</h2>
+                <ol class="cv-list">
+                    <li class="cv-item">
+                        <p class="cv-when">09.2019 – 08.2021</p>
+                        <div><h3>Diploma, Game Art &amp; 3D Animation <span>SAE Institute, Zürich</span></h3></div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">08.2016 – 07.2019</p>
+                        <div><h3>Commercial basic training, Federal VET diploma (EFZ) <span>Wirtschaftsschule KV Winterthur</span></h3></div>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Other activities</h2>
+                <ol class="cv-list">
+                    <li class="cv-item">
+                        <p class="cv-when">10.2023</p>
+                        <div><h3>Holiday course instructor <span>IBW Höhere Fachschule Südostschweiz, Chur</span></h3></div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">since 2019</p>
+                        <div><h3>Trade fair support (setup and customer service) <span>HeroFest, Bern</span></h3></div>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Skills</h2>
+                <dl class="cv-skills">
+                    <dt>Game engines</dt><dd>Unity, Unreal Engine 5, Godot 4</dd>
+                    <dt>Programming (hobby)</dt><dd>C++, Blueprint, Python, GDScript</dd>
+                    <dt>3D / graphics</dt><dd>Blender, Autodesk Maya, Substance Painter, Substance Designer, Affinity Suite (Photo, Publisher, Designer)</dd>
+                    <dt>Office &amp; AI</dt><dd>MS Office, Microsoft Copilot (Word, PowerPoint, Excel), Claude, Gemini</dd>
+                    <dt>Languages</dt><dd>German (native), English (B2)</dd>
+                </dl>
+            </section>
+
+            <section>
+                <h2>Interests</h2>
+                <dl class="cv-skills">
+                    <dt>Games programming</dt><dd>Building my own prototypes in C++ and various engines</dd>
+                    <dt>Board games</dt><dd>Strategy and tactics, e.g. Magic: The Gathering Commander, Settlers of Catan</dd>
+                </dl>
+            </section>
+
+            <p class="cv-foot">Further details and references on request.</p>
+        </article>
+
+        <!-- ============================== Deutsch ============================== -->
+        <article id="de" class="cv" lang="de" data-title="Lebenslauf Micael Gomes Fernandes">
+            <header class="cv-head">
+                <h1>Micael Gomes Fernandes</h1>
+                <p class="cv-role">Game Designer · 3D-Artist · Operateur</p>
+                <p class="cv-contact">
+                    <a href="mailto:micael@gomes-fernandes.ch">micael@gomes-fernandes.ch</a> ·
+                    <a href="https://gomes-fernandes.ch">gomes-fernandes.ch</a> ·
+                    <a href="https://www.linkedin.com/in/micael-gomes-fernandes">linkedin.com/in/micael-gomes-fernandes</a> ·
+                    <a href="https://github.com/lazyboxDude">github.com/lazyboxDude</a>
+                </p>
+            </header>
+
+            <section>
+                <h2>Berufliche Tätigkeiten</h2>
+                <ol class="cv-list">
+                    <li class="cv-item">
+                        <p class="cv-when">11.2024 – heute</p>
+                        <div>
+                            <h3>Game Designer &amp; Mitgründer <span>Moonflux Interactive, Zürich</span></h3>
+                            <p>Mitgestaltung, Konzeption und strategische Planung des gesamten Spielerlebnisses.</p>
+                            <p>Strukturierte Dokumentation des Technical- und Gamedesigns als Schnittstelle zur Entwicklung.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">03.2025 – heute</p>
+                        <div>
+                            <h3>Operateur <span>Cinema 8, Schöftland</span></h3>
+                            <p>Verantwortung für die Behebung von Systemstörungen und den reibungslosen Ablauf der Kinotechnik im Live-Betrieb.</p>
+                            <p>Koordination des Einlass-Teams und Protokollierung der Betriebs- und Systemdaten.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">01.2023 – 02.2024</p>
+                        <div>
+                            <h3>Betriebsmitarbeiter <span>Läbesruum, Winterthur</span></h3>
+                            <p>Technische Mitarbeit beim Umbau von Ticketautomaten der Stadtbus Winterthur.</p>
+                            <p>Unterstützung bei Logistik-, Lagerarbeiten, Verpackung sowie Firmenumzügen und Entsorgungen.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">04.2019 – 07.2019</p>
+                        <div>
+                            <h3>3D-Artist <span>Raumgleiter AG, Zürich</span></h3>
+                            <p>3D-Modellierung von Assets in Blender für interaktive Anwendungen (AR-Archviewer).</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">09.2017 – 07.2018</p>
+                        <div>
+                            <h3>Praktikant Trade Marketing <span>Luxottica (Switzerland) AG, Zürich</span></h3>
+                            <p>Pflege und Betreuung der internen Werbemittelapplikation und des zentralen Kontaktpostfaches.</p>
+                            <p>Beschaffung und Verwaltung digitaler Assets über Contentlab.</p>
+                        </div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">08.2016 – 07.2019</p>
+                        <div>
+                            <h3>Kaufmann EFZ <span>gustello GmbH, Winterthur</span></h3>
+                            <p>Kaufmännische Bewirtschaftung der E-Commerce-Website sowie Einkauf und Verkauf von Waren auf Onlineplattformen.</p>
+                            <p>Gestaltung von digitalem und physischem Werbematerial.</p>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Ausbildung</h2>
+                <ol class="cv-list">
+                    <li class="cv-item">
+                        <p class="cv-when">09.2019 – 08.2021</p>
+                        <div><h3>Game Art &amp; 3D Animation, Diploma <span>SAE Institute, Zürich</span></h3></div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">08.2016 – 07.2019</p>
+                        <div><h3>Kaufmännische Grundausbildung, EFZ <span>Wirtschaftsschule KV Winterthur</span></h3></div>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Nebenberufliche Tätigkeiten</h2>
+                <ol class="cv-list">
+                    <li class="cv-item">
+                        <p class="cv-when">10.2023</p>
+                        <div><h3>Ferienkursleiter <span>IBW Höhere Fachschule Südostschweiz, Chur</span></h3></div>
+                    </li>
+                    <li class="cv-item">
+                        <p class="cv-when">seit 2019</p>
+                        <div><h3>Messe-Support (Aufbau &amp; Kundenbetreuung) <span>HeroFest, Bern</span></h3></div>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Technische Kenntnisse &amp; Skills</h2>
+                <dl class="cv-skills">
+                    <dt>Game Engines</dt><dd>Unity, Unreal Engine 5, Godot 4</dd>
+                    <dt>Programmieren (Hobby)</dt><dd>C++, Blueprint, Python, GDScript</dd>
+                    <dt>3D / Grafik</dt><dd>Blender, Autodesk Maya, Substance Painter, Substance Designer, Affinity Suite (Photo, Publisher, Designer)</dd>
+                    <dt>Office &amp; KI</dt><dd>MS Office, Microsoft Copilot (Word, PowerPoint, Excel), Claude, Gemini</dd>
+                    <dt>Sprachen</dt><dd>Deutsch (Muttersprache), Englisch (Niveau B2)</dd>
+                </dl>
+            </section>
+
+            <section>
+                <h2>Hobbys &amp; Interessen</h2>
+                <dl class="cv-skills">
+                    <dt>Games Programming</dt><dd>Vertiefung eigener Prototypen in C++ und verschiedenen Engines</dd>
+                    <dt>Gesellschaftsspiele</dt><dd>Strategie und Taktik, u. a. Magic: The Gathering Commander, Siedler von Catan</dd>
+                </dl>
+            </section>
+
+            <p class="cv-foot">Weitere Angaben und Referenzen auf Anfrage.</p>
+        </article>
+    </main>
+
+    <script type="module" src="js/cv.js"></script>
+</body>
+</html>

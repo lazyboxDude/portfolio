@@ -81,7 +81,13 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 - `datenschutz.html` und `nutzungsbedingungen.html` werden für die Google-Integration gebraucht.
   Sie nutzen `css/hub.css` und `js/socials.js`.
 - `CNAME` bleibt im Root.
-- `archive/` bleibt unverändert.
+- `archive/` bleibt unverändert. Ausnahme: `archive/v1-2026-11/docs/` (altes CV-PDF und `CV.txt` mit privaten Daten) bleibt im Repo, wird aber über `.assetsignore` nicht ausgeliefert.
+
+## Privatsphäre (gilt für alles, was ausgeliefert wird)
+
+- **Keine privaten Daten auf der Website:** keine Wohnadresse, Telefonnummer, Geburtsdatum, Zivilstand, Nationalität und keine Kontaktdaten Dritter (z. B. von Referenzen). Öffentlich sind Name, Stationen, Skills, E-Mail, GitHub, LinkedIn.
+- **Keine PDFs im Deploy.** Der CV ist die Seite `cv.html` (Deutsch und Englisch), die der Browser auf Knopfdruck als PDF speichert. Zeugnisse und Diplome (Scans) gehören nicht ins Repo.
+- Dieses PLAN.md liegt im öffentlichen Repo: keine privaten Daten hier hineinschreiben.
 
 ## Roadmap
 
@@ -93,11 +99,11 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 3 | Folge von Bauschritten | erledigt: Teil 1 ([PR #17](https://github.com/lazyboxDude/portfolio/pull/17)): ein Klick pro Abschnitt, zweite Karte mit Name und Handle. Teil 2 ([PR #19](https://github.com/lazyboxDude/portfolio/pull/19)): Startbox verschwindet nach dem ersten Klick, Pill für die Folgeschritte, Bots mit Persönlichkeit (reagieren im Leerlauf auf den echten Mauszeiger und aufeinander, klicken ins Leere). |
 | 4 | **Cursor-Sprache** (Orbit/Linea) | erledigt, [PR #20](https://github.com/lazyboxDude/portfolio/pull/20): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen mit Griffen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Akzentrahmen. Die Persönlichkeit im Leerlauf kommt aus Schritt 3 (Teil 2) und gilt auch für den neuen Bot. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
 | 5 | **Landingpage-Gerüst: Hero + Nav** (Linea) | gebaut (siehe Status): Nav-Pill, Hero mit Serifen-Kursiv-Akzent, zwei Buttons, Hintergrund-Glow. Die Seite ist echtes HTML und baut sich nach dem Klick auf die Startbox selbst (alle drei Bots, drei Spuren parallel). Look festgelegt (dunkel, blau), Schriften selbst gehostet. |
-| 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | Jeder Abschnitt baut sich beim Erreichen live (IntersectionObserver, Bots wandern mit): Über mich, Werdegang/Timeline, Skills als Bento-Grid, Kontakt/CTA, Footer. Inhalte aus echten CV-Daten (Micael liefert sie, siehe offene Frage 4). Ohne-JS-Fallback von Anfang an (`<noscript>`-Muster aus Schritt 3). |
+| 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | gebaut (siehe Status): Über mich, Werdegang, Skills (fünf Ebenen), Kontakt mit CV-Download und Footer bauen sich beim Scrollen. Dazu die mehrsprachige CV-Seite `cv.html` statt PDF. |
 | 7 | **Projekte als Mockups** | Projekte (Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) als Browser-/Phone-Mockups, die die Bots zusammensetzen (gekippt, mit Tiefe wie bei Orbit), mit Link zur Live-App oder zum Case. |
 | 8 | **Schwarm-Finale** (Bakelayer) | Signatur der Seite: Ein Klick (z. B. "More agents") skaliert von wenigen auf hunderte Cursors (`agent-NNN`, Job-Namen), gezeichnet auf `<canvas>`, mit Verbindungslinien und Zähler. Der Schwarm sammelt sich zu einer geschichteten Struktur (CSS-3D oder Canvas), die für Micaels Skill-Ebenen steht. Harte Obergrenze, Frame-Budget, Reduced-Motion zeigt ein Standbild. |
 | 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über einen Cloudflare Worker, der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
-| 10 | Bewerbungs-Essentials | CV-Download (PDF), Kontakt, Links (GitHub, LinkedIn). Ohne-JS-Fallback prüfen, Meta-/OG-Tags (mit Vorschaubild), Favicon, Seitentitel, Druck-Stylesheet. |
+| 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
 | 11 | Feinschliff | Performance-Messung, Mobil, Reduced-Motion, Lighthouse, Cross-Browser, Sound optional (standardmäßig aus). |
 
 Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Schritt Status und Roadmap hier aktualisieren.
@@ -127,8 +133,8 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - Auswahlrahmen mit Griffen und gezeichneter Rahmen (4 Ecken blenden ein, 4 Kanten wachsen, nur `transform`/`opacity`) leben seit Schritt 5 in `Shape` (`js/build.js`).
 - **Schritt 5 gebaut** (im PR): Landingpage-Gerüst, Hero + Nav. Die Seite ist jetzt echtes HTML und baut sich nach dem Klick auf die Startbox selbst.
   - **Inhalt** (nur Wahres, nichts Erfundenes): Nav-Pill mit Logo `._lazybox_`, Links zu Dienstplan, Archiv, GitHub und LinkedIn und Button "Contact" (`mailto:`).
-    Hero mit Eyebrow, Headline "I build interfaces that *build themselves.*" (Akzentwort in Instrument Serif kursiv), Lede, "Download CV" (das bestehende PDF aus `archive/v1-2026-11/docs/`, deutsch, mit Adresse; wird in Schritt 10 ersetzt)
-    und "Say hello" (`mailto:micael@gomes-fernandes.ch`, steht schon auf der alten Seite). Die Nav-Links zeigen nur auf Ziele, die es gibt. Anker auf Abschnitte kommen mit Schritt 6.
+    Hero mit Eyebrow, Headline "I build interfaces that *build themselves.*" (Akzentwort in Instrument Serif kursiv), Lede, "About me" und "Say hello" (`mailto:micael@gomes-fernandes.ch`, steht schon auf der alten Seite).
+    Der "Download CV"-Button aus dem ersten Entwurf ist in Schritt 6 nach unten in den Kontaktbereich gewandert.
   - **Wer baut was:** `layout-bot` zieht die Nav-Pill, den Nav-Button und die zwei Hero-Buttons auf (Auswahlrahmen, Live-Größen-Tag). `copy-bot` tippt alle Texte Zeichen für Zeichen
     (Tag mit der echten Typografie, z. B. `600 · 96px / 1.00 · -0.035em`). `design-bot` schaltet den Hintergrund-Glow an, zeichnet die Unterstreichung unter dem Akzentwort und den Rahmen des Ghost-Buttons.
     Drei Spuren laufen parallel (Reihenfolge in `SiteBuilder.buildAnimated`). Der Bau dauert ca. 14 Sekunden.
@@ -144,18 +150,37 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **`prefers-reduced-motion`:** Alles sofort fertig, Bots stehen still daneben, keine Tags, keine "Build again"-Pill.
   - **Pill "Build again"** (`#next`, unten mittig) baut alles von vorn, nur sichtbar, solange kein Bau läuft.
   - Die Einschränkung aus Schritt 3 bleibt: Scrollt man mitten im Bau, stimmen die Bot-Positionen nicht mehr (der Hero passt in einen Bildschirm). Das Scroll-getriebene Bauen kommt in Schritt 6.
-  - **Nächster Schritt: 6 (Scroll-getriebenes Bauen + CV-Abschnitte).** Dafür brauche ich die echten CV-Daten (offene Frage 4). Das CV-PDF im Archiv enthält schon Stationen, Ausbildung, Programme und Sprachen.
+- **Schritt 6 gebaut** (im PR, zusammen mit Schritt 5): Scroll-getriebenes Bauen, CV-Abschnitte, mehrsprachiger CV.
+  - **Seitenaufbau** (`index.html`): Hero · Über mich · Werdegang · Skills · Kontakt · Footer. Jeder Block ist ein `data-section`.
+    Der Hero baut sich nach dem Klick auf die Startbox, **jeder weitere Abschnitt, wenn er in den Bildschirm scrollt**. Vor dem Klick ist Scrollen gesperrt.
+    Wer an einen späteren Abschnitt springt (Anker, Scrollbalken), sieht alle übersprungenen Abschnitte sofort fertig, nur der Abschnitt im Bild wird gebaut. Der Footer erscheint ohne Bots (`data-instant`).
+    "Build again" (`#next`) steht am Ende der Seite und erscheint erst, wenn alles gebaut ist. Es scrollt nach oben und baut von vorn.
+  - **Die Bau-Engine ist jetzt allgemein** (`js/build.js`): Sie liest das Markup und baut jeden Abschnitt mit denselben drei Spuren.
+    `data-box` (layout-bot zieht auf, `data-box="fast"` = kleine Wiederholer ohne Größen-Tag), `data-type` (copy-bot tippt; `data-tag` zeigt die Typografie, `data-speed` überschreibt das Tempo),
+    `data-underline` und `data-outline` (design-bot zeichnet). Ein Text wartet auf die Form um ihn, eine Unterstreichung auf ihren Text, ein Rahmen auf seine Form. Neue Abschnitte brauchen nur Markup, kein JS.
+  - **Tempo:** Das Tippen eines Abschnitts soll etwa `data-type-ms` dauern (Standard 4,5 s, Hero 4,2 s, Kontakt 3 s), unterhalb des Hero höchstens halb so langsam wie voll. Bauzeiten: Hero ca. 15 s, Über mich 3 s, Werdegang 5 s, Skills 6 s, Kontakt 9 s.
+  - **Scroll-fest:** Alles, worauf die Bots zielen, wird relativ zur Seite gemessen (`anchor()` in `js/build.js`, neu `Cursor.chase()` und Tags, die einer Funktion folgen, in `js/cursors.js`). Scrollt man mitten im Bau, bleiben die Bots an ihren Elementen. Das behebt die Einschränkung aus Schritt 3.
+  - **Inhalt** stammt aus dem aktuellen Lebenslauf und dem Dienstplan-Projekt. Die Texte unter "About" sind aus den Fakten formuliert, nicht von Micael geschrieben: bitte lesen und anpassen.
+    Skills als fünf Ebenen: 1 Business und Betrieb, 2 3D und Grafik, 3 Game Engines, 4 Programmieren, 5 KI-Werkzeuge. Das ist auch die Grundlage für den Schwarm in Schritt 8.
+  - **CV statt PDF:** `cv.html` enthält den Lebenslauf als HTML, pro Sprache ein `<article class="cv">` (Deutsch und Englisch), mit Sprachwechsel (ohne JS über `:target`, mit JS zusätzlich nach Browsersprache) und Druckstil für A4.
+    "Save as PDF" öffnet den Druckdialog des Browsers, der Seitentitel wird zum Dateinamen. Eine neue Sprache: Artikel kopieren, übersetzen, Link in die Toolbar. `css/cv.css`, `js/cv.js`.
+    Der CV enthält bewusst keine privaten Daten (siehe "Privatsphäre"), "weitere Angaben und Referenzen auf Anfrage".
+  - **Kontakt:** "Download CV" steht unten im Kontaktbereich und führt auf `cv.html`. Die Nav verlinkt About, Experience, Skills und Dienstplan. GitHub, LinkedIn, Archiv und die Rechtsseiten stehen im Footer.
+  - **Altes CV-PDF** und `CV.txt` im Archiv werden über `.assetsignore` nicht mehr ausgeliefert (bleiben im Repo und in der Git-Historie).
+  - **Nächster Schritt: 7 (Projekte als Mockups).** Vorher der PR für Schritt 5 und 6.
 
 ## Offene Fragen an Micael
 
-1. **Sprache:** Englisch (passt zu einer internationalen AI-Firma) oder Deutsch? Aktuell: Englisch auf der Startseite (so gebaut, bis du anders entscheidest).
-2. **Zielfirma/Rolle:** Wofür genau bewirbst du dich (Rolle, Firma)? Das bestimmt, was in Schritt 6 bis 9 gezeigt werden soll.
-3. **Look:** Die Referenzen gehen in zwei Richtungen: Linea hell und ruhig, Orbit/Bakelayer dunkel mit Glow.
-   Seit Schritt 5 so umgesetzt (Mockup-Empfehlung, bis du anders entscheidest): dunkel mit einem blauen Akzent (passt zu Bakelayer und zum jetzigen Stand), dazu ein Serifen-Kursiv-Akzentwort aus Linea für Wärme. Einverstanden?
-4. **Inhalte (CV-Daten):** Ich brauche für Schritt 6 und 7 die echten Daten: Werdegang (Stationen, Zeiträume), Skills (3 bis 5 Ebenen für den Schwarm/die Struktur),
-   welche Projekte rein sollen, Kontaktdaten und Links, ein aktuelles CV als PDF. Welche 3 bis 5 Dinge sollen Besucher:innen unbedingt über dich erfahren?
-5. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
-6. **Schwarm-Struktur (Schritt 8):** Soll die Struktur am Ende eine Pyramide aus Layern sein (wie bei Bakelayer) oder etwas Eigenes, das zu dir passt (z. B. deine Skill-Ebenen, ein Logo)?
+1. **Läbesruum, Zeitraum:** Der Lebenslauf nennt 05.2021 bis 02.2024, das Arbeitszeugnis 25.01.2023 bis 13.02.2024. Die Website und der CV zeigen vorläufig **2023 bis 2024** (das, was das Zeugnis belegt). Welches Datum stimmt?
+2. **Luxottica, Bezeichnung:** Im Lebenslauf "Sachbearbeiter", im Zeugnis "Praktikant Trade Marketing". Der CV zeigt vorläufig die Zeugnis-Bezeichnung. Passt das?
+3. **Über-mich-Texte:** Sie sind aus dem Lebenslauf formuliert. Bitte lesen und in deinen Worten anpassen (Abschnitt "About" in `index.html`).
+4. **Zielfirma/Rolle:** Wofür genau bewirbst du dich (Rolle, Firma)? Das bestimmt, was in Schritt 7 bis 9 gezeigt werden soll und ob der CV eine Kurzprofil-Zeile bekommt.
+5. **Projekte (Schritt 7):** Welche Projekte gehören rein? Bisher: Dienstplan-App und diese Seite. Aus dem Archiv und von Moonflux Interactive: was darf öffentlich gezeigt werden?
+6. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
+7. **Schwarm-Struktur (Schritt 8):** Pyramide aus Layern (wie bei Bakelayer), oder etwas Eigenes? Die fünf Skill-Ebenen aus Schritt 6 sind die Grundlage.
+8. **Weitere CV-Sprachen:** Deutsch und Englisch sind drin. Soll eine weitere dazu (z. B. Portugiesisch, Französisch)?
+
+Entschieden: Englisch auf der Startseite, dunkler Look mit blauem Akzent (Mockup), CV als Seite statt PDF, Skill-Ebenen wie oben ("lass das mal so testen").
 
 ## Arbeitsweise
 
@@ -163,6 +188,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 - Commit-Messages und Chat auf Deutsch, Code und Kommentare auf Englisch.
 - Lokal testen: `python3 -m http.server` im Repo-Root, dann `http://localhost:8000` öffnen.
   Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken (die Pill `#next` schwebt nicht).
-  Der Bau der Seite dauert ca. 14 Sekunden. In Tests auf Zustände warten (z. B. `#next` mit Klasse `is-ready`, oder `#status` mit "Website built."), keine festen Pausen.
+  Der Hero baut sich in ca. 15 Sekunden, jeder weitere Abschnitt in 3 bis 9 Sekunden. In Tests auf Zustände warten (z. B. alle `.ch` eines Abschnitts mit Klasse `on` und alle `[data-box]` mit `is-shown`, oder `#next` mit Klasse `is-ready`), keine festen Pausen.
+  Weitere Abschnitte bauen sich erst, wenn man hinscrollt: im Test mit `window.scrollTo({ top, behavior: 'instant' })` springen (das Standard-Scrollen ist weich).
   Bei Zeitmessungen keine Screenshots mitlaufen lassen, sie verfälschen die Dauer.
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.
