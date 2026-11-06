@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <title>Micael G. Fernandes</title>
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
+    <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
+    <main class="stage">
+        <button id="box" class="box" type="button" aria-label="Click me to spawn cursors">
+            <span class="box-label">Click me</span>
+        </button>
+    </main>
+
+    <!-- Fake cursors are spawned into this layer by js/cursors.js -->
+    <div id="cursor-layer" class="cursor-layer" aria-hidden="true"></div>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
