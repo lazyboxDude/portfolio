@@ -37,9 +37,9 @@ Nicht anfassen. Ideen oder Inhalte dürfen von dort übernommen werden.
 | # | Schritt | Ergebnis |
 |---|---------|----------|
 | 0 | Archiv + leerer Root | erledigt, [PR #13](https://github.com/lazyboxDude/portfolio/pull/13) |
-| 1 | **Box + Cursor-Schwarm** | Eine Box mittig. Klick darauf lässt mehrere Mauszeiger herausplatzen, die herumwandern. |
-| 2 | Cursor mit Persönlichkeit | Cursors reagieren auf den echten Mauszeiger (folgen, fliehen), aufeinander und auf die Box. Gelegentliche Klicks und Ripple-Effekte. Eventuell Namensschilder wie in Multiplayer-Tools. |
-| 3 | Ein erster Inhalt durch Interaktion | Cursors "arbeiten" etwas ab (z. B. tragen sie Karten, zeichnen, bauen Text). Dabei erscheint der erste echte Inhalt: wer ich bin in einem Satz. |
+| 1 | Box + Cursor-Schwarm | erledigt, [PR #14](https://github.com/lazyboxDude/portfolio/pull/14): Box spawnt mehrere Mauszeiger, die herumwandern. |
+| 2 | **Bots mit Jobs: Intro baut sich selbst** | Idee: die Seite baut sich live vor den Augen auf, wie Bots arbeiten. Klick auf "Build Website", ein Cursor zieht die Karte auf, ein zweiter tippt den ersten Text ein. Besucher:innen scrollen und klicken höchstens Buttons. |
+| 3 | Mehr Jobs + Persönlichkeit | Weitere Bauschritte (Karten tragen, zeichnen, Abschnitte bauen) beim Scrollen. Dazu Reaktionen auf den echten Mauszeiger, aufeinander und auf die Box, gelegentliche Klicks und Ripples im Leerlauf. |
 | 4 | Projekte entdecken | Projekte (u. a. Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) werden spielerisch freigeschaltet und verlinkt. |
 | 5 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über einen Cloudflare Worker, der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 6 | Bewerbungs-Essentials | CV-Download, Kontakt, Links (GitHub, LinkedIn). Ohne-JS-Fallback, Meta-/OG-Tags, Favicon, Seitentitel. |
@@ -49,11 +49,20 @@ Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Sc
 
 ## Status
 
-- **Schritt 1 gebaut** (siehe PR): `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`.
-  - Box ist ein `<button>`, schwebt leicht. Klick (oder Enter/Tap) spawnt 6 Cursors an der Klickposition.
-  - Cursors sind DOM-Elemente (SVG) in `#cursor-layer`, bewegt über einen gemeinsamen rAF-Loop als gedämpfte Federn zu zufälligen Zielen.
-  - Maximal 40 Cursors, danach zeigt die Box "Enough!".
-  - Mit `prefers-reduced-motion` werden die Cursors ohne Animation platziert.
+- **Schritt 1 erledigt** (gemerged): Box + Cursor-Schwarm.
+- **Schritt 2 gebaut** (siehe PR): Bots mit Jobs.
+  - Konzept: jeder Cursor hat einen Job und ein Namensschild (`layout-bot`, `copy-bot`). Das zeigt, wie Bots arbeiten.
+  - Ablauf: Klick auf die Box ("Build Website") lässt zwei Cursors herausplatzen. Das `layout-bot` zieht die Karte unter der Box auf
+    (Skalierung ab der oberen linken Ecke folgt dem Cursor), dann tippt das `copy-bot` den Satz und folgt dabei dem Textcursor.
+    Danach wandern beide frei herum. Die Box heißt dann "Build again" und startet den Ablauf erneut.
+  - Code: `js/cursors.js` (`CursorSwarm` mit gemeinsamem rAF-Loop, `Cursor` mit `moveTo`/`follow`/`wander`/`click`),
+    `js/intro.js` (der Intro-Job als `async`-Ablauf), `js/main.js` (Verdrahtung).
+    Neue Jobs sind einfach weitere `async`-Abläufe auf diesen Bausteinen.
+  - Der Satz steht als echter Text in `index.html`. Ohne JS ist er sofort sichtbar (Button ausgeblendet),
+    mit JS tippen ihn die Bots. Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
+  - `prefers-reduced-motion`: kein Anlauf, keine Ripples. Karte und Text sind sofort da, die Cursors stehen still daneben, kein Replay.
+  - Die Obergrenze von 40 Cursors bleibt als Sicherung im `CursorSwarm`. Die Zähler-Anzeige ("Enough!") aus Schritt 1 entfällt.
+  - Der Intro-Satz ist vorläufig, genau wie von Micael vorgegeben (nur das Backtick-Apostroph in "i`m" wurde zu "I'm"). Er steht in `index.html` im `#typed`-Element.
 
 ## Offene Fragen an Micael
 
@@ -69,4 +78,5 @@ Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Sc
 - Commit-Messages und Chat auf Deutsch, Code und Kommentare auf Englisch.
 - Lokal testen: `python3 -m http.server` im Repo-Root, dann `http://localhost:8000` öffnen.
   Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken.
+  Der Intro-Ablauf dauert ca. 9 Sekunden. In Tests auf Zustände warten (z. B. Label "Build again"), keine festen Pausen.
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.
