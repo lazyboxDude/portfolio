@@ -60,6 +60,9 @@ body {
 
 a { color: inherit; }
 
+/* Author styles (display: flex on buttons ...) would otherwise override the hidden attribute. */
+[hidden] { display: none !important; }
+
 .sr-only {
     position: absolute;
     width: 1px;
@@ -695,6 +698,100 @@ html:not(.js) .btn-ghost { border-color: var(--accent); }
     .skill, .skill:nth-child(-n + 2) { grid-column: auto; min-height: 0; }
 }
 
+/* Swarm finale (js/agents.js draws the canvas) */
+.swarm {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 24px 32px;
+    align-items: center;
+    margin-top: 48px;
+    padding: clamp(16px, 3vw, 28px);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: #070a13;
+}
+
+.swarm .swarm-canvas {
+    display: block;
+    width: 100%;
+    height: 520px;
+}
+
+.layer-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.layer-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #26304f;
+    border-radius: 14px;
+    background: rgba(13, 18, 32, 0.86);
+    color: var(--fg);
+    font: 500 16px/1.3 var(--font-sans);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.layer-btn:hover,
+.layer-btn[aria-pressed="true"] {
+    border-color: var(--c, var(--accent));
+    background: rgba(26, 35, 64, 0.9);
+}
+
+.layer-dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--c);
+}
+
+.layer-n {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--accent-soft);
+    font: 500 11px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.swarm-bar {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 20px;
+}
+
+.swarm-bar .btn[disabled] { opacity: 0.6; cursor: default; }
+.swarm-bar .btn-ghost[aria-pressed="true"] { background: rgba(108, 140, 255, 0.22); }
+
+.swarm-count {
+    margin: 0;
+    color: var(--subtle);
+    font: 500 13px/1 var(--font-mono);
+}
+
+/* Without JS there is nothing to draw or press: only the list of layers stays. */
+html:not(.js) .swarm-canvas,
+html:not(.js) .swarm-bar { display: none; }
+html:not(.js) .swarm { grid-template-columns: 1fr; }
+
+@media (max-width: 720px) {
+    .swarm { grid-template-columns: 1fr; }
+    .swarm .swarm-canvas { height: 380px; }
+}
+
 /* Contact */
 .cta {
     --outline: #dfe7ff;
@@ -934,7 +1031,7 @@ html:not(.js) .btn-ghost { border-color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .tilt, .tile img { transition: none; }
+    .tilt, .tile img, .layer-btn { transition: none; }
     .box { animation: none; transition: none; }
     .next, .btn, .glow, .sel-frame, .inspector-tag { transition: none; }
     .fake-cursor.is-new { animation: none; }

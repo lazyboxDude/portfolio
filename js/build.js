@@ -509,8 +509,9 @@ export class SiteBuilder {
                 d,
                 ready: d.kind === 'underline'
                     ? typed.get(d.text).promise
-                    // An outline waits for its box, or (no box) for its text, or goes right away.
-                    : (boxReady.get(d.shape)?.promise ?? typed.get(d.text)?.promise ?? Promise.resolve()),
+                    // An outline waits for its box, or (no box) for its text, or for the box around it, or goes right away.
+                    : (boxReady.get(d.shape)?.promise ?? typed.get(d.text)?.promise
+                        ?? boxReady.get(section.shapeOf.get(d.shape.el.closest('[data-box]')))?.promise ?? Promise.resolve()),
             }));
             while (pending.length) {
                 const item = await Promise.race(pending.map((p) => p.ready.then(() => p)));
