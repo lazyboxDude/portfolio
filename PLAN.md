@@ -178,8 +178,10 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Bau:** Nur die Karten und das Dienstplan-Telefon werden vom `layout-bot` aufgezogen, die übrigen Mockups erscheinen mit ihrer Karte, die Ghost-Buttons haben keine eigene Form.
     `data-outline` funktioniert dafür jetzt auch **ohne** `data-box` (der `design-bot` zeichnet den Rahmen, sobald der Text getippt ist). Bauzeit des Abschnitts ca. 9 s (vorher 16 s mit 13 einzelnen Formen).
   - **Cache-Hinweis:** Nach einem Deploy hat ein Browser die neue HTML-Seite mit alten CSS/JS-Dateien angezeigt (erkennbar am Schritt-1-Label "6 cursors"). Vercel liefert statische Dateien mit `max-age=0, must-revalidate`, das erklärt es nicht.
-    **Wahrscheinliche Ursache: Cloudflare** (DNS-Proxy davor). Dessen "Browser Cache TTL" (Standard: 4 Stunden) verlängert die Browser-Zwischenspeicherung von JS/CSS, HTML nicht. Abhilfe in Cloudflare: Caching, Configuration, Browser Cache TTL auf "Respect Existing Headers", einmal "Purge Everything".
-    Oder Proxy aus (graue Wolke, nur DNS), denn Vercel hat ein eigenes CDN. Im Repo lässt sich das nicht lösen (nicht überprüft: ich komme von der Sandbox nicht an die Domain).
+    **Ursache bestätigt (Messung an der Live-Seite):** HTML kommt mit `max-age=0`, **JS, CSS, Bilder und PDFs mit `max-age=14400`** (4 Stunden) und `server: cloudflare`. Das ist die Cloudflare-Einstellung "Browser Cache TTL" (Standard 4 Stunden), Vercel selbst sendet `max-age=0`.
+    Wer die Seite innerhalb von 4 Stunden vor einem Deploy besucht hat, sieht danach neue HTML mit alten CSS/JS-Dateien. Abhilfe in Cloudflare: Caching, Configuration, Browser Cache TTL auf "Respect Existing Headers", dann einmal "Purge Everything".
+    Oder Proxy aus (graue Wolke, nur DNS), denn Vercel hat ein eigenes CDN. Im Repo lässt sich das nicht lösen. Die Apex-Domain `gomes-fernandes.ch` leitet mit 307 auf `www.gomes-fernandes.ch` um.
+  - **Live geprüft (Stand Schritt 6):** Das alte CV-PDF (1,5 MB) und `CV.txt` sind unter `www.gomes-fernandes.ch/archive/v1-2026-11/docs/` noch öffentlich abrufbar, bis `vercel.json` deployt ist. Nach dem Deploy in Cloudflare "Purge Everything" (sonst kann der Edge-Cache das PDF noch ausliefern) und die Adresse prüfen: sie soll auf `/cv.html` umleiten.
   - **Weiterleitung:** `vercel.json` leitet `/archive/v1-2026-11/docs/*` auf `/cv.html` um (so wird auch der alte "Download"-Link im Archiv zur neuen CV-Seite).
   - **Nächster Schritt: 8 (Schwarm-Finale).**
 
@@ -193,7 +195,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 6. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
 7. **Schwarm-Struktur (Schritt 8):** Pyramide aus Layern (wie bei Bakelayer), oder etwas Eigenes? Die fünf Skill-Ebenen aus Schritt 6 sind die Grundlage.
 8. **Weitere CV-Sprachen:** Deutsch und Englisch sind drin. Soll eine weitere dazu (z. B. Portugiesisch, Französisch)?
-9. **Cloudflare:** Kannst du die "Browser Cache TTL" in Cloudflare auf "Respect Existing Headers" stellen (siehe Cache-Hinweis in Schritt 7)? Optional: gomes-fernandes.ch für die Sandbox freigeben, dann kann ich die Live-Seite prüfen.
+9. **Cloudflare:** Bitte "Browser Cache TTL" auf "Respect Existing Headers" stellen und nach dem nächsten Deploy "Purge Everything" (siehe Cache-Hinweis in Schritt 7). Die Domain ist für die Sandbox freigegeben (`gomes-fernandes.ch` und `www`), ich kann die Live-Seite also prüfen.
 
 Entschieden: Alle acht Renders werden gezeigt, Aphonia und Dolphin Rush bleiben so, Deploy über Vercel (Domain bei GoDaddy, DNS über Cloudflare), Englisch auf der Startseite, dunkler Look mit blauem Akzent (Mockup), CV als Seite statt PDF, Skill-Ebenen wie oben ("lass das mal so testen").
 
