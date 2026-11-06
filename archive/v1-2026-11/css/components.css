@@ -1,0 +1,844 @@
+/* Buttons */
+.funky-btn {
+    margin-left: 20px;
+    background: transparent;
+    border: 1px solid #ccc;
+    color: #ccc;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.funky-btn:hover { background: #fff; color: #000; }
+.funky-btn:active { transform: scale(0.95); }
+
+/* Resume Link */
+.resume-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid transparent;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.resume-link:hover {
+    border-color: var(--accent-color);
+    background: rgba(0, 210, 255, 0.1);
+}
+
+/* Modal Overlay */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+.modal-overlay.active { display: flex; opacity: 1; }
+.modal-content { background: #252525; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 8px; position: relative; padding: 0; display: flex; flex-direction: column; }
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #fff; z-index: 101; }
+
+/* Close Button Enhancement */
+.close-btn {
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    top: 10px;
+    right: 10px;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+}
+
+.close-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    transform: rotate(90deg);
+}
+
+.modal-body { padding: 2rem; }
+.modal-image { width: 100%; height: 400px; background: #000; display: flex; align-items: center; justify-content: center; color: #666; }
+
+/* --- MODERN MODAL REDESIGN --- */
+.modern-modal {
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    max-height: 800px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+}
+
+.modal-grid {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+/* Media Section (Left) */
+.modal-media-section {
+    flex: 2;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border-right: 1px solid #333;
+}
+
+.modal-main-media {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.modal-main-media img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.modal-gallery-strip {
+    height: 80px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+    overflow-x: auto;
+    border-top: 1px solid #333;
+}
+
+.gallery-thumb {
+    height: 60px;
+    width: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid #444;
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.gallery-thumb:hover {
+    opacity: 1;
+    border-color: var(--accent-color);
+}
+
+/* Info Section (Right) */
+.modal-info-section {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background: #222;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.modal-header h2 {
+    font-size: 2rem;
+    margin: 0;
+    color: #fff;
+}
+
+.modal-subtitle {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+    margin-top: 5px;
+}
+
+.modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.meta-year {
+    color: #888;
+    font-size: 0.9rem;
+    padding-right: 10px;
+    border-right: 1px solid #444;
+}
+
+.meta-tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #ccc;
+    border: 1px solid #444;
+}
+
+.modal-description {
+    color: #ddd;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.modal-links {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-link-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 12px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.modal-link-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
+/* CTA Group */
+.cta-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.cta-btn.steam-btn {
+    background: #171a21;
+    color: #c5c3c0;
+    border: 1px solid #171a21;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.cta-btn.steam-btn:hover {
+    background: #2a475e;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cta-btn.outline-btn {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid #666;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cta-btn.outline-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(0, 210, 255, 0.05);
+}
+
+/* Modal Overlay */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+.modal-overlay.active { display: flex; opacity: 1; }
+.modal-content { background: #252525; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 8px; position: relative; padding: 0; display: flex; flex-direction: column; }
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #fff; z-index: 101; }
+
+/* Close Button Enhancement */
+.close-btn {
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    top: 10px;
+    right: 10px;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+}
+
+.close-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    transform: rotate(90deg);
+}
+
+.modal-body { padding: 2rem; }
+.modal-image { width: 100%; height: 400px; background: #000; display: flex; align-items: center; justify-content: center; color: #666; }
+
+/* --- MODERN MODAL REDESIGN --- */
+.modern-modal {
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    max-height: 800px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+}
+
+.modal-grid {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+/* Media Section (Left) */
+.modal-media-section {
+    flex: 2;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border-right: 1px solid #333;
+}
+
+.modal-main-media {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.modal-main-media img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.modal-gallery-strip {
+    height: 80px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+    overflow-x: auto;
+    border-top: 1px solid #333;
+}
+
+.gallery-thumb {
+    height: 60px;
+    width: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid #444;
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.gallery-thumb:hover {
+    opacity: 1;
+    border-color: var(--accent-color);
+}
+
+/* Info Section (Right) */
+.modal-info-section {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background: #222;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.modal-header h2 {
+    font-size: 2rem;
+    margin: 0;
+    color: #fff;
+}
+
+.modal-subtitle {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+    margin-top: 5px;
+}
+
+.modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.meta-year {
+    color: #888;
+    font-size: 0.9rem;
+    padding-right: 10px;
+    border-right: 1px solid #444;
+}
+
+.meta-tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #ccc;
+    border: 1px solid #444;
+}
+
+.modal-description {
+    color: #ddd;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.modal-links {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-link-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 12px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.modal-link-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+}
+
+/* CTA Group */
+.cta-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.cta-btn.steam-btn {
+    background: #171a21;
+    color: #c5c3c0;
+    border: 1px solid #171a21;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.cta-btn.steam-btn:hover {
+    background: #2a475e;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cta-btn.outline-btn {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid #666;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cta-btn.outline-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(0, 210, 255, 0.05);
+}
+
+/* Trusted By Section Animations */
+@keyframes logoFloat {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.trusted-logo {
+    animation: logoFloat 4s ease-in-out infinite;
+}
+
+.trusted-logo:nth-child(odd) {
+    animation-delay: 0s;
+}
+
+.trusted-logo:nth-child(even) {
+    animation-delay: 2s;
+}
+
+/* Glitch Effect for Trusted Logos */
+@keyframes glitch-snap {
+    0%, 100% { transform: scale(1) skew(0deg); filter: none; }
+    92% { transform: scale(1) skew(0deg); filter: none; }
+    93% { transform: scale(1.1) skew(-10deg); filter: brightness(2) contrast(1.5); }
+    94% { transform: scale(1) skew(10deg); filter: brightness(0.8); }
+    95% { transform: scale(1.1) skew(-5deg); filter: brightness(1.5); }
+    96% { transform: scale(1) skew(0deg); filter: none; }
+}
+
+.trusted-logo img {
+    /* Apply glitch animation to the image itself */
+    animation: glitch-snap 6s infinite;
+    will-change: transform, filter;
+}
+
+.trusted-logo:nth-child(odd) img {
+    animation-delay: 1.2s;
+}
+
+.trusted-logo:nth-child(even) img {
+    animation-delay: 4.7s;
+}
+
+/* Mobile Responsive for Modal */
+@media (max-width: 900px) {
+    .modal-grid {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    
+    .modern-modal {
+        height: 100%;
+        max-height: 100%;
+        width: 100%;
+        border: none;
+    }
+
+    .modal-media-section {
+        flex: none;
+        height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid #333;
+    }
+
+    .modal-info-section {
+        flex: none;
+        padding: 1.5rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .modal-image {
+        height: 250px;
+    }
+}
+
+/* Contact Form */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+.form-input, 
+.form-textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    padding: 1rem;
+    color: #fff;
+    font-family: inherit;
+    transition: all 0.3s;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-input:focus, 
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.submit-btn {
+    background: var(--accent-color);
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* --- TERMINAL MODAL STYLE --- */
+.terminal-window {
+    background: rgba(10, 10, 10, 0.95);
+    width: 90%;
+    max-width: 700px;
+    border-radius: 6px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    border: 1px solid #333;
+    font-family: 'Space Mono', 'Courier New', monospace;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.terminal-header {
+    background: #1a1a1a;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    user-select: none;
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 15px;
+}
+
+.term-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.term-btn.close { background: #ff5f56; }
+.term-btn.minimize { background: #ffbd2e; }
+.term-btn.maximize { background: #27c93f; }
+
+.terminal-title {
+    color: #888;
+    font-size: 0.8rem;
+    flex: 1;
+    text-align: center;
+    margin-right: 50px; /* Balance the buttons */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.terminal-body {
+    padding: 2rem;
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+.term-line {
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.term-green { color: var(--accent-color); }
+.term-blue { color: var(--accent-secondary); }
+.term-gray { color: #666; }
+
+.terminal-form {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.term-input-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.term-prompt {
+    color: var(--accent-color);
+    white-space: nowrap;
+    padding-top: 10px; /* Align with input text */
+}
+
+.term-input, .term-textarea {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    width: 100%;
+    padding: 10px 0;
+    outline: none;
+}
+
+.term-input:focus, .term-textarea:focus {
+    box-shadow: none;
+}
+
+.term-textarea {
+    resize: none;
+    min-height: 100px;
+}
+
+/* Blinking cursor effect for active input */
+.term-input:focus, .term-textarea:focus {
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.term-submit {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px 20px;
+    font-family: 'Space Mono', monospace;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    align-self: flex-start;
+}
+
+.term-submit:hover {
+    background: rgba(0, 210, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+}
+
+/* Terminal Window States */
+/* Minimized Overlay State */
+.modal-overlay.minimized-overlay {
+    background: transparent;
+    pointer-events: none; /* Let clicks pass through to website */
+}
+
+/* Terminal Window States */
+.terminal-window {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: auto; /* Ensure terminal catches clicks even when overlay doesn't */
+}
+
+.terminal-window.minimized {
+    height: 42px; /* Height of header only */
+    width: 300px; /* Smaller width */
+    overflow: hidden;
+    
+    /* Position at bottom right */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    margin: 0;
+    
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    border: 1px solid var(--accent-color);
+    z-index: 1001;
+}
+
+.terminal-window.minimized .terminal-header {
+    padding: 0 15px;
+    height: 100%;
+    border-bottom: none;
+}
+
+.terminal-window.minimized .terminal-body {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.terminal-window.maximized {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    border: none;
+}
+
+.term-btn {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.term-btn:hover {
+    transform: scale(1.2);
+}
+
+.term-btn:active {
+    transform: scale(0.9);
+}
