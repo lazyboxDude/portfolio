@@ -495,24 +495,47 @@ html:not(.js) .btn-ghost { border-color: var(--accent); }
 .poster-title { font: italic 400 38px/1 var(--font-serif); color: #e4ebff; }
 .poster-sub { color: var(--subtle); font: 500 10px/1.4 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
 
-.stack {
-    position: relative;
-    width: 250px;
-    height: 250px;
+.gallery {
+    flex: 1 1 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
 }
 
-.art {
-    position: absolute;
-    width: 180px;
-    height: 180px;
+.tile { margin: 0; }
+
+.tile img {
+    display: block;
+    width: 100%;
+    height: auto; /* the height attribute only reserves space; the tile is square */
+    aspect-ratio: 1;
     object-fit: cover;
     border: 1px solid #26304f;
     border-radius: 12px;
-    box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.75);
+    background: #111522;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.art-back { right: 0; top: 0; }
-.art-front { left: 0; bottom: 0; }
+@media (hover: hover) {
+    .tile:hover img { transform: translateY(-4px) scale(1.02); }
+}
+
+.tile figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 10px;
+}
+
+.tile strong { font-size: 14px; font-weight: 600; }
+
+.tile figcaption > span {
+    color: var(--subtle);
+    font: 500 11px/1.5 var(--font-mono);
+}
 
 /* A tiny picture of this page, with the three bots */
 .mini {
@@ -561,6 +584,7 @@ html:not(.js) .btn-ghost { border-color: var(--accent); }
 .mini-cur-c { left: 14%; top: 104px; }
 
 @media (max-width: 720px) {
+    .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     .projects { grid-template-columns: 1fr; }
     .project-wide, .project-slim { grid-column: auto; }
 }
@@ -910,7 +934,7 @@ html:not(.js) .btn-ghost { border-color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .tilt { transition: none; }
+    .tilt, .tile img { transition: none; }
     .box { animation: none; transition: none; }
     .next, .btn, .glow, .sel-frame, .inspector-tag { transition: none; }
     .fake-cursor.is-new { animation: none; }

@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/archive/v1-2026-11/docs/:path*",
+      "destination": "/cv.html",
+      "permanent": false
+    }
+  ]
+}
