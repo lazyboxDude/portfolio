@@ -4,6 +4,31 @@
       "source": "/archive/v1-2026-11/docs/:path*",
       "destination": "/cv.html",
       "permanent": false
+    },
+    {
+      "source": "/PLAN.md",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/CLAUDE.md",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/README.md",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/HANDOVER.md",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/.github/:path*",
+      "destination": "/",
+      "permanent": false
     }
   ]
 }
