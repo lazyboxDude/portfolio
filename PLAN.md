@@ -100,7 +100,7 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 4 | **Cursor-Sprache** (Orbit/Linea) | erledigt, [PR #20](https://github.com/lazyboxDude/portfolio/pull/20): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen mit Griffen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Akzentrahmen. Die Persönlichkeit im Leerlauf kommt aus Schritt 3 (Teil 2) und gilt auch für den neuen Bot. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
 | 5 | **Landingpage-Gerüst: Hero + Nav** (Linea) | gebaut (siehe Status): Nav-Pill, Hero mit Serifen-Kursiv-Akzent, zwei Buttons, Hintergrund-Glow. Die Seite ist echtes HTML und baut sich nach dem Klick auf die Startbox selbst (alle drei Bots, drei Spuren parallel). Look festgelegt (dunkel, blau), Schriften selbst gehostet. |
 | 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | gebaut (siehe Status): Über mich, Werdegang, Skills (fünf Ebenen), Kontakt mit CV-Download und Footer bauen sich beim Scrollen. Dazu die mehrsprachige CV-Seite `cv.html` statt PDF. |
-| 7 | **Projekte als Mockups** | Projekte (Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) als Browser-/Phone-Mockups, die die Bots zusammensetzen (gekippt, mit Tiefe wie bei Orbit), mit Link zur Live-App oder zum Case. |
+| 7 | **Projekte als Mockups** | gebaut (siehe Status): Dienstplan als Telefon mit echtem Screenshot, Aphonia als Poster, zwei Renders aus dem Archiv, diese Seite als Mini-Bild, Dolphin Rush. Mockups sind gekippt (CSS-3D) und richten sich beim Hover auf. |
 | 8 | **Schwarm-Finale** (Bakelayer) | Signatur der Seite: Ein Klick (z. B. "More agents") skaliert von wenigen auf hunderte Cursors (`agent-NNN`, Job-Namen), gezeichnet auf `<canvas>`, mit Verbindungslinien und Zähler. Der Schwarm sammelt sich zu einer geschichteten Struktur (CSS-3D oder Canvas), die für Micaels Skill-Ebenen steht. Harte Obergrenze, Frame-Budget, Reduced-Motion zeigt ein Standbild. |
 | 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über einen Cloudflare Worker, der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
@@ -167,7 +167,18 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
     Der CV enthält bewusst keine privaten Daten (siehe "Privatsphäre"), "weitere Angaben und Referenzen auf Anfrage".
   - **Kontakt:** "Download CV" steht unten im Kontaktbereich und führt auf `cv.html`. Die Nav verlinkt About, Experience, Skills und Dienstplan. GitHub, LinkedIn, Archiv und die Rechtsseiten stehen im Footer.
   - **Altes CV-PDF** und `CV.txt` im Archiv werden über `.assetsignore` nicht mehr ausgeliefert (bleiben im Repo und in der Git-Historie).
-  - **Nächster Schritt: 7 (Projekte als Mockups).** Vorher der PR für Schritt 5 und 6.
+  - Gemerged als [PR #21](https://github.com/lazyboxDude/portfolio/pull/21).
+- **Schritt 7 gebaut** (siehe PR): Projekte als Mockups, neuer Abschnitt `#projects` zwischen "About" und "Experience". Nav: About, Projects, Experience, Skills.
+  - **Fünf Karten:** Dienstplan (Web-App im Einsatz, Link auf die App), Aphonia (Moonflux Interactive, 2025, Links zu Steam und zum Studio), "Selected renders" (Gone und Under The Bridge aus dem Archiv, Link ins Archiv),
+    "This website" (Mini-Bild dieser Seite mit den drei Bots) und Dolphin Rush (2023, nur Text). Alle Angaben stammen aus dem Dienstplan selbst und aus dem alten Portfolio im Archiv (`js/projects-data.js`), nichts ist erfunden.
+  - **Mockups mit Tiefe:** `.tilt` kippt die Geräte per `perspective()`/`rotateY()`, `@media (hover: hover)` richtet sie beim Hover auf, mit Reduced Motion ohne Übergang.
+    Das Telefon zeigt einen **echten Screenshot** der Dienstplan-App im Leerzustand (ohne Daten), das Aphonia-"Poster" ist reine Typografie (es gibt kein Titelbild), die Renders sind kleine Webp-Kopien.
+  - **Bilder** liegen in `images/projects/` (je ca. 55 bis 65 KB, `loading="lazy"`, `width`/`height` gesetzt, damit sich das Layout nie verschiebt). Die Originale im Archiv (3 bis 21 MB pro PNG) werden nicht verlinkt.
+    Gezeigt werden nur Arbeiten ohne Personen. Die anderen Archiv-Bilder bleiben im Archiv.
+  - **Bau:** Nur die Karten und das Dienstplan-Telefon werden vom `layout-bot` aufgezogen, die übrigen Mockups erscheinen mit ihrer Karte, die Ghost-Buttons haben keine eigene Form.
+    `data-outline` funktioniert dafür jetzt auch **ohne** `data-box` (der `design-bot` zeichnet den Rahmen, sobald der Text getippt ist). Bauzeit des Abschnitts ca. 9 s (vorher 16 s mit 13 einzelnen Formen).
+  - **Cache-Hinweis:** Nach einem Deploy hat ein Browser neue HTML-Seite mit alten CSS/JS-Dateien angezeigt (erkennbar am Schritt-1-Label "6 cursors"). Hilfe: hart neu laden. Dauerhaft: `_headers` mit `no-cache` (nur Cloudflare), siehe offene Frage 9.
+  - **Nächster Schritt: 8 (Schwarm-Finale).**
 
 ## Offene Fragen an Micael
 
@@ -175,10 +186,11 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 2. **Luxottica, Bezeichnung:** Im Lebenslauf "Sachbearbeiter", im Zeugnis "Praktikant Trade Marketing". Der CV zeigt vorläufig die Zeugnis-Bezeichnung. Passt das?
 3. **Über-mich-Texte:** Sie sind aus dem Lebenslauf formuliert. Bitte lesen und in deinen Worten anpassen (Abschnitt "About" in `index.html`).
 4. **Zielfirma/Rolle:** Wofür genau bewirbst du dich (Rolle, Firma)? Das bestimmt, was in Schritt 7 bis 9 gezeigt werden soll und ob der CV eine Kurzprofil-Zeile bekommt.
-5. **Projekte (Schritt 7):** Welche Projekte gehören rein? Bisher: Dienstplan-App und diese Seite. Aus dem Archiv und von Moonflux Interactive: was darf öffentlich gezeigt werden?
+5. **Projekte (Schritt 7):** Gezeigt werden jetzt Dienstplan, Aphonia, zwei Renders, diese Seite und Dolphin Rush. Fehlt etwas, oder soll etwas raus (z. B. Dolphin Rush hat noch keinen Link, weil unklar ist, ob das Spiel noch spielbar ist)? Gibt es ein Titelbild oder Screenshots von Aphonia, die öffentlich sein dürfen?
 6. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
 7. **Schwarm-Struktur (Schritt 8):** Pyramide aus Layern (wie bei Bakelayer), oder etwas Eigenes? Die fünf Skill-Ebenen aus Schritt 6 sind die Grundlage.
 8. **Weitere CV-Sprachen:** Deutsch und Englisch sind drin. Soll eine weitere dazu (z. B. Portugiesisch, Französisch)?
+9. **Hosting:** Läuft gomes-fernandes.ch auf Cloudflare oder auf Vercel (die PRs bekommen Vercel-Vorschauen)? Davon hängt ab, wie wir veraltete CSS/JS-Dateien nach einem Deploy verhindern (Cloudflare: Datei `_headers`, Vercel: `vercel.json`).
 
 Entschieden: Englisch auf der Startseite, dunkler Look mit blauem Akzent (Mockup), CV als Seite statt PDF, Skill-Ebenen wie oben ("lass das mal so testen").
 
