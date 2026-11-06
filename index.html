@@ -1,97 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Micael G. Fernandes | Hub</title>
-
-    <!-- SEO & Social Media Tags -->
-    <meta name="description" content="Hub for Micael G. Fernandes — Game Art & Development portfolio and independent web apps & tools.">
-    <meta property="og:title" content="Micael G. Fernandes | Hub">
-    <meta property="og:description" content="Game Art & Development portfolio and independent web apps & tools.">
-    <meta property="og:image" content="images/portfolio/BF.png">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-
-    <!-- Favicon -->
+    <title>Micael G. Fernandes</title>
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-
-    <!-- Preconnect for Performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="stylesheet" href="css/hub.css">
 </head>
-<body class="hub">
-
-<div class="hub-shell">
-
-    <header class="hub-header">
-        <a href="index.html" class="hub-logo">
-            <b>Micael G. Fernandes</b>
-            <span>lazyboxdude · gomes-fernandes.ch</span>
-        </a>
-        <nav>
-            <a href="portfolio.html">Portfolio</a>
-            <a href="webapps.html">Web Apps</a>
-            <a href="resume.html">Resume</a>
-        </nav>
-    </header>
-
-    <section class="hub-hero">
-        <span class="hub-eyebrow"><span class="dot"></span> Currently building on two fronts</span>
-        <h1>Game worlds by day,<br><em>web apps</em> on the side.</h1>
-        <p>3D Generalist &amp; Game Developer, co-founding Moonflux Interactive — and lately building small, focused web apps and tools. Pick a direction below.</p>
-    </section>
-
-    <div class="hub-grid">
-        <a href="portfolio.html" class="hub-card">
-            <div class="ic"><i class="fas fa-cubes"></i></div>
-            <h2>Game Dev &amp; 3D Art</h2>
-            <p>Games, real-time 3D art, and B2B services — level design, tech art, courses and commissions.</p>
-            <div class="tags">
-                <span class="tag">Unreal Engine 5</span>
-                <span class="tag">Unity</span>
-                <span class="tag">Blender</span>
-            </div>
-            <span class="go">View portfolio <i class="fas fa-arrow-right"></i></span>
-        </a>
-
-        <a href="webapps.html" class="hub-card">
-            <div class="ic"><i class="fas fa-laptop-code"></i></div>
-            <h2>Web Apps &amp; Tools</h2>
-            <p>Small, self-contained web apps I build to solve real problems — no installs, runs in the browser.</p>
-            <div class="tags">
-                <span class="tag">JavaScript</span>
-                <span class="tag">PWA</span>
-                <span class="tag">Tools</span>
-            </div>
-            <span class="go">Browse apps <i class="fas fa-arrow-right"></i></span>
-        </a>
-    </div>
-
-    <footer class="hub-footer">
-        <p>&copy; 2025 Micael G. Fernandes.</p>
-        <div class="hub-social"></div>
-    </footer>
-
-</div>
-
-<script src="js/socials.js"></script>
-<script>
-    // Re-target the shared social config into the hub's own footer markup.
-    document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector('.hub-social');
-        if (!container || typeof socialLinks === 'undefined') return;
-        container.innerHTML = socialLinks.map(link => {
-            const content = link.customHtml ? link.customHtml : `<i class="${link.icon}"></i>`;
-            return `<a href="${link.url}" target="_blank" rel="noopener" title="${link.platform}">${content}</a>`;
-        }).join('');
-    });
-</script>
+<body>
 </body>
 </html>

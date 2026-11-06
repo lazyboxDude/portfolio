@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dienstplan</title>
+<meta name="theme-color" content="#2e4bc7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dienstplan">
+<link rel="manifest" id="manifest">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%232e4bc7'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='26' stroke-linecap='round'%3E%3Ccircle cx='256' cy='256' r='150'/%3E%3Cpath d='M256 168v92l60 40'/%3E%3C/g%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --paper:#f5f6f9; --surface:#ffffff; --ink:#181a20; --muted:#767c88;
+    --line:#e7e9ef; --line-2:#eef0f4;
+    --accent:#2e4bc7; --accent-weak:#eaeefb; --accent-ink:#22368f;
+    --opv:#3550cf; --ev:#178f7f; --bo:#5b6aa0; --ot:#b3792c;
+    --pos:#1c9d64;
+    --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono','SFMono-Regular',Menlo,'Roboto Mono','Liberation Mono',monospace;
+    --shadow:0 1px 2px rgba(24,26,32,.04),0 8px 24px -12px rgba(24,26,32,.14);
+    --shadow-lift:0 2px 6px rgba(24,26,32,.06),0 16px 32px -14px rgba(24,26,32,.22);
+    --spring:cubic-bezier(.32,.72,0,1);
+    --spring-bounce:cubic-bezier(.34,1.56,.64,1);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--sans);
+    line-height:1.5; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    font-optical-sizing:auto;
+  }
+  .app{max-width:780px;margin:0 auto;padding:0 20px 72px}
+
+  /* top bar */
+  header.bar{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(245,246,249,.78);
+    backdrop-filter:saturate(180%) blur(16px);-webkit-backdrop-filter:saturate(180%) blur(16px);
+    box-shadow:inset 0 -1px 0 rgba(255,255,255,.6),0 1px 0 var(--line),0 12px 24px -20px rgba(24,26,32,.25);
+    display:flex;align-items:center;gap:12px;padding:14px 0;margin-bottom:26px;
+    transition:box-shadow .2s var(--spring);
+  }
+  .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);flex:0 0 auto;
+    display:grid;place-items:center;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.35)}
+  .mark svg{display:block}
+  .brand{display:flex;flex-direction:column;line-height:1.05}
+  .brand b{font-size:15px;letter-spacing:-.01em}
+  .brand span{font-size:12px;color:var(--muted)}
+  .bar .right{margin-left:auto;font-size:12.5px;color:var(--muted)}
+  .iconbtn{background:none;border:none;color:var(--muted);cursor:pointer;padding:7px;
+    border-radius:9px;display:grid;place-items:center;flex:0 0 auto;touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .13s var(--spring),color .13s var(--spring),transform .12s var(--spring)}
+  .iconbtn:hover{background:var(--accent-weak);color:var(--accent-ink)}
+  .iconbtn:active{transform:scale(.9);transition-duration:.08s}
+  .iconbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  h1.hero{font-size:clamp(26px,5.2vw,36px);line-height:1.06;letter-spacing:-.025em;
+    margin:8px 0 6px;font-weight:680}
+  .lede{color:var(--muted);font-size:15px;margin:0 0 22px;max-width:52ch}
+
+  /* dropzone */
+  .drop{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);padding:40px 24px;text-align:center;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    transition:border-color .18s var(--spring),background .18s var(--spring),
+      box-shadow .18s var(--spring),transform .12s var(--spring);
+  }
+  .drop:hover{border-color:#cfd4e4;box-shadow:var(--shadow-lift);transform:translateY(-1px)}
+  .drop:active{transform:scale(.99);transition-duration:.08s}
+  .drop:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .drop.hot{border-color:var(--accent);background:var(--accent-weak);transform:scale(1.01)}
+  .drop .ic{width:38px;height:38px;margin:0 auto 12px;color:var(--accent)}
+  .drop .t{font-size:16px;font-weight:560}
+  .drop .s{font-size:13.5px;color:var(--muted);margin-top:4px}
+  .drop .s2{font-size:12px;color:var(--muted);margin-top:12px;opacity:.8}
+  input[type=file]{display:none}
+  .msg{font-size:13px;color:var(--muted);margin-top:12px;text-align:center}
+  .msg.error{color:#c0392b}
+
+  /* controls */
+  .controls{display:none;align-items:flex-end;gap:14px;margin-top:8px;
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:16px 18px}
+  .controls.show{display:flex}
+  .field{flex:1 1 auto;min-width:0}
+  .field label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:500}
+  select{
+    width:100%;font-family:inherit;font-size:15.5px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    padding:11px 40px 11px 13px;cursor:pointer;appearance:none;touch-action:manipulation;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23767c88' stroke-width='1.7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;
+    transition:border-color .15s var(--spring),box-shadow .15s var(--spring);
+  }
+  select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+  select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .found{flex:0 0 auto;font-size:12.5px;color:var(--muted);padding-bottom:11px}
+
+  .numfield{width:100%;font-family:inherit;font-size:15.5px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    padding:11px 13px;touch-action:manipulation;
+    transition:border-color .15s var(--spring),box-shadow .15s var(--spring)}
+  .numfield:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+
+  /* result */
+  .result{display:none;margin-top:26px}
+  .result.show{display:block}
+
+  .summary{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);padding:22px 24px;margin-bottom:22px;
+  }
+  .summary .who{font-size:19px;font-weight:640;letter-spacing:-.01em}
+  .summary .period{font-size:13px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+  .bignum{display:flex;align-items:baseline;gap:12px;margin-top:16px;flex-wrap:wrap}
+  .bignum .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    align-self:center}
+  .bignum .v{font-family:var(--mono);font-size:38px;font-weight:600;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums}
+  .bignum .u{font-family:var(--mono);font-size:15px;color:var(--muted)}
+  .cap{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .cap .linklike{all:unset;color:var(--accent);cursor:pointer;font-weight:600;touch-action:manipulation}
+  .cap .linklike:hover{text-decoration:underline}
+
+  .subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px;margin-top:18px;
+    padding-top:16px;border-top:1px solid var(--line-2)}
+  .stat{display:flex;flex-direction:column;gap:3px}
+  .stat .sk{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .stat .sv{font-family:var(--mono);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+  .stat .sv.dim{color:var(--muted);font-weight:500}
+
+  .paycard{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--line-2)}
+  .paycard.show{display:block}
+  .paycard .pk{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .paycard .pk .basis{text-transform:none;letter-spacing:0;font-weight:400}
+  .payrow{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;padding:3px 0}
+  .payrow b{font-family:var(--mono);font-size:18px;font-variant-numeric:tabular-nums;color:var(--accent-ink)}
+
+  .months{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{display:flex;align-items:baseline;gap:8px;background:var(--paper);
+    border:1px solid var(--line-2);border-radius:999px;padding:7px 13px;font-size:13px}
+  .chip b{font-weight:560} .chip .h{font-family:var(--mono);color:var(--accent-ink);font-variant-numeric:tabular-nums}
+  .chip .n{color:var(--muted);font-size:12px}
+
+  /* time-axis list (signature) */
+  .listwrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);padding:8px 20px 14px;margin-bottom:22px}
+  .ruler{display:grid;grid-template-columns:112px 1fr 78px;align-items:center;
+    padding:12px 0 8px;border-bottom:1px solid var(--line-2)}
+  .ruler .track{position:relative;height:14px}
+  .ruler .tick{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mono);
+    font-size:10.5px;color:var(--muted)}
+  .ruler .tick::before{content:"";position:absolute;top:14px;left:50%;width:1px;height:6px;
+    background:var(--line);transform:translateX(-50%)}
+  .rlabel{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .rlabel.r{text-align:right}
+
+  .shift{display:grid;grid-template-columns:112px 1fr 78px;align-items:center;gap:0;
+    padding:11px 0;border-bottom:1px solid var(--line-2);
+    animation:rise .34s cubic-bezier(.2,.7,.3,1) both}
+  .shift:last-child{border-bottom:none}
+  .shift .d{display:flex;flex-direction:column;line-height:1.25}
+  .shift .d .dm{font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
+  .shift .d .wd{font-size:11.5px;color:var(--muted)}
+  .shift .d .tt{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:3px}
+  .track{position:relative;height:26px;border-radius:7px;background:var(--paper);
+    box-shadow:inset 0 0 0 1px var(--line-2)}
+  .grid{position:absolute;top:0;bottom:0;width:1px;background:var(--line-2)}
+  .bar{position:absolute;top:4px;bottom:4px;border-radius:5px;min-width:6px;
+    display:flex;align-items:center;padding:0 7px;overflow:hidden;
+    transition:filter .12s,transform .12s}
+  .bar .lab{font-family:var(--mono);font-size:11px;font-weight:600;color:#fff;
+    white-space:nowrap;letter-spacing:.02em}
+  .bar.opv{background:var(--opv)} .bar.ev{background:var(--ev)}
+  .bar.bo{background:var(--bo)} .bar.ot{background:var(--ot)}
+  .shift:hover .bar{filter:brightness(1.06)}
+  .meta{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
+  .meta .hh{font-family:var(--mono);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+  .meta .p1{font-size:10px;color:var(--muted);margin-top:2px}
+  .ist{width:100%;max-width:60px;text-align:right;font-family:var(--mono);font-size:10.5px;
+    color:var(--muted);background:transparent;border:none;border-bottom:1px dashed var(--line);
+    padding:3px 0 2px;margin-top:3px;touch-action:manipulation;
+    transition:border-color .15s var(--spring),color .15s var(--spring)}
+  .ist::placeholder{color:var(--muted);opacity:.65}
+  .ist:focus{outline:none;border-bottom:1px solid var(--accent)}
+  .ist.filled{border-bottom-style:solid;border-bottom-color:var(--accent-ink);
+    color:var(--accent-ink);font-weight:600}
+  .ist-hint{font-size:11px;color:var(--muted);margin:2px 0 4px;padding:0 0 8px;
+    border-bottom:1px solid var(--line-2)}
+
+  /* actions */
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;font-weight:550;border-radius:11px;cursor:pointer;
+    padding:12px 18px;border:1px solid transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    transition:background .13s var(--spring),border-color .13s var(--spring),
+      transform .15s var(--spring),box-shadow .15s var(--spring)}
+  button:active{transform:scale(.96);transition-duration:.08s}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .primary{background:var(--accent);color:#fff}
+  .primary:hover{background:#2740ad;box-shadow:0 6px 16px -8px rgba(46,75,199,.5)}
+  .secondary{background:var(--surface);color:var(--ink);border-color:var(--line)}
+  .secondary:hover{border-color:#cfd4e4;background:#fafbfc}
+  select.secondary{font-family:inherit;font-size:14px;font-weight:550;border-radius:11px;cursor:pointer;
+    padding:12px 14px;border:1px solid var(--line);max-width:220px}
+
+  footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);line-height:1.6}
+  footer b{color:var(--ink);font-weight:560}
+
+  .modal{position:fixed;inset:0;background:rgba(20,22,28,0);display:flex;
+    align-items:flex-end;justify-content:center;z-index:40;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .2s var(--spring),background-color .2s var(--spring),visibility 0s linear .2s}
+  .modal.show{opacity:1;visibility:visible;pointer-events:auto;background:rgba(20,22,28,.45);
+    transition:opacity .2s var(--spring),background-color .2s var(--spring)}
+  .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:18px 18px 0 0;
+    padding:18px 20px 22px;box-shadow:0 -8px 40px -12px rgba(0,0,0,.3);
+    transform:translateY(16px);opacity:0;transition:transform .32s var(--spring-bounce),opacity .22s var(--spring)}
+  .modal.show .sheet{transform:translateY(0);opacity:1}
+  .sheet-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+  .sheet-h b{font-size:15px;font-family:var(--mono)}
+  .x{background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 6px;line-height:1;
+    border-radius:8px;transition:background .13s var(--spring),transform .12s var(--spring)}
+  .x:hover{background:var(--paper)} .x:active{transform:scale(.9)}
+  .sheet-note{font-size:13px;color:var(--muted);margin:2px 0 12px;line-height:1.5}
+  textarea{width:100%;height:180px;font-family:var(--mono);font-size:11.5px;line-height:1.5;
+    color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:12px;resize:none;white-space:pre;overflow:auto}
+  .sheet-actions{display:flex;gap:10px;margin-top:12px}
+  @media(min-width:560px){.modal{align-items:center}.sheet{border-radius:18px}}
+
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%) translateY(10px) scale(.94);
+    background:var(--ink);color:#fff;font-size:13.5px;font-weight:500;padding:11px 17px;
+    border-radius:11px;opacity:0;transition:opacity .22s var(--spring),transform .28s var(--spring-bounce);
+    box-shadow:var(--shadow);pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (prefers-reduced-transparency:reduce){
+    header.bar{background:var(--paper);backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
+  @media (max-width:560px){
+    .shift,.ruler{grid-template-columns:96px 1fr 66px}
+    .bignum .v{font-size:32px}
+    .summary,.listwrap{padding-left:16px;padding-right:16px}
+    .hideSm{display:none}
+    .subgrid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="bar">
+    <div class="mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2.2"/>
+      </svg>
+    </div>
+    <div class="brand"><b>Dienstplan</b><span>Plan → Kalender &amp; Stunden</span></div>
+    <div class="right" id="appnote">
+      <a href="webapps.html" style="color:inherit;text-decoration:none">← Web Apps</a><span class="hideSm"> · läuft lokal</span>
+    </div>
+    <button class="iconbtn" id="wageBtn" aria-label="Stundenlohn hinterlegen" title="Stundenlohn hinterlegen">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M19.4 14.5a1.7 1.7 0 00.35 1.87l.06.06a2.05 2.05 0 11-2.9 2.9l-.06-.06a1.7 1.7 0 00-1.87-.35 1.7 1.7 0 00-1.03 1.56V21a2.05 2.05 0 01-4.1 0v-.1a1.7 1.7 0 00-1.1-1.55 1.7 1.7 0 00-1.87.35l-.06.06a2.05 2.05 0 11-2.9-2.9l.06-.06a1.7 1.7 0 00.35-1.87 1.7 1.7 0 00-1.56-1.03H3a2.05 2.05 0 010-4.1h.1a1.7 1.7 0 001.55-1.1 1.7 1.7 0 00-.35-1.87l-.06-.06a2.05 2.05 0 112.9-2.9l.06.06a1.7 1.7 0 001.87.35H9a1.7 1.7 0 001.03-1.56V3a2.05 2.05 0 014.1 0v.1a1.7 1.7 0 001.03 1.56 1.7 1.7 0 001.87-.35l.06-.06a2.05 2.05 0 112.9 2.9l-.06.06a1.7 1.7 0 00-.35 1.87V9a1.7 1.7 0 001.56 1.03H21a2.05 2.05 0 010 4.1h-.1a1.7 1.7 0 00-1.55 1.03z"/>
+      </svg>
+    </button>
+  </header>
+
+  <h1 class="hero">Vom Plan zu deinen Stunden.</h1>
+  <p class="lede">Zieh den Monats-Dienstplan als PDF herein, wähl deinen Namen und du bekommst deine Schichten, die Soll-Zeit und einen Export für Kalender oder Notion.</p>
+
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Dienstplan-PDF auswählen oder hierher ziehen">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 16V4m0 0L8 8m4-4l4 4"/><path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
+    </svg>
+    <div class="t">Dienstplan-PDF hierher ziehen</div>
+    <div class="s">oder <span style="color:var(--accent);font-weight:560">Datei auswählen</span></div>
+    <div class="s2">Die Datei bleibt auf deinem Gerät — nichts wird hochgeladen.</div>
+  </div>
+  <input type="file" id="file" accept="application/pdf">
+  <div class="msg" id="msg" style="display:none"></div>
+
+  <div class="controls" id="controls">
+    <div class="field">
+      <label for="name">Mitarbeiter</label>
+      <select id="name"></select>
+    </div>
+    <div class="found" id="found"></div>
+  </div>
+
+  <section class="result" id="result">
+    <div class="summary">
+      <div class="who" id="who"></div>
+      <div class="period" id="period"></div>
+      <div class="bignum">
+        <span class="k">Soll-Zeit</span>
+        <span class="v" id="total"></span>
+        <span class="u" id="totalDec"></span>
+      </div>
+      <div class="cap">Bruttozeit, ohne gesetzlichen Pausenabzug.</div>
+
+      <div class="subgrid" id="subgrid">
+        <div class="stat"><span class="sk">Pause (Soll, Art. 15 ArG)</span><span class="sv" id="sollPause"></span></div>
+        <div class="stat"><span class="sk">Netto-Soll</span><span class="sv" id="sollNetto"></span></div>
+        <div class="stat"><span class="sk">Ist erfasst</span><span class="sv" id="istCount"></span></div>
+        <div class="stat"><span class="sk">Netto-Ist</span><span class="sv" id="istNetto"></span></div>
+      </div>
+
+      <div class="paycard" id="paycard">
+        <div class="pk">Voraussichtlicher Verdienst <span class="basis" id="payBasis"></span></div>
+        <div class="payrow"><span>Brutto</span><b id="payBrutto"></b></div>
+        <div class="payrow"><span>Netto</span><b id="payNetto"></b></div>
+      </div>
+      <p class="cap" id="payPrompt"><button class="linklike" id="payPromptBtn">Stundenlohn hinterlegen</button> für eine Verdienst-Schätzung.</p>
+
+      <div class="months" id="months"></div>
+    </div>
+
+    <div class="listwrap">
+      <p class="ist-hint">Tippe rechts bei einer Schicht, um deine effektive Ist-Zeit einzutragen.</p>
+      <div class="ruler">
+        <div class="rlabel">Tag</div>
+        <div class="track" id="rulerTrack"></div>
+        <div class="rlabel r">Dauer</div>
+      </div>
+      <div id="list"></div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="gcal">In Google Kalender speichern</button>
+      <select class="secondary" id="gcalSel" style="display:none"></select>
+      <button class="secondary" id="dl">Kalender (.ics)</button>
+      <button class="secondary" id="csv">Notion (.csv)</button>
+      <button class="secondary" id="copy">Kopieren</button>
+    </div>
+    <p class="cap" id="gcalHint" style="display:none">📅 iPhone-Tipp: „In Google Kalender speichern" meldet dich direkt bei Google an. Nach der Anmeldung erscheint eine Auswahl, in welchen deiner Google-Kalender die Schichten eingetragen werden sollen — dann nochmal auf den Button klicken, um zu speichern. Ganz ohne die Apple-Kalender-App. Die .ics-Datei bleibt als Alternative für andere Kalender-Apps.</p>
+  </section>
+
+  <footer>
+    <b>Als App nutzen.</b> iPhone: in Safari unten auf das Teilen-Symbol <span aria-hidden="true">⬆️</span> tippen → „Zum Home-Bildschirm". Android: im Chrome-Menü <span aria-hidden="true">⋮</span> „App installieren" bzw. „Zum Startbildschirm hinzufügen" wählen. Danach startet der Dienstplan direkt vom Home-Bildschirm, ohne Adressleiste.
+    <div style="margin-top:10px"><a href="datenschutz.html" style="color:inherit">Datenschutzerklärung</a> · <a href="nutzungsbedingungen.html" style="color:inherit">Nutzungsbedingungen</a></div>
+  </footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sheet-h"><b id="mTitle"></b><button class="x" id="mClose" aria-label="Schliessen">✕</button></div>
+    <p class="sheet-note" id="mNote"></p>
+    <textarea id="mText" readonly spellcheck="false"></textarea>
+    <div class="sheet-actions"><button class="primary" id="mCopy">Text kopieren</button></div>
+  </div>
+</div>
+
+<div class="modal" id="wageModal">
+  <div class="sheet">
+    <div class="sheet-h"><b>Stundenlohn</b><button class="x" id="wageClose" aria-label="Schliessen">✕</button></div>
+    <p class="sheet-note">Für eine grobe Verdienst-Schätzung anhand deiner Netto-Zeit (nach Pausenabzug). Bleibt nur auf diesem Gerät gespeichert.</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="field"><label for="wBrutto">Bruttolohn pro Stunde (CHF)</label>
+        <input class="numfield" type="number" inputmode="decimal" step="0.05" min="0" id="wBrutto"></div>
+      <div class="field"><label for="wNetto">Nettolohn pro Stunde (CHF)</label>
+        <input class="numfield" type="number" inputmode="decimal" step="0.05" min="0" id="wNetto"></div>
+    </div>
+    <div class="sheet-actions"><button class="primary" id="wageSave">Speichern</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- app / PWA ---------- */
+const ICON="data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='#2e4bc7'/><g fill='none' stroke='#fff' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'><circle cx='256' cy='256' r='150'/><path d='M256 168v92l60 40'/></g></svg>");
+try{
+  const manifest={name:"Dienstplan",short_name:"Dienstplan",start_url:".",scope:".",
+    display:"standalone",background_color:"#f5f6f9",theme_color:"#2e4bc7",
+    icons:[{src:ICON,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
+  document.getElementById('manifest').href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));
+}catch(e){}
+
+/* ---------- constants ---------- */
+const WD=['Mo','Di','Mi','Do','Fr','Sa','So'];
+const WDname=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const OFF_RE=/ferien|frei|krank|freiwunsch|kompensation|kann ev/i;
+const TIME_RE=/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/;
+const DATE_RE=/^\d{2}\.\d{2}\.\d{4}$/;
+const SECTIONS=['name','operateure','platzanweiser','teamleitung kk/dutyfree','kalender [200','kalender'];
+const AXIS_START=480, AXIS_SPAN=1080; // 08:00 .. 02:00 next day (18h)
+
+try{ pdfjsLib.setVerbosityLevel && pdfjsLib.setVerbosityLevel((pdfjsLib.VerbosityLevel&&pdfjsLib.VerbosityLevel.ERRORS)||0); }catch(e){}
+// pdf.js prints "Warning: Setting up fake worker." via console.log when no background
+// worker is available (e.g. in a sandboxed preview). It's harmless — hide just that line.
+['log','warn'].forEach(fn=>{
+  const orig=console[fn].bind(console);
+  console[fn]=(...a)=>{ if(typeof a[0]==='string'&&/fake worker/i.test(a[0]))return; orig(...a); };
+});
+function ensureWorker(){
+  if(!pdfjsLib.GlobalWorkerOptions.workerSrc)
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+let PAGES=[], CURRENT=[];
+const $=id=>document.getElementById(id);
+
+/* ---------- file loading ---------- */
+const drop=$('drop');
+drop.onclick=()=>$('file').click();
+drop.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();$('file').click();} });
+['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot')}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot')}));
+drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f)loadPDF(f)});
+$('file').addEventListener('change',ev=>{const f=ev.target.files[0];if(f)loadPDF(f)});
+
+async function loadPDF(file){
+  const msg=$('msg'); msg.className='msg'; msg.style.display='block';
+  msg.textContent='Lese „'+file.name+'“ …';
+  $('controls').classList.remove('show'); $('result').classList.remove('show');
+  try{
+    ensureWorker();
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    PAGES=[]; const names=new Set();
+    for(let p=1;p<=pdf.numPages;p++){
+      const page=await pdf.getPage(p);
+      const tc=await page.getTextContent();
+      const items=tc.items.filter(i=>i.str&&i.str.trim()).map(i=>({s:i.str.trim(),x:i.transform[4],top:-i.transform[5]}));
+      const parsed=parsePage(items);
+      if(parsed){PAGES.push(parsed);parsed.people.forEach(n=>names.add(n));}
+    }
+    if(!PAGES.length) throw 0;
+    const sel=$('name'); sel.innerHTML='';
+    [...names].sort((a,b)=>a.localeCompare(b,'de')).forEach(n=>{
+      const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);
+    });
+    sel.selectedIndex=-1;
+    $('found').textContent=names.size+' Mitarbeiter · '+PAGES.length+' Seiten';
+    msg.style.display='none';
+    $('controls').classList.add('show');
+    generate();
+  }catch(e){
+    msg.className='msg error';
+    msg.textContent='Diese PDF sieht nicht wie ein Dienstplan aus. Prüf die Datei und versuch es erneut.';
+  }
+}
+
+/* ---------- parsing (unchanged logic) ---------- */
+function parsePage(items){
+  const wdItems=items.filter(i=>WD.includes(i.s));
+  const byTop={};
+  wdItems.forEach(i=>{const k=Math.round(i.top);(byTop[k]=byTop[k]||[]).push(i)});
+  let header=null;
+  for(const k in byTop){
+    const sorted=byTop[k].slice().sort((a,b)=>a.x-b.x);
+    if(sorted.length<2)continue;
+    // weekday header can start on any day and cover any number of columns
+    // (e.g. an 11-day plan starting on a Thursday), not just a Mon–Sun week
+    const seq=sorted.every((it,idx)=>idx===0||(WD.indexOf(it.s)-WD.indexOf(sorted[idx-1].s)+7)%7===1);
+    if(seq&&(!header||sorted.length>header.length))header=sorted;
+  }
+  if(!header)return null;
+  const colX=header.map(i=>i.x), headerTop=header[0].top;
+  const dateItems=items.filter(i=>DATE_RE.test(i.s)&&i.top<headerTop);
+  const colDate=colX.map(cx=>{const c=dateItems.filter(i=>Math.abs(i.x-cx)<8).sort((a,b)=>b.top-a.top);return c.length?c[0].s:null;});
+  const bounds=colX.map((cx,i)=>{
+    const left=i===0?cx-30:(colX[i-1]+cx)/2;
+    const right=i<colX.length-1?(cx+colX[i+1])/2:cx+400;
+    return [left,right];
+  });
+  const nameItems=items.filter(i=>i.x<colX[0]-15&&i.top>headerTop+2);
+  const rows=clusterRows(nameItems);
+  const people=[];
+  rows.forEach((r,idx)=>{
+    const low=r.text.toLowerCase();
+    if(SECTIONS.some(s=>low.startsWith(s)))return;
+    const ybot=idx+1<rows.length?rows[idx+1].top:r.top+40;
+    const cells=collectCells(items,colX,bounds,r.top,ybot);
+    if(cells.some(c=>c&&(TIME_RE.test(c)||OFF_RE.test(c))))people.push(r.text);
+  });
+  return {items,colX,bounds,colDate,rows,people,headerTop};
+}
+function clusterRows(items){
+  const sorted=items.slice().sort((a,b)=>a.top-b.top);
+  const rows=[];let cur=null;
+  for(const it of sorted){
+    if(cur&&it.top-cur.top<14)cur.parts.push(it);
+    else{cur={top:it.top,parts:[it]};rows.push(cur);}
+  }
+  return rows.map(r=>({top:r.top,text:r.parts.sort((a,b)=>a.x-b.x).map(p=>p.s).join(' ').trim()}));
+}
+function collectCells(items,colX,bounds,ytop,ybot){
+  const band=items.filter(i=>i.top>=ytop-14&&i.top<ybot-3&&i.x>=colX[0]-12);
+  const cols=colX.map(()=>[]);
+  band.sort((a,b)=>a.top-b.top||a.x-b.x);
+  for(const it of band){
+    for(let i=0;i<bounds.length;i++){if(it.x>=bounds[i][0]&&it.x<bounds[i][1]){cols[i].push(it.s);break;}}
+  }
+  return cols.map(c=>c.join(' ').trim());
+}
+function buildEvents(target){
+  const tokens=norm(target).split(' ').filter(x=>x.length>1);
+  const ev=[];
+  for(const pg of PAGES){
+    const idx=pg.rows.findIndex(r=>{const rt=norm(r.text);return tokens.every(t=>rt.includes(t));});
+    if(idx<0)continue;
+    const r=pg.rows[idx];
+    const ybot=idx+1<pg.rows.length?pg.rows[idx+1].top:r.top+40;
+    collectCells(pg.items,pg.colX,pg.bounds,r.top,ybot).forEach((cell,ci)=>{
+      if(!cell||!pg.colDate[ci])return;
+      const m=cell.match(TIME_RE); if(!m)return;
+      const before=cell.slice(0,m.index).replace(/\*/g,'').trim();
+      const after=cell.slice(m.index+m[0].length).replace(/\*/g,'').trim();
+      ev.push({date:pg.colDate[ci],code:before||'Schicht',note:after,sh:+m[1],sm:+m[2],eh:+m[3],em:+m[4]});
+    });
+  }
+  const seen=new Set(),out=[];
+  ev.sort((a,b)=>key(a)-key(b));
+  for(const e of ev){const k=e.date+e.sh+e.sm+e.code;if(!seen.has(k)){seen.add(k);out.push(e);}}
+  return out;
+}
+const key=e=>{const[d,mo,y]=e.date.split('.');return new Date(+y,+mo-1,+d,e.sh,e.sm).getTime();};
+const norm=s=>s.toLowerCase().replace(/\s+/g,' ').trim();
+
+/* ---------- Ist-Zeit (lokal gespeichert) ---------- */
+const IST_KEY='dienstplan_ist_v1';
+let ISTSTORE={};
+try{ ISTSTORE=JSON.parse(localStorage.getItem(IST_KEY)||'{}'); }catch(e){ ISTSTORE={}; }
+const istKey=(name,e)=>slug(name)+'|'+e.date+'|'+pad(e.sh)+pad(e.sm)+'|'+e.code;
+function getIst(k){ const v=ISTSTORE[k]; return (typeof v==='number'&&v>=0)?v:null; }
+function setIst(k,min){
+  if(min==null) delete ISTSTORE[k]; else ISTSTORE[k]=min;
+  try{ localStorage.setItem(IST_KEY,JSON.stringify(ISTSTORE)); }catch(e){}
+}
+function parseHM(s){
+  const m=/^(\d{1,2}):([0-5]\d)$/.exec(s.trim());
+  return m?(+m[1])*60+(+m[2]):null;
+}
+// Schweizer Mindestpausen, Art. 15 ArG: >5.5h → 15min, >7h → 30min, >9h → 60min
+function pauseMin(workMin){
+  if(workMin>9*60) return 60;
+  if(workMin>7*60) return 30;
+  if(workMin>5.5*60) return 15;
+  return 0;
+}
+
+/* ---------- Stundenlohn (lokal gespeichert) ---------- */
+const WAGE_KEY='dienstplan_wage_v1';
+function loadWage(){ try{ return JSON.parse(localStorage.getItem(WAGE_KEY)||'null'); }catch(e){ return null; } }
+function saveWage(w){ try{ localStorage.setItem(WAGE_KEY,JSON.stringify(w)); }catch(e){} }
+const fmtCHF=n=>'CHF '+n.toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2});
+function openWageModal(){
+  const w=loadWage()||{};
+  $('wBrutto').value=w.brutto||'';
+  $('wNetto').value=w.netto||'';
+  $('wageModal').classList.add('show');
+}
+$('wageBtn').onclick=openWageModal;
+$('payPromptBtn').onclick=openWageModal;
+$('wageClose').onclick=()=>$('wageModal').classList.remove('show');
+$('wageModal').onclick=e=>{ if(e.target===$('wageModal'))$('wageModal').classList.remove('show'); };
+$('wageSave').onclick=()=>{
+  saveWage({brutto:parseFloat($('wBrutto').value)||0,netto:parseFloat($('wNetto').value)||0});
+  $('wageModal').classList.remove('show');
+  toast('Stundenlohn gespeichert');
+  if(CURRENT.length) renderResult($('name').value.trim(),CURRENT);
+};
+
+/* ---------- render ---------- */
+$('name').onchange=generate;
+function generate(){
+  const name=$('name').value.trim(); if(!name)return;
+  CURRENT=buildEvents(name);
+  const res=$('result');
+  if(!CURRENT.length){
+    res.classList.remove('show');
+    const msg=$('msg');msg.className='msg';msg.style.display='block';
+    msg.textContent='Für „'+name+'“ stehen in diesem Plan nur Frei/Ferien.';
+    return;
+  }
+  $('msg').style.display='none';
+  renderResult(name,CURRENT);
+  res.classList.add('show');
+}
+
+function typeClass(code){
+  if(/opv/i.test(code))return'opv';
+  if(/^bo/i.test(code))return'bo';
+  if(/ev/i.test(code))return'ev';
+  return'ot';
+}
+function barPos(e){
+  let s=e.sh*60+e.sm, en=e.eh*60+e.em; if(en<=s)en+=1440;
+  let l=(s-AXIS_START)/AXIS_SPAN*100, r=(en-AXIS_START)/AXIS_SPAN*100;
+  l=Math.max(0,Math.min(100,l)); r=Math.max(0,Math.min(100,r));
+  return [l,Math.max(r-l,1.4)];
+}
+function renderResult(name,ev){
+  $('who').textContent=name;
+  const first=ev[0].date, last=ev[ev.length-1].date;
+  $('period').textContent=ev.length+' Schichten · '+first+' – '+last;
+
+  const months=new Map(); let total=0, sollPause=0, istBrutto=0, istCount=0;
+  for(const e of ev){
+    const min=durMin(e); total+=min; sollPause+=pauseMin(min);
+    const[,mo,y]=e.date.split('.'); const k=y+'-'+mo;
+    if(!months.has(k))months.set(k,{label:MONTHS[+mo-1]+' '+y,min:0,n:0});
+    const m=months.get(k);m.min+=min;m.n++;
+    const ist=getIst(istKey(name,e));
+    istBrutto+=(ist!=null?ist:min);
+    if(ist!=null)istCount++;
+  }
+  const sollNetto=total-sollPause;
+  const istPause=ev.reduce((s,e)=>{const ist=getIst(istKey(name,e));return s+pauseMin(ist!=null?ist:durMin(e));},0);
+  const istNetto=istBrutto-istPause;
+
+  $('total').textContent=fmtHM(total);
+  $('totalDec').textContent='('+fmtDec(total)+' h)';
+
+  $('sollPause').textContent='−'+fmtHM(sollPause);
+  $('sollNetto').textContent=fmtHM(sollNetto);
+  $('istCount').textContent=istCount+' / '+ev.length;
+  $('istCount').className='sv'+(istCount?'':' dim');
+  $('istNetto').textContent=istCount?fmtHM(istNetto):'–';
+  $('istNetto').className='sv'+(istCount?'':' dim');
+
+  const wage=loadWage();
+  if(wage&&(wage.brutto||wage.netto)){
+    const basisMin=istCount?istNetto:sollNetto;
+    $('paycard').classList.add('show'); $('payPrompt').style.display='none';
+    $('payBasis').textContent=istCount?'· nach erfasster Ist-Zeit':'· nach Soll-Zeit, noch keine Ist-Zeit erfasst';
+    $('payBrutto').textContent=wage.brutto?fmtCHF(basisMin/60*wage.brutto):'–';
+    $('payNetto').textContent=wage.netto?fmtCHF(basisMin/60*wage.netto):'–';
+  }else{
+    $('paycard').classList.remove('show'); $('payPrompt').style.display='block';
+  }
+
+  $('months').innerHTML=months.size>1?[...months.values()].map(m=>
+    `<span class="chip"><b>${m.label}</b><span class="h">${fmtHM(m.min)}</span><span class="n">${m.n}×</span></span>`).join(''):'';
+
+  // ruler ticks (12,16,20,00)
+  const ticks=[[12,'12'],[16,'16'],[20,'20'],[24,'00']];
+  $('rulerTrack').innerHTML=ticks.map(([h,l])=>{
+    const pos=(h*60-AXIS_START)/AXIS_SPAN*100;
+    return `<span class="tick" style="left:${pos}%">${l}</span>`;
+  }).join('');
+
+  const gridHTML=ticks.map(([h])=>{const pos=(h*60-AXIS_START)/AXIS_SPAN*100;return `<span class="grid" style="left:${pos}%"></span>`;}).join('');
+  $('list').innerHTML=ev.map((e,i)=>{
+    const[d,mo,y]=e.date.split('.');
+    const wd=WDname[new Date(+y,+mo-1,+d).getDay()];
+    const[l,w]=barPos(e); const cls=typeClass(e.code);
+    const cross=(e.eh*60+e.em)<=(e.sh*60+e.sm);
+    const t=`${pad(e.sh)}:${pad(e.sm)}–${pad(e.eh)}:${pad(e.em)}`;
+    const soll=durMin(e), k=istKey(name,e), ist=getIst(k);
+    return `<div class="shift" style="animation-delay:${Math.min(i*16,320)}ms">
+      <div class="d"><span class="dm">${d}.${mo}.</span><span class="wd">${wd}</span><span class="tt">${t}</span></div>
+      <div class="track">${gridHTML}<span class="bar ${cls}" style="left:${l}%;width:${w}%" title="${esc(e.code)} ${t}"><span class="lab">${esc(e.code)}</span></span></div>
+      <div class="meta">
+        <span class="hh">${fmtHM(soll)}</span>
+        <input class="ist${ist!=null?' filled':''}" type="text" inputmode="numeric" data-key="${k}"
+          placeholder="${fmtHM(soll)}" value="${ist!=null?fmtHM(ist):''}" aria-label="Ist-Zeit für ${d}.${mo}.${y}, Soll ${fmtHM(soll)}">
+        ${cross?'<span class="p1">bis Folgetag</span>':''}
+      </div>
+    </div>`;
+  }).join('');
+
+  $('list').querySelectorAll('.ist').forEach(inp=>{
+    inp.addEventListener('keydown',ev=>{ if(ev.key==='Enter') inp.blur(); });
+    inp.addEventListener('change',()=>{
+      const raw=inp.value.trim();
+      if(!raw){ setIst(inp.dataset.key,null); }
+      else{
+        const m=parseHM(raw);
+        if(m==null){ toast('Format Stunden:Minuten, z. B. 8:15'); setIst(inp.dataset.key,null); }
+        else setIst(inp.dataset.key,m);
+      }
+      renderResult(name,ev);
+    });
+  });
+}
+
+/* ---------- exports ---------- */
+$('dl').onclick=()=>download(makeICS(CURRENT,$('name').value.trim()),'Dienstplan_'+slug($('name').value)+'.ics','text/calendar','Kalenderdatei gespeichert');
+$('csv').onclick=()=>download('﻿'+makeCSV(CURRENT),'Dienstplan_'+slug($('name').value)+'.csv','text/csv;charset=utf-8','CSV gespeichert');
+$('copy').onclick=()=>{
+  let total=0;
+  const lines=CURRENT.map(e=>{
+    const[d,mo,y]=e.date.split('.');const wd=WDname[new Date(+y,+mo-1,+d).getDay()];
+    total+=durMin(e);
+    return `${e.date} ${wd}  ${e.code}  ${pad(e.sh)}:${pad(e.sm)}–${pad(e.eh)}:${pad(e.em)}  (${fmtHM(durMin(e))})`;
+  });
+  lines.push('','Soll-Zeit gesamt: '+fmtHM(total)+' h ('+fmtDec(total)+')');
+  copyText(lines.join('\n'),'Liste kopiert');
+};
+
+function makeCSV(ev){
+  const rows=[['Eintrag','Datum','Tag','Schicht','Start','Ende','Soll-Std','Monat']];
+  for(const e of ev){
+    const[d,mo,y]=e.date.split('.');const wd=WDname[new Date(+y,+mo-1,+d).getDay()];
+    rows.push([`${d}.${mo}. ${e.code}`,`${y}-${mo}-${d}`,wd,e.code+(e.note?' '+e.note:''),
+      `${pad(e.sh)}:${pad(e.sm)}`,`${pad(e.eh)}:${pad(e.em)}`,(durMin(e)/60).toFixed(2),MONTHS[+mo-1]+' '+y]);
+  }
+  return rows.map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n';
+}
+const csvCell=v=>{v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+
+function makeICS(ev,name){
+  const dt=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z/,'Z');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Dienstplan//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH',
+    'X-WR-CALNAME:Dienstplan '+name,'X-WR-TIMEZONE:Europe/Zurich',
+    'BEGIN:VTIMEZONE','TZID:Europe/Zurich',
+    'BEGIN:DAYLIGHT','TZOFFSETFROM:+0100','TZOFFSETTO:+0200','TZNAME:CEST','DTSTART:19700329T020000','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU','END:DAYLIGHT',
+    'BEGIN:STANDARD','TZOFFSETFROM:+0200','TZOFFSETTO:+0100','TZNAME:CET','DTSTART:19701025T030000','RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU','END:STANDARD',
+    'END:VTIMEZONE'];
+  for(const e of ev){
+    const[d,mo,y]=e.date.split('.');
+    const start=`${y}${mo}${d}T${pad(e.sh)}${pad(e.sm)}00`;
+    let ey=+y,em2=+mo,ed=+d;
+    if((e.eh*60+e.em)<=(e.sh*60+e.sm)){const nd=new Date(+y,+mo-1,+d+1);ey=nd.getFullYear();em2=nd.getMonth()+1;ed=nd.getDate();}
+    const end=`${ey}${pad(em2)}${pad(ed)}T${pad(e.eh)}${pad(e.em)}00`;
+    L.push('BEGIN:VEVENT',`UID:${slug(name)}-${start}@dienstplan`,`DTSTAMP:${dt}`,
+      `DTSTART;TZID=Europe/Zurich:${start}`,`DTEND;TZID=Europe/Zurich:${end}`,
+      `SUMMARY:Arbeit Kino (${e.code})`+(e.note?' '+e.note:''),
+      `DESCRIPTION:Schicht ${e.code}${e.note?' '+e.note:''} – Die Cinema 8 AG\\, Schöftland`,
+      'LOCATION:Die Cinema 8 AG\\, 5040 Schöftland','END:VEVENT');
+  }
+  L.push('END:VCALENDAR');
+  return L.join('\r\n')+'\r\n';
+}
+
+/* ---------- Google Kalender (direkt, per OAuth) ---------- */
+const GOOGLE_CLIENT_ID='894649432118-i4tbo5kgrotgsv4aij5953lori8qh1sh.apps.googleusercontent.com';
+const GCAL_SCOPE='https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.calendarlist.readonly';
+const GCAL_LAST_KEY='dienstplan_gcal_calendar_id';
+let gcalToken=null, gcalTokenClient=null, gcalCalendars=null;
+
+function ensureGcalClient(){
+  if(gcalTokenClient) return gcalTokenClient;
+  if(!window.google||!google.accounts||!google.accounts.oauth2) throw new Error('google-lib-missing');
+  gcalTokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:GCAL_SCOPE,callback:()=>{}});
+  return gcalTokenClient;
+}
+function getGcalToken(){
+  return new Promise((resolve,reject)=>{
+    let client;
+    try{ client=ensureGcalClient(); }catch(e){ reject(e); return; }
+    client.callback=resp=>{ if(resp.error) reject(resp); else { gcalToken=resp.access_token; resolve(gcalToken); } };
+    client.error_callback=err=>reject(err);
+    client.requestAccessToken({prompt:gcalToken?'':'consent'});
+  });
+}
+async function loadGcalCalendars(){
+  const res=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=writer&fields=items(id,summary,primary)',{
+    headers:{Authorization:'Bearer '+gcalToken}
+  });
+  if(!res.ok) throw new Error('calendarList-failed');
+  const data=await res.json();
+  return (data.items||[]).sort((a,b)=>(b.primary?1:0)-(a.primary?1:0));
+}
+function fillGcalSelect(cals){
+  const sel=$('gcalSel');
+  sel.innerHTML=cals.map(c=>`<option value="${esc(c.id)}">${esc(c.summary)}${c.primary?' (Standard)':''}</option>`).join('');
+  let last=null; try{ last=localStorage.getItem(GCAL_LAST_KEY); }catch(e){}
+  if(last&&cals.some(c=>c.id===last)) sel.value=last;
+  sel.style.display='inline-block';
+}
+function hashId(s){
+  let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+  return 'dp'+h.toString(16).padStart(8,'0');
+}
+function evToGcalBody(e,name){
+  const[d,mo,y]=e.date.split('.');
+  const start=`${y}-${mo}-${d}T${pad(e.sh)}:${pad(e.sm)}:00`;
+  let ey=+y,em2=+mo,ed=+d;
+  if((e.eh*60+e.em)<=(e.sh*60+e.sm)){const nd=new Date(+y,+mo-1,+d+1);ey=nd.getFullYear();em2=nd.getMonth()+1;ed=nd.getDate();}
+  const end=`${ey}-${pad(em2)}-${pad(ed)}T${pad(e.eh)}:${pad(e.em)}:00`;
+  return{
+    id:hashId(slug(name)+'-'+y+mo+d+pad(e.sh)+pad(e.sm)),
+    summary:`Arbeit Kino (${e.code})`+(e.note?' '+e.note:''),
+    description:`Schicht ${e.code}${e.note?' '+e.note:''} – Die Cinema 8 AG, Schöftland`,
+    location:'Die Cinema 8 AG, 5040 Schöftland',
+    start:{dateTime:start,timeZone:'Europe/Zurich'},
+    end:{dateTime:end,timeZone:'Europe/Zurich'}
+  };
+}
+async function upsertGcalEvent(calId,body){
+  const base=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`;
+  const put=await fetch(`${base}/${body.id}`,{
+    method:'PUT',headers:{Authorization:'Bearer '+gcalToken,'Content-Type':'application/json'},body:JSON.stringify(body)
+  });
+  if(put.ok) return true;
+  if(put.status!==404) return false;
+  const post=await fetch(base,{
+    method:'POST',headers:{Authorization:'Bearer '+gcalToken,'Content-Type':'application/json'},body:JSON.stringify(body)
+  });
+  return post.ok;
+}
+async function pushToGoogleCalendar(){
+  if(GOOGLE_CLIENT_ID.startsWith('DEINE-')){ toast('Google Kalender ist noch nicht eingerichtet (Client-ID fehlt)'); return; }
+  if(!CURRENT.length) return;
+  const btn=$('gcal'), name=$('name').value.trim();
+  btn.disabled=true;
+  try{
+    if(!gcalCalendars){
+      btn.textContent='Verbinde …';
+      await getGcalToken();
+      btn.textContent='Lade Kalenderliste …';
+      gcalCalendars=await loadGcalCalendars();
+      fillGcalSelect(gcalCalendars);
+      toast('Kalender ausgewählt lassen oder wechseln, dann nochmal klicken');
+      btn.disabled=false; btn.textContent='Kalender wählen, dann hier klicken';
+      return;
+    }
+    const calId=$('gcalSel').value;
+    try{ localStorage.setItem(GCAL_LAST_KEY,calId); }catch(e){}
+    let ok=0,fail=0;
+    for(const e of CURRENT){
+      btn.textContent=`Speichere … (${ok+fail+1}/${CURRENT.length})`;
+      const done=await upsertGcalEvent(calId,evToGcalBody(e,name));
+      if(done)ok++; else fail++;
+    }
+    toast(`${ok} Termin${ok===1?'':'e'} in „${$('gcalSel').selectedOptions[0].textContent}“ gespeichert`+(fail?`, ${fail} fehlgeschlagen`:''));
+    btn.disabled=false; btn.textContent='In gewählten Kalender speichern';
+  }catch(e){
+    toast('Google-Anmeldung fehlgeschlagen oder abgebrochen');
+    gcalCalendars=null; $('gcalSel').style.display='none';
+    btn.disabled=false; btn.textContent='In Google Kalender speichern';
+  }
+}
+$('gcal').onclick=pushToGoogleCalendar;
+
+/* ---------- helpers ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const durMin=e=>{let m=(e.eh*60+e.em)-(e.sh*60+e.sm);if(m<=0)m+=1440;return m;};
+const fmtHM=min=>Math.floor(min/60)+':'+pad(min%60);
+const fmtDec=min=>(min/60).toFixed(2);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||'plan';
+let inFrame=false; try{ inFrame=window.self!==window.top; }catch(e){ inFrame=true; }
+const isIOS=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if(isIOS) $('gcalHint').style.display='block';
+function download(text,fn,type,okMsg){
+  if(inFrame){ showSaveModal(text,fn); return; }
+  try{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([text],{type}));
+    a.download=fn; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    toast(okMsg||'Gespeichert');
+  }catch(e){ showSaveModal(text,fn); }
+}
+function showSaveModal(text,fn){
+  $('mTitle').textContent=fn;
+  $('mNote').textContent='Die Chat-Vorschau erlaubt keinen direkten Download. Kopier den Text und speichere ihn als Datei „'+fn+'“ — oder öffne das Tool lokal bzw. gehostet, dann lädt es mit einem Klick.';
+  $('mText').value=text;
+  $('modal').classList.add('show');
+  $('mText').focus(); $('mText').select();
+  $('mCopy').onclick=()=>copyText(text,'Text kopiert — als „'+fn+'“ speichern');
+}
+$('mClose').onclick=()=>$('modal').classList.remove('show');
+$('modal').onclick=e=>{ if(e.target===$('modal'))$('modal').classList.remove('show'); };
+
+function copyText(text,okMsg){
+  const done=()=>toast(okMsg||'Kopiert');
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  else fallbackCopy(text,done);
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta); cb&&cb();
+}
+let tT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2000);}
+</script>
+</body>
+</html>
