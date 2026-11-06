@@ -39,7 +39,7 @@ Nicht anfassen. Ideen oder Inhalte dürfen von dort übernommen werden.
 | 0 | Archiv + leerer Root | erledigt, [PR #13](https://github.com/lazyboxDude/portfolio/pull/13) |
 | 1 | Box + Cursor-Schwarm | erledigt, [PR #14](https://github.com/lazyboxDude/portfolio/pull/14): Box spawnt mehrere Mauszeiger, die herumwandern. |
 | 2 | **Bots mit Jobs: Intro baut sich selbst** | Idee: die Seite baut sich live vor den Augen auf, wie Bots arbeiten. Klick auf "Build Website", ein Cursor zieht die Karte auf, ein zweiter tippt den ersten Text ein. Besucher:innen scrollen und klicken höchstens Buttons. |
-| 3 | Mehr Jobs + Persönlichkeit | Weitere Bauschritte (Karten tragen, zeichnen, Abschnitte bauen) beim Scrollen. Dazu Reaktionen auf den echten Mauszeiger, aufeinander und auf die Box, gelegentliche Klicks und Ripples im Leerlauf. |
+| 3 | **Mehr Jobs + Persönlichkeit** | **Teil 1 gebaut:** Folge von Bauschritten, ein Klick pro Schritt. Zweite Karte mit Name und Handle. **Teil 2 offen:** weitere Bauarten (Karten tragen, zeichnen, Abschnitte beim Scrollen) sowie Reaktionen auf den echten Mauszeiger, aufeinander und auf die Box, Klicks und Ripples im Leerlauf. |
 | 4 | Projekte entdecken | Projekte (u. a. Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) werden spielerisch freigeschaltet und verlinkt. |
 | 5 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über einen Cloudflare Worker, der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 6 | Bewerbungs-Essentials | CV-Download, Kontakt, Links (GitHub, LinkedIn). Ohne-JS-Fallback, Meta-/OG-Tags, Favicon, Seitentitel. |
@@ -50,19 +50,21 @@ Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Sc
 ## Status
 
 - **Schritt 1 erledigt** (gemerged): Box + Cursor-Schwarm.
-- **Schritt 2 gebaut** (siehe PR): Bots mit Jobs.
-  - Konzept: jeder Cursor hat einen Job und ein Namensschild (`layout-bot`, `copy-bot`). Das zeigt, wie Bots arbeiten.
-  - Ablauf: Klick auf die Box ("Build Website") lässt zwei Cursors herausplatzen. Das `layout-bot` zieht die Karte unter der Box auf
-    (Skalierung ab der oberen linken Ecke folgt dem Cursor), dann tippt das `copy-bot` den Satz und folgt dabei dem Textcursor.
-    Danach wandern beide frei herum. Die Box heißt dann "Build again" und startet den Ablauf erneut.
+- **Schritt 2 erledigt** (gemerged): Bots mit Jobs. Jeder Cursor hat einen Job und ein Namensschild (`layout-bot`, `copy-bot`).
+- **Schritt 3, Teil 1 gebaut** (siehe PR): Folge von Bauschritten.
+  - Jeder Klick auf die Box baut den nächsten Abschnitt: das `layout-bot` zieht die Karte auf
+    (Skalierung ab der oberen linken Ecke folgt dem Cursor, mit Ripple beim "Mausdruck"), das `copy-bot` tippt den Satz und folgt dem Textcursor.
+  - Aktuelle Folge: 1. "Hi, welcome to my personal website" (Button: "Build Website"),
+    2. "I'm Micael Gomes Fernandes, or online ._lazybox_." (Button davor: "Who are you?"). Danach heißt der Button "Build again" und baut von vorn.
+  - Weitere Abschnitte sind weitere `<section class="card">` in `#cards` (`index.html`). Der Button-Text davor steht in `data-prompt`.
+    Die Karten wachsen nach unten, bereits gebaute Karten wandern nie.
   - Code: `js/cursors.js` (`CursorSwarm` mit gemeinsamem rAF-Loop, `Cursor` mit `moveTo`/`follow`/`wander`/`click`),
-    `js/intro.js` (der Intro-Job als `async`-Ablauf), `js/main.js` (Verdrahtung).
-    Neue Jobs sind einfach weitere `async`-Abläufe auf diesen Bausteinen.
-  - Der Satz steht als Text in einem `<noscript>` in `index.html`. Ohne JS ist er sofort sichtbar (Button ausgeblendet).
-    Mit JS liest `js/intro.js` ihn und entfernt das Element: vor dem Klick ist die Karte komplett leer, den Text tippen erst die Bots. Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
-  - `prefers-reduced-motion`: kein Anlauf, keine Ripples. Karte und Text sind sofort da, die Cursors stehen still daneben, kein Replay.
-  - Die Obergrenze von 40 Cursors bleibt als Sicherung im `CursorSwarm`. Die Zähler-Anzeige ("Enough!") aus Schritt 1 entfällt.
-  - Der Intro-Satz ist vorläufig: "Hi, welcome to my personal website". Er steht in `index.html` im `<noscript id="intro-text">`. Name und Handle (Micael Gomes Fernandes, ._lazybox_) kommen später dazu.
+    `js/build.js` (`SiteBuilder` und `Section`, früher `js/intro.js`), `js/main.js` (Verdrahtung).
+  - Jeder Satz steht in einem `<noscript>` in der jeweiligen Karte. Ohne JS sind alle Sätze sofort sichtbar (Button ausgeblendet).
+    Mit JS liest `js/build.js` sie und entfernt das Element: vor dem Bau ist eine Karte komplett leer, der Text kommt erst beim Bau ins DOM.
+    Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
+  - `prefers-reduced-motion`: kein Anlauf, keine Ripples. Jeder Klick zeigt den nächsten Abschnitt sofort, die Cursors stehen still daneben, nach dem letzten kein Replay.
+  - Die Obergrenze von 40 Cursors bleibt als Sicherung im `CursorSwarm`.
 
 ## Offene Fragen an Micael
 
@@ -78,5 +80,5 @@ Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Sc
 - Commit-Messages und Chat auf Deutsch, Code und Kommentare auf Englisch.
 - Lokal testen: `python3 -m http.server` im Repo-Root, dann `http://localhost:8000` öffnen.
   Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken.
-  Der Intro-Ablauf dauert ca. 9 Sekunden. In Tests auf Zustände warten (z. B. Label "Build again"), keine festen Pausen.
+  Ein Bauschritt dauert ca. 9 Sekunden. In Tests auf Zustände warten (z. B. Label "Who are you?" oder "Build again"), keine festen Pausen.
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.
