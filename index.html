@@ -4,47 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Micael G. Fernandes</title>
-    <meta name="description" content="Neue Website in Arbeit.">
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/hub.css">
 </head>
-<body class="hub">
-<div class="hub-shell">
-    <header class="hub-header">
-        <a href="index.html" class="hub-logo">
-            <b>Micael G. Fernandes</b>
-            <span>lazyboxdude · gomes-fernandes.ch</span>
-        </a>
-        <nav>
-            <a href="dienstplan.html">Dienstplan</a>
-        </nav>
-    </header>
-
-    <section class="hub-hero">
-        <span class="hub-eyebrow"><span class="dot"></span> In Arbeit</span>
-        <h1>Neue Website <em>kommt bald</em>.</h1>
-        <p>Der alte Auftritt ist archiviert, hier entsteht etwas Neues. Bis dahin: die Dienstplan-App.</p>
-    </section>
-
-    <footer class="hub-footer">
-        <p>&copy; 2026 Micael G. Fernandes. · <a href="datenschutz.html" style="color:inherit">Datenschutz</a> · <a href="nutzungsbedingungen.html" style="color:inherit">Nutzungsbedingungen</a></p>
-        <div class="hub-social"></div>
-    </footer>
-</div>
-<script src="js/socials.js"></script>
-<script>
-    (function () {
-        const c = document.querySelector('.hub-social');
-        if (!c || typeof socialLinks === 'undefined') return;
-        c.innerHTML = socialLinks.map(l => {
-            const inner = l.customHtml || `<i class="${l.icon}"></i>`;
-            return `<a href="${l.url}" target="_blank" rel="noopener" title="${l.platform}">${inner}</a>`;
-        }).join('');
-    })();
-</script>
+<body>
 </body>
 </html>
