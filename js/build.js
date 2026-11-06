@@ -272,6 +272,13 @@ class Section {
         for (const shape of this.shapes) {
             if (shape.el.hasAttribute('data-outline')) this.decos.push({ kind: 'outline', shape });
         }
+        // data-outline without data-box: not dragged out, only outlined once its text is typed.
+        this.outlined = [];
+        for (const e of el.querySelectorAll('[data-outline]:not([data-box])')) {
+            const shape = new Shape(e);
+            this.outlined.push(shape);
+            this.decos.push({ kind: 'outline', shape, text: this.textOf.get(e.querySelector('[data-type]')) });
+        }
     }
 
     /** Typing speed (1 = full, smaller = faster) so that the whole section takes about data-type-ms. */
@@ -283,7 +290,7 @@ class Section {
 
     /** Empty again, ready to be built. */
     reset() {
-        for (const shape of this.shapes) shape.collapse();
+        for (const shape of [...this.shapes, ...this.outlined]) shape.collapse();
         for (const t of this.texts) t.hideAll();
         for (const d of this.decos) if (d.line) d.line.style.scale = '';
         this.state = 'idle';
@@ -500,7 +507,10 @@ export class SiteBuilder {
             if (section.isHero) await this.lightUp();
             const pending = section.decos.map((d) => ({
                 d,
-                ready: d.kind === 'underline' ? typed.get(d.text).promise : boxReady.get(d.shape).promise,
+                ready: d.kind === 'underline'
+                    ? typed.get(d.text).promise
+                    // An outline waits for its box, or (no box) for its text, or goes right away.
+                    : (boxReady.get(d.shape)?.promise ?? typed.get(d.text)?.promise ?? Promise.resolve()),
             }));
             while (pending.length) {
                 const item = await Promise.race(pending.map((p) => p.ready.then(() => p)));

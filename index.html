@@ -26,7 +26,7 @@
          time: the hero after the first click, every other section when it scrolls into view.
          data-box    = a shape the layout-bot drags out (hidden until then; "fast" = quicker, no size tag)
          data-type   = text the copy-bot types, character by character
-         data-underline / data-outline = something the design-bot draws
+         data-underline / data-outline = something the design-bot draws (data-outline works with or without data-box)
          data-tag    = the copy-bot shows the real typography while typing it
          data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
          data-instant = the section simply appears when it scrolls into view, no bots
@@ -39,9 +39,9 @@
                     <a class="nav-logo" href="./" data-type>._lazybox_</a>
                     <ul class="nav-links">
                         <li><a href="#about" data-type>About</a></li>
+                        <li><a href="#projects" data-type>Projects</a></li>
                         <li><a href="#experience" data-type>Experience</a></li>
                         <li><a href="#skills" data-type>Skills</a></li>
-                        <li><a href="dienstplan.html" data-type>Dienstplan</a></li>
                     </ul>
                     <a id="nav-cta" class="btn btn-solid btn-small" href="#contact" data-box><span data-type>Contact</span></a>
                 </nav>
@@ -73,6 +73,145 @@
                         <li class="chip" data-box="fast"><span data-type>Live operation</span></li>
                         <li class="chip" data-box="fast"><span data-type>Own tools</span></li>
                     </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section" data-section aria-labelledby="projects-title">
+            <div class="wrap">
+                <p class="eyebrow" data-type>Projects</p>
+                <h2 id="projects-title" class="title" data-type>Things I made, <em class="accent">and use.</em></h2>
+                <div class="projects">
+
+                    <article class="project project-wide" data-box aria-labelledby="p-dienstplan">
+                        <div class="project-text">
+                            <p class="eyebrow" data-type>Web app · in use</p>
+                            <h3 id="p-dienstplan" data-type>Dienstplan</h3>
+                            <p data-type>Drop in the monthly roster as a PDF, pick your name and get your shifts, your target hours and an export for your calendar or Notion. The file stays on your device.</p>
+                            <div class="project-links">
+                                <a class="btn btn-ghost btn-small" href="dienstplan.html" data-outline><span data-type>Open the app</span></a>
+                            </div>
+                        </div>
+                        <div class="device" data-box="fast">
+                            <div class="tilt tilt-r">
+                                <div class="phone"><img src="images/projects/dienstplan.webp" width="390" height="844" alt="The Dienstplan app: drop a roster PDF to get your shifts and hours." loading="lazy" decoding="async"></div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project" data-box="fast" aria-labelledby="p-aphonia">
+                        <div class="project-text">
+                            <p class="eyebrow" data-type>Game · Moonflux Interactive · 2025</p>
+                            <h3 id="p-aphonia" data-type>Aphonia</h3>
+                            <p data-type>A narrative puzzle game about the erosion of sound and the act of listening. You accompany Leelo, a mute being who notices what others no longer do. In development, built with Unity.</p>
+                            <div class="project-links">
+                                <a class="btn btn-ghost btn-small" href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" data-outline><span data-type>Wishlist on Steam</span></a>
+                                <a class="btn btn-ghost btn-small" href="https://moonflux-interactive.com" data-outline><span data-type>Moonflux Interactive</span></a>
+                            </div>
+                        </div>
+                        <div class="device" aria-hidden="true">
+                            <div class="tilt tilt-l">
+                                <div class="poster"><span class="poster-title">Aphonia</span><span class="poster-sub">Leelo's Journey to Harmony</span></div>
+                            </div>
+                        </div>
+                    </article>
+
+
+
+                    <article class="project" data-box="fast" aria-labelledby="p-site">
+                        <div class="project-text">
+                            <p class="eyebrow" data-type>Experiment · this page</p>
+                            <h3 id="p-site" data-type>This website</h3>
+                            <p data-type>Three cursor bots with jobs lay it out, write it and draw it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
+                        </div>
+                        <div class="device" aria-hidden="true">
+                            <div class="tilt tilt-l">
+                                <div class="mini">
+                                    <div class="mini-bar"><i></i><i></i><i></i></div>
+                                    <div class="mini-body">
+                                        <span class="mini-nav"></span>
+                                        <span class="mini-h mini-h1"></span>
+                                        <span class="mini-h mini-h2"></span>
+                                        <span class="mini-p"></span>
+                                        <span class="mini-p mini-p2"></span>
+                                        <span class="mini-btn"></span>
+                                    </div>
+                                    <span class="mini-cur mini-cur-a"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#7b95ff" stroke="#06080d" stroke-width="1"/></svg><b style="background:#7b95ff">layout-bot</b></span>
+                                    <span class="mini-cur mini-cur-b"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#ff8fb8" stroke="#06080d" stroke-width="1"/></svg><b style="background:#ff8fb8">copy-bot</b></span>
+                                    <span class="mini-cur mini-cur-c"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#ffc766" stroke="#06080d" stroke-width="1"/></svg><b style="background:#ffc766">design-bot</b></span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project project-wide" data-box="fast" aria-labelledby="p-art">
+                        <div class="project-text">
+                            <p class="eyebrow" data-type>3D &amp; digital art · 2023–2024</p>
+                            <h3 id="p-art" data-type>Selected renders</h3>
+                            <p data-type>A selection from my earlier portfolio: 3D renders, environment art and digital compositions.</p>
+                            <div class="project-links">
+                                <a class="btn btn-ghost btn-small" href="archive/v1-2026-11/portfolio.html" data-outline><span data-type>Browse the archive</span></a>
+                            </div>
+                        </div>
+                        <ul class="gallery" aria-label="Selected renders">
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/gone.webp" width="640" height="640" alt="Gone: two swings in a snowy forest." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>Gone</strong><span data-type>Atmospheric render · Blender · 2024</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/under-the-bridge.webp" width="640" height="640" alt="Under The Bridge: a green, overgrown station with a neon sign beneath a steel bridge." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>Under The Bridge</strong><span data-type>Environment art · Maya, Substance Painter · 2024</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/bf.webp" width="640" height="640" alt="BF: a neon-lit bedroom glowing in pink and blue, with a figure posing on the bed." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>BF</strong><span data-type>3D composition · Blender, Cycles · 2024</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/thoughts.webp" width="640" height="640" alt="Thoughts: a figure sitting on a utility pole in front of a dark building with a neon sign." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>Thoughts</strong><span data-type>Surreal composition · Blender, Photoshop · 2024</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/sunshine.webp" width="640" height="640" alt="Sunshine: a marble bathtub in front of a window with a glowing orange sky and floating soap bubbles." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>Sunshine</strong><span data-type>Lighting study · Unreal Engine 5 · 2024</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/fys02.webp" width="640" height="853" alt="FYS 02: a colourful, psychedelic garden scene with a chrome creature in the middle." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>FYS 02</strong><span data-type>Abstract design · Illustrator · 2023</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/fridom.webp" width="640" height="640" alt="Fridom: a weathered wooden cottage among ferns and clouds." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>Fridom</strong><span data-type>Concept art · Photoshop, Midjourney · 2023</span></figcaption>
+                                    </figure>
+                                </li>
+                                <li>
+                                    <figure class="tile">
+                                        <img src="images/projects/fbdnl.webp" width="640" height="640" alt="FBDNL: a black marble slab with chains and small ornaments in a purple and white checkered tunnel." loading="lazy" decoding="async">
+                                        <figcaption><strong data-type>FBDNL</strong><span data-type>Digital art · Photoshop · 2023</span></figcaption>
+                                    </figure>
+                                </li>
+                        </ul>
+                    </article>
+
+                    <article class="project project-slim" data-box="fast" aria-labelledby="p-dolphin">
+                        <div class="project-text">
+                            <p class="eyebrow" data-type>Educational game · 2023</p>
+                            <h3 id="p-dolphin" data-type>Dolphin Rush</h3>
+                            <p data-type>Made for Whale and Dolphin Conservation: an interactive experience that raises awareness for marine life. Built with Unity.</p>
+                        </div>
+                    </article>
                 </div>
             </div>
         </section>

@@ -62,7 +62,7 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 
 - **Interaktion zuerst.** Jede Seite hat etwas zum Anfassen. Inhalt wird durch Interaktion freigeschaltet.
 - **Schritt für Schritt.** Jeder Schritt ist ein kleiner, lauffähiger PR, der für sich Spaß macht.
-- **Kein Build-Schritt.** Statisches HTML, CSS und Vanilla-JS (ES-Module). Das Hosting ist statisch (Cloudflare).
+- **Kein Build-Schritt.** Statisches HTML, CSS und Vanilla-JS (ES-Module). Das Hosting ist statisch: **Vercel** (Deploy), Domain bei GoDaddy, DNS/Proxy über Cloudflare.
   Eine Bibliothek oder ein Bundler kommt erst dazu, wenn ein Schritt sie wirklich braucht, und das wird im PR begründet.
   Absehbar: Der Schwarm (Schritt 7) braucht ein `<canvas>` statt DOM-Cursors. Das ist ohne Bibliothek machbar.
   Das 3D-Objekt lässt sich mit CSS-3D (`transform`) lösen. Three.js nur, wenn das nicht reicht.
@@ -81,7 +81,7 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 - `datenschutz.html` und `nutzungsbedingungen.html` werden für die Google-Integration gebraucht.
   Sie nutzen `css/hub.css` und `js/socials.js`.
 - `CNAME` bleibt im Root.
-- `archive/` bleibt unverändert. Ausnahme: `archive/v1-2026-11/docs/` (altes CV-PDF und `CV.txt` mit privaten Daten) bleibt im Repo, wird aber über `.assetsignore` nicht ausgeliefert.
+- `archive/` bleibt unverändert. Ausnahme: `archive/v1-2026-11/docs/` (altes CV-PDF und `CV.txt` mit privaten Daten) bleibt im Repo, wird aber nicht ausgeliefert: `vercel.json` leitet `/archive/v1-2026-11/docs/*` auf `/cv.html` um (`.assetsignore` greift nur bei Cloudflare-Deploys).
 
 ## Privatsphäre (gilt für alles, was ausgeliefert wird)
 
@@ -100,9 +100,9 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 4 | **Cursor-Sprache** (Orbit/Linea) | erledigt, [PR #20](https://github.com/lazyboxDude/portfolio/pull/20): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen mit Griffen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Akzentrahmen. Die Persönlichkeit im Leerlauf kommt aus Schritt 3 (Teil 2) und gilt auch für den neuen Bot. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
 | 5 | **Landingpage-Gerüst: Hero + Nav** (Linea) | gebaut (siehe Status): Nav-Pill, Hero mit Serifen-Kursiv-Akzent, zwei Buttons, Hintergrund-Glow. Die Seite ist echtes HTML und baut sich nach dem Klick auf die Startbox selbst (alle drei Bots, drei Spuren parallel). Look festgelegt (dunkel, blau), Schriften selbst gehostet. |
 | 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | gebaut (siehe Status): Über mich, Werdegang, Skills (fünf Ebenen), Kontakt mit CV-Download und Footer bauen sich beim Scrollen. Dazu die mehrsprachige CV-Seite `cv.html` statt PDF. |
-| 7 | **Projekte als Mockups** | Projekte (Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) als Browser-/Phone-Mockups, die die Bots zusammensetzen (gekippt, mit Tiefe wie bei Orbit), mit Link zur Live-App oder zum Case. |
+| 7 | **Projekte als Mockups** | gebaut (siehe Status): Dienstplan als Telefon mit echtem Screenshot, Aphonia als Poster, zwei Renders aus dem Archiv, diese Seite als Mini-Bild, Dolphin Rush. Mockups sind gekippt (CSS-3D) und richten sich beim Hover auf. |
 | 8 | **Schwarm-Finale** (Bakelayer) | Signatur der Seite: Ein Klick (z. B. "More agents") skaliert von wenigen auf hunderte Cursors (`agent-NNN`, Job-Namen), gezeichnet auf `<canvas>`, mit Verbindungslinien und Zähler. Der Schwarm sammelt sich zu einer geschichteten Struktur (CSS-3D oder Canvas), die für Micaels Skill-Ebenen steht. Harte Obergrenze, Frame-Budget, Reduced-Motion zeigt ein Standbild. |
-| 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über einen Cloudflare Worker, der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
+| 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über eine serverseitige Funktion (Vercel Function oder Cloudflare Worker), der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
 | 11 | Feinschliff | Performance-Messung, Mobil, Reduced-Motion, Lighthouse, Cross-Browser, Sound optional (standardmäßig aus). |
 
@@ -166,8 +166,24 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
     "Save as PDF" öffnet den Druckdialog des Browsers, der Seitentitel wird zum Dateinamen. Eine neue Sprache: Artikel kopieren, übersetzen, Link in die Toolbar. `css/cv.css`, `js/cv.js`.
     Der CV enthält bewusst keine privaten Daten (siehe "Privatsphäre"), "weitere Angaben und Referenzen auf Anfrage".
   - **Kontakt:** "Download CV" steht unten im Kontaktbereich und führt auf `cv.html`. Die Nav verlinkt About, Experience, Skills und Dienstplan. GitHub, LinkedIn, Archiv und die Rechtsseiten stehen im Footer.
-  - **Altes CV-PDF** und `CV.txt` im Archiv werden über `.assetsignore` nicht mehr ausgeliefert (bleiben im Repo und in der Git-Historie).
-  - **Nächster Schritt: 7 (Projekte als Mockups).** Vorher der PR für Schritt 5 und 6.
+  - **Altes CV-PDF** und `CV.txt` im Archiv: In Schritt 6 nur über `.assetsignore` ausgeschlossen, das bei Vercel nichts bewirkt. Seit Schritt 7 leitet `vercel.json` die Adressen unter `/archive/v1-2026-11/docs/` auf `/cv.html` um (bleiben im Repo und in der Git-Historie).
+  - Gemerged als [PR #21](https://github.com/lazyboxDude/portfolio/pull/21).
+- **Schritt 7 gebaut** (siehe PR): Projekte als Mockups, neuer Abschnitt `#projects` zwischen "About" und "Experience". Nav: About, Projects, Experience, Skills.
+  - **Fünf Karten:** Dienstplan (Web-App im Einsatz, Link auf die App), Aphonia (Moonflux Interactive, 2025, Links zu Steam und zum Studio), "Selected renders" (alle acht Arbeiten aus dem Archiv als Galerie mit Titel, Werkzeugen und Jahr, Link ins Archiv),
+    "This website" (Mini-Bild dieser Seite mit den drei Bots) und Dolphin Rush (2023, nur Text). Alle Angaben stammen aus dem Dienstplan selbst und aus dem alten Portfolio im Archiv (`js/projects-data.js`), nichts ist erfunden.
+  - **Mockups mit Tiefe:** `.tilt` kippt die Geräte per `perspective()`/`rotateY()`, `@media (hover: hover)` richtet sie beim Hover auf, mit Reduced Motion ohne Übergang.
+    Das Telefon zeigt einen **echten Screenshot** der Dienstplan-App im Leerzustand (ohne Daten), das Aphonia-"Poster" ist reine Typografie (es gibt kein Titelbild). Aphonia und Dolphin Rush bleiben so (Micael).
+  - **Bilder** liegen in `images/projects/` (Webp, 22 bis 85 KB, zusammen ca. 0,5 MB, `loading="lazy"`, `width`/`height` gesetzt, damit sich das Layout nie verschiebt). Die Originale im Archiv (3 bis 21 MB pro PNG) werden nicht verlinkt.
+    **Alle acht Renders sind drin** (Entscheidung von Micael). Titel, Kategorie, Werkzeuge und Jahr stammen aus `js/projects-data.js` im Archiv, die Bildbeschreibungen (`alt`) habe ich selbst geschrieben.
+  - **Bau:** Nur die Karten und das Dienstplan-Telefon werden vom `layout-bot` aufgezogen, die übrigen Mockups erscheinen mit ihrer Karte, die Ghost-Buttons haben keine eigene Form.
+    `data-outline` funktioniert dafür jetzt auch **ohne** `data-box` (der `design-bot` zeichnet den Rahmen, sobald der Text getippt ist). Bauzeit des Abschnitts ca. 9 s (vorher 16 s mit 13 einzelnen Formen).
+  - **Cache-Hinweis:** Nach einem Deploy hat ein Browser die neue HTML-Seite mit alten CSS/JS-Dateien angezeigt (erkennbar am Schritt-1-Label "6 cursors"). Vercel liefert statische Dateien mit `max-age=0, must-revalidate`, das erklärt es nicht.
+    **Ursache bestätigt (Messung an der Live-Seite):** HTML kommt mit `max-age=0`, **JS, CSS, Bilder und PDFs mit `max-age=14400`** (4 Stunden) und `server: cloudflare`. Das ist die Cloudflare-Einstellung "Browser Cache TTL" (Standard 4 Stunden), Vercel selbst sendet `max-age=0`.
+    Wer die Seite innerhalb von 4 Stunden vor einem Deploy besucht hat, sieht danach neue HTML mit alten CSS/JS-Dateien. Abhilfe in Cloudflare: Caching, Configuration, Browser Cache TTL auf "Respect Existing Headers", dann einmal "Purge Everything".
+    Oder Proxy aus (graue Wolke, nur DNS), denn Vercel hat ein eigenes CDN. Im Repo lässt sich das nicht lösen. Die Apex-Domain `gomes-fernandes.ch` leitet mit 307 auf `www.gomes-fernandes.ch` um.
+  - **Live geprüft (Stand Schritt 6):** Das alte CV-PDF (1,5 MB) und `CV.txt` sind unter `www.gomes-fernandes.ch/archive/v1-2026-11/docs/` noch öffentlich abrufbar, bis `vercel.json` deployt ist. Nach dem Deploy in Cloudflare "Purge Everything" (sonst kann der Edge-Cache das PDF noch ausliefern) und die Adresse prüfen: sie soll auf `/cv.html` umleiten.
+  - **Weiterleitung:** `vercel.json` leitet `/archive/v1-2026-11/docs/*` auf `/cv.html` um (so wird auch der alte "Download"-Link im Archiv zur neuen CV-Seite).
+  - **Nächster Schritt: 8 (Schwarm-Finale).**
 
 ## Offene Fragen an Micael
 
@@ -175,12 +191,13 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 2. **Luxottica, Bezeichnung:** Im Lebenslauf "Sachbearbeiter", im Zeugnis "Praktikant Trade Marketing". Der CV zeigt vorläufig die Zeugnis-Bezeichnung. Passt das?
 3. **Über-mich-Texte:** Sie sind aus dem Lebenslauf formuliert. Bitte lesen und in deinen Worten anpassen (Abschnitt "About" in `index.html`).
 4. **Zielfirma/Rolle:** Wofür genau bewirbst du dich (Rolle, Firma)? Das bestimmt, was in Schritt 7 bis 9 gezeigt werden soll und ob der CV eine Kurzprofil-Zeile bekommt.
-5. **Projekte (Schritt 7):** Welche Projekte gehören rein? Bisher: Dienstplan-App und diese Seite. Aus dem Archiv und von Moonflux Interactive: was darf öffentlich gezeigt werden?
+5. **Aphonia-Bilder:** Gibt es ein Titelbild oder Screenshots, die öffentlich sein dürfen? Sonst bleibt das Typografie-Poster.
 6. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
 7. **Schwarm-Struktur (Schritt 8):** Pyramide aus Layern (wie bei Bakelayer), oder etwas Eigenes? Die fünf Skill-Ebenen aus Schritt 6 sind die Grundlage.
 8. **Weitere CV-Sprachen:** Deutsch und Englisch sind drin. Soll eine weitere dazu (z. B. Portugiesisch, Französisch)?
+9. **Cloudflare:** Bitte "Browser Cache TTL" auf "Respect Existing Headers" stellen und nach dem nächsten Deploy "Purge Everything" (siehe Cache-Hinweis in Schritt 7). Die Domain ist für die Sandbox freigegeben (`gomes-fernandes.ch` und `www`), ich kann die Live-Seite also prüfen.
 
-Entschieden: Englisch auf der Startseite, dunkler Look mit blauem Akzent (Mockup), CV als Seite statt PDF, Skill-Ebenen wie oben ("lass das mal so testen").
+Entschieden: Alle acht Renders werden gezeigt, Aphonia und Dolphin Rush bleiben so, Deploy über Vercel (Domain bei GoDaddy, DNS über Cloudflare), Englisch auf der Startseite, dunkler Look mit blauem Akzent (Mockup), CV als Seite statt PDF, Skill-Ebenen wie oben ("lass das mal so testen").
 
 ## Arbeitsweise
 
