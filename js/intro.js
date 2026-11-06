@@ -1,7 +1,8 @@
 // The intro "job": two bot cursors build the first piece of the page live.
 //   1. layout-bot drags out the card (scale from the top-left corner follows the cursor)
 //   2. copy-bot walks to the card and types the sentence, following the text caret
-// The sentence itself lives in index.html, so it is still readable without JS.
+// The sentence lives in a <noscript> in index.html: readable without JS, and with JS it
+// only enters the DOM once the box was clicked.
 // With prefers-reduced-motion everything is shown at once and the cursors are parked.
 
 import { DRAG_DAMPING, prefersReducedMotion } from './cursors.js';
@@ -21,7 +22,7 @@ function typingDelay(ch) {
 }
 
 export class Intro {
-    constructor({ swarm, label, card, typed, caret, rest, status }) {
+    constructor({ swarm, label, card, source, typed, caret, rest, status }) {
         this.swarm = swarm;
         this.label = label;
         this.card = card;
@@ -30,17 +31,17 @@ export class Intro {
         this.rest = rest;
         this.status = status;
 
-        this.text = typed.textContent.trim();
+        this.text = source.textContent.trim();
+        source.remove(); // not needed in the DOM any more: with JS the text only appears after the click
         this.builder = null;
         this.typist = null;
         this.busy = false;
         this.parked = false; // reduced motion: built once, no replay
 
         // Screen readers get the whole sentence at once, not one character at a time.
-        const sr = document.createElement('span');
-        sr.className = 'sr-only';
-        sr.textContent = this.text;
-        typed.parentElement.prepend(sr);
+        this.sr = document.createElement('span');
+        this.sr.className = 'sr-only';
+        typed.parentElement.prepend(this.sr);
         typed.setAttribute('aria-hidden', 'true');
 
         this.collapse();
@@ -52,6 +53,9 @@ export class Intro {
         this.busy = true;
         try {
             this.collapse();
+            // The text only enters the DOM now. `rest` reserves the final layout.
+            this.rest.textContent = this.text;
+            this.sr.textContent = this.text;
             this.card.scrollIntoView({ block: 'nearest' });
             if (prefersReducedMotion()) await this.buildStatic(origin);
             else await this.buildAnimated(origin);
@@ -62,12 +66,13 @@ export class Intro {
 
     // ---- States -----------------------------------------------------------
 
-    /** Back to the empty state. The full text stays in `rest` so the layout is stable. */
+    /** Back to the empty state: no text anywhere in the card. */
     collapse() {
         this.card.classList.remove('is-shown', 'is-typing');
         this.card.style.scale = '';
         this.typed.textContent = '';
-        this.rest.textContent = this.text;
+        this.rest.textContent = '';
+        this.sr.textContent = '';
     }
 
     ensureBots(origin, burst) {
