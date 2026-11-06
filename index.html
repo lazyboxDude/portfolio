@@ -6,14 +6,27 @@
     <meta name="color-scheme" content="dark">
     <title>Micael G. Fernandes</title>
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
+    <!-- Marks that JS runs: the no-JS page shows the card right away and hides the button. -->
+    <script>document.documentElement.classList.add('js');</script>
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
     <main class="stage">
-        <button id="box" class="box" type="button" aria-label="Click me to spawn cursors">
-            <span class="box-label">Click me</span>
-        </button>
+        <div class="hero">
+            <button id="box" class="box" type="button">
+                <span class="box-label">Build Website</span>
+            </button>
+
+            <!-- Built live by the bot cursors (js/intro.js). The text is real content: it
+                 stays here for no-JS, and js/intro.js empties and retypes it. -->
+            <section id="card" class="card" aria-label="Introduction">
+                <p class="card-text"><span id="typed">Hi, welcome to my personal website</span><span id="caret" class="caret" aria-hidden="true"></span><span id="rest" class="rest" aria-hidden="true"></span></p>
+            </section>
+        </div>
     </main>
+
+    <!-- Announces build progress to screen readers -->
+    <p id="status" class="sr-only" role="status"></p>
 
     <!-- Fake cursors are spawned into this layer by js/cursors.js -->
     <div id="cursor-layer" class="cursor-layer" aria-hidden="true"></div>
