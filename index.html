@@ -5,36 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
     <title>Micael G. Fernandes</title>
+    <meta name="description" content="Micael Gomes Fernandes (._lazybox_): game designer, 3D artist and tool builder. A personal website that builds itself.">
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-    <!-- Marks that JS runs: the no-JS page shows the card right away and hides the button. -->
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Marks that JS runs: without it the whole page is shown right away and the buttons below are hidden. -->
     <script>document.documentElement.classList.add('js');</script>
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <main class="stage">
-        <!-- Start box: vanishes after the first click and never spawns anything again. -->
-        <button id="box" class="box" type="button">
-            <span class="box-label">Build Website</span>
-        </button>
+    <!-- Background glow: the design-bot switches it on (js/build.js). -->
+    <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
 
-        <!-- Built live by the bot cursors (js/build.js), one section per click. The cards are
-             empty until built. Each sentence lives in a <noscript>: it is the no-JS fallback
-             and the single source that js/build.js reads and types.
-             data-prompt = pill label while that section is the next one to build. -->
-        <div id="build" class="build" tabindex="-1">
-            <div id="cards" class="cards">
-                <section class="card" aria-label="Introduction">
-                    <p class="card-text"><noscript>Hi, welcome to my personal website</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
-                </section>
-                <section class="card" aria-label="About me" data-prompt="Who are you?">
-                    <p class="card-text"><noscript>I'm Micael Gomes Fernandes, or online ._lazybox_.</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
-                </section>
-            </div>
+    <!-- Start box: vanishes after the first click and never comes back. -->
+    <button id="box" class="box" type="button">
+        <span class="box-label">Build Website</span>
+    </button>
 
-            <!-- Builds the next section; label is set by js/build.js -->
-            <button id="next" class="next" type="button"><span class="next-label"></span></button>
+    <!-- The page itself. With JS it is built live by the bot cursors (js/build.js), one data-section at a
+         time: the hero after the first click, every other section when it scrolls into view.
+         data-box    = a shape the layout-bot drags out (hidden until then; "fast" = quicker, no size tag)
+         data-type   = text the copy-bot types, character by character
+         data-underline / data-outline = something the design-bot draws
+         data-tag    = the copy-bot shows the real typography while typing it
+         data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
+         data-instant = the section simply appears when it scrolls into view, no bots
+         Without JS everything is simply visible. Screen readers get all text at once. -->
+    <div id="site" class="site" tabindex="-1">
+
+        <div class="s-hero" data-section="hero" data-type-ms="4200">
+            <header>
+                <nav id="nav" class="nav" data-box aria-label="Main">
+                    <a class="nav-logo" href="./" data-type>._lazybox_</a>
+                    <ul class="nav-links">
+                        <li><a href="#about" data-type>About</a></li>
+                        <li><a href="#experience" data-type>Experience</a></li>
+                        <li><a href="#skills" data-type>Skills</a></li>
+                        <li><a href="dienstplan.html" data-type>Dienstplan</a></li>
+                    </ul>
+                    <a id="nav-cta" class="btn btn-solid btn-small" href="#contact" data-box><span data-type>Contact</span></a>
+                </nav>
+            </header>
+
+            <main class="hero">
+                <p class="eyebrow" data-type>Micael Gomes Fernandes · ._lazybox_</p>
+                <h1 id="headline" data-type data-tag data-speed="0.7">I build interfaces that <em class="accent" data-underline>build themselves.</em></h1>
+                <p class="lede" data-type data-tag>This page builds itself: a small team of cursor bots lays it out, writes it and draws it, live. Everything is plain HTML, CSS and JavaScript.</p>
+                <div class="actions">
+                    <a id="about-link" class="btn btn-solid" href="#about" data-box><span data-type>About me</span></a>
+                    <a id="hello" class="btn btn-ghost" href="mailto:micael@gomes-fernandes.ch" data-box data-outline><span data-type>Say hello</span></a>
+                </div>
+            </main>
         </div>
-    </main>
+
+        <section id="about" class="section" data-section aria-labelledby="about-title">
+            <div class="wrap">
+                <p class="eyebrow" data-type>About</p>
+                <h2 id="about-title" class="title" data-type>Game design, 3D art and a habit of <em class="accent">building tools.</em></h2>
+                <div class="about">
+                    <div class="about-text">
+                        <p data-type>I'm a game designer and co-founder of Moonflux Interactive. I shape the player experience and keep the technical and game design documentation that connects ideas to development.</p>
+                        <p data-type>My background is mixed on purpose: a commercial apprenticeship, a diploma in Game Art &amp; 3D Animation at SAE Zürich and live operation of cinema technology at Cinema 8. I also build my own tools, like Dienstplan, a shift-planning web app with PDF import and Google Calendar integration, and this page.</p>
+                    </div>
+                    <ul class="chips" aria-label="Focus">
+                        <li class="chip" data-box="fast"><span data-type>Game design</span></li>
+                        <li class="chip" data-box="fast"><span data-type>3D art</span></li>
+                        <li class="chip" data-box="fast"><span data-type>Live operation</span></li>
+                        <li class="chip" data-box="fast"><span data-type>Own tools</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="section" data-section aria-labelledby="experience-title">
+            <div class="wrap">
+                <p class="eyebrow" data-type>Experience</p>
+                <h2 id="experience-title" class="title" data-type>The path <em class="accent">so far.</em></h2>
+                <ol class="timeline" data-box>
+                    <li class="row">
+                        <p class="when" data-type>11.2024 – today</p>
+                        <div class="what">
+                            <h3 data-type>Game Designer &amp; Co-founder</h3>
+                            <p class="where" data-type>Moonflux Interactive, Zürich</p>
+                            <p data-type>Co-design, concept and strategic planning of the whole player experience. Structured documentation of technical and game design as the interface to development.</p>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <p class="when" data-type>03.2025 – today</p>
+                        <div class="what">
+                            <h3 data-type>Operator</h3>
+                            <p class="where" data-type>Cinema 8, Schöftland</p>
+                            <p data-type>Fixing system faults and keeping the cinema technology running in live operation. Coordinating the entry team and logging operational and system data.</p>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <p class="when" data-type>2023 – 2024</p>
+                        <div class="what">
+                            <h3 data-type>Operations Assistant</h3>
+                            <p class="where" data-type>Läbesruum, Winterthur</p>
+                            <p data-type>Technical work converting ticket machines for the Winterthur city bus, plus logistics, storage and moving jobs.</p>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <p class="when" data-type>09.2019 – 08.2021</p>
+                        <div class="what">
+                            <h3 data-type>Diploma, Game Art &amp; 3D Animation</h3>
+                            <p class="where" data-type>SAE Institute, Zürich</p>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <p class="when" data-type>04.2019 – 07.2019</p>
+                        <div class="what">
+                            <h3 data-type>3D Artist</h3>
+                            <p class="where" data-type>Raumgleiter AG, Zürich</p>
+                            <p data-type>3D modelling of assets in Blender for an interactive AR architecture viewer.</p>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <p class="when" data-type>08.2016 – 07.2019</p>
+                        <div class="what">
+                            <h3 data-type>Commercial apprenticeship (Kaufmann EFZ)</h3>
+                            <p class="where" data-type>gustello GmbH, Winterthur</p>
+                            <p data-type>Running an e-commerce website, buying and selling goods on online platforms and designing digital and print advertising material.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="skills" class="section" data-section aria-labelledby="skills-title">
+            <div class="wrap">
+                <p class="eyebrow" data-type>Skills</p>
+                <h2 id="skills-title" class="title" data-type>Five layers, <em class="accent">one stack.</em></h2>
+                <ul class="skills">
+                    <li class="skill" data-box="fast">
+                        <p class="layer" data-type>Layer 1</p>
+                        <h3 data-type>Business &amp; operations</h3>
+                        <p data-type>Kaufmann EFZ · e-commerce · live operation · documentation · MS Office</p>
+                    </li>
+                    <li class="skill" data-box="fast">
+                        <p class="layer" data-type>Layer 2</p>
+                        <h3 data-type>3D &amp; graphics</h3>
+                        <p data-type>Blender · Autodesk Maya · Substance Painter · Substance Designer · Affinity Photo, Publisher, Designer</p>
+                    </li>
+                    <li class="skill" data-box="fast">
+                        <p class="layer" data-type>Layer 3</p>
+                        <h3 data-type>Game engines</h3>
+                        <p data-type>Unreal Engine 5 · Unity · Godot 4</p>
+                    </li>
+                    <li class="skill" data-box="fast">
+                        <p class="layer" data-type>Layer 4</p>
+                        <h3 data-type>Programming</h3>
+                        <p data-type>C++ · Blueprint · Python · GDScript, for my own prototypes</p>
+                    </li>
+                    <li class="skill" data-box="fast">
+                        <p class="layer" data-type>Layer 5</p>
+                        <h3 data-type>AI tools</h3>
+                        <p data-type>Claude · Gemini · Microsoft Copilot</p>
+                    </li>
+                </ul>
+                <p class="note" data-type>Languages: German (native), English (B2)</p>
+            </div>
+        </section>
+
+        <section id="contact" class="section" data-section data-type-ms="3000" aria-labelledby="contact-title">
+            <div class="wrap">
+                <div class="cta" data-box>
+                    <h2 id="contact-title" class="title" data-type>Let's build something <em class="accent" data-underline>together.</em></h2>
+                    <p class="lede" data-type>Questions, ideas or a project? Write me. My CV is a PDF in German and English, made on the spot from this site.</p>
+                    <div class="actions">
+                        <a class="btn btn-solid" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>micael@gomes-fernandes.ch</span></a>
+                        <a class="btn btn-ghost" href="cv.html" data-box data-outline><span data-type>Download CV</span></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer" data-section data-instant>
+            <div class="wrap footer-inner">
+                <p class="footer-name" data-type>Micael Gomes Fernandes · gomes-fernandes.ch</p>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/lazyboxDude" data-type>GitHub</a></li>
+                    <li><a href="https://www.linkedin.com/in/micael-gomes-fernandes" data-type>LinkedIn</a></li>
+                    <li><a href="dienstplan.html" data-type>Dienstplan</a></li>
+                    <li><a href="archive/v1-2026-11/index.html" data-type>Archive</a></li>
+                    <li><a href="datenschutz.html" data-type>Datenschutz</a></li>
+                    <li><a href="nutzungsbedingungen.html" data-type>Nutzungsbedingungen</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Builds everything again once the whole page is built; label is set by js/build.js -->
+    <button id="next" class="next" type="button"><span class="next-label"></span></button>
 
     <!-- Announces build progress to screen readers -->
     <p id="status" class="sr-only" role="status"></p>

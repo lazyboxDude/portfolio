@@ -1,0 +1,206 @@
+/* ==========================================================================
+   CV page (cv.html). On screen: a white sheet on the dark site look.
+   Printed (or saved as PDF from the print dialog): just the sheet on A4.
+   ========================================================================== */
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-latin-var.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --bg: #07090f;
+    --paper: #ffffff;
+    --ink: #14161d;
+    --ink-soft: #4a5166;
+    --line: #dfe3ee;
+    --accent: #3d5bd9;
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0 16px 64px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---- Toolbar (screen only) ------------------------------------------------ */
+
+.cv-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    width: min(820px, 100%);
+    margin: 0 auto;
+    padding: 20px 0;
+    color: #c9d2ea;
+    font-size: 14px;
+}
+
+.cv-toolbar a { color: #c9d2ea; text-underline-offset: 3px; }
+.cv-toolbar a:hover { color: #fff; }
+.cv-toolbar :focus-visible { outline-color: #9fb4ff; }
+
+.cv-langs {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cv-langs a {
+    display: block;
+    padding: 8px 14px;
+    border: 1px solid #2a3658;
+    border-radius: 999px;
+    text-decoration: none;
+}
+
+.cv-langs a[aria-current="true"] {
+    border-color: #6c8cff;
+    background: rgba(108, 140, 255, 0.16);
+    color: #fff;
+}
+
+.cv-print {
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 999px;
+    background: #eaf0ff;
+    color: #07090f;
+    font: 600 14px/1 var(--font-sans);
+    cursor: pointer;
+}
+
+.cv-print:hover { background: #fff; }
+
+/* ---- Language switching: no JS needed (:target), JS adds .is-active ------- */
+
+.cv { display: none; }
+.cv:target,
+.cv.is-active { display: block; }
+main:not(:has(.cv:target)):not(:has(.cv.is-active)) .cv:first-of-type { display: block; }
+
+/* ---- The sheet ------------------------------------------------------------ */
+
+.cv {
+    width: min(820px, 100%);
+    margin: 0 auto;
+    padding: clamp(24px, 6vw, 56px);
+    border-radius: 6px;
+    background: var(--paper);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.cv-head { padding-bottom: 20px; border-bottom: 2px solid var(--ink); }
+
+.cv h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.cv-role {
+    margin: 4px 0 12px;
+    color: var(--ink-soft);
+    font-size: 16px;
+}
+
+.cv-contact { margin: 0; color: var(--ink-soft); font-size: 13px; }
+
+.cv section { margin-top: 28px; break-inside: avoid-page; }
+
+.cv h2 {
+    margin: 0 0 12px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.cv-list { margin: 0; padding: 0; list-style: none; }
+
+.cv-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 4px 24px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    break-inside: avoid;
+}
+
+.cv-item:first-child { border-top: 0; padding-top: 0; }
+
+.cv-when {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.cv h3 {
+    margin: 0 0 2px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cv h3 span {
+    display: block;
+    color: var(--ink-soft);
+    font-weight: 400;
+}
+
+.cv-item p { margin: 0 0 2px; }
+.cv-item div p + p { margin-top: 2px; }
+
+.cv-skills {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 6px 24px;
+    margin: 0;
+}
+
+.cv-skills dt { font-weight: 600; }
+.cv-skills dd { margin: 0; }
+
+.cv-foot {
+    margin: 32px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+@media (max-width: 560px) {
+    .cv-item, .cv-skills { grid-template-columns: 1fr; }
+}
+
+/* ---- Print / "Save as PDF" ------------------------------------------------ */
+
+@page { size: A4; margin: 14mm; }
+
+@media print {
+    body { padding: 0; background: #fff; }
+    .cv-toolbar { display: none; }
+    .cv { width: auto; margin: 0; padding: 0; border-radius: 0; font-size: 10.5pt; }
+    .cv h1 { font-size: 22pt; }
+    .cv a { color: inherit; text-decoration: none; }
+    .cv section { margin-top: 18pt; }
+}

@@ -1,2 +1,5 @@
 archive/v1-2026-11/images/portfolio/DryOuz 2.mp4
 .git
+# Old CV files (PDF and plain text with private data) stay in the frozen archive but are not served.
+# The CV is built from cv.html instead.
+archive/v1-2026-11/docs/
