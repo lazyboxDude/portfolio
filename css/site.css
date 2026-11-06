@@ -97,14 +97,20 @@ body {
 /* Without JS the button does nothing, so hide it. */
 html:not(.js) .box { display: none; }
 
-/* ---- The card (built live by the bots) ---------------------------------- */
+/* ---- The cards (built live by the bots) --------------------------------- */
 
-.card {
+/* Hangs below the box and grows downwards, so earlier cards never move when a new one is built. */
+.cards {
     position: absolute;
     top: calc(100% + 32px);
     left: 50%;
     translate: -50% 0;
     width: min(560px, calc(100vw - 32px));
+    display: grid;
+    gap: 16px;
+}
+
+.card {
     padding: 22px 26px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 20px;
@@ -138,8 +144,8 @@ html:not(.js) .box { display: none; }
 /* With JS the card stays hidden until the layout-bot starts dragging it out. */
 .js .card:not(.is-shown) { visibility: hidden; }
 
-/* Without JS: plain block under nothing, centred. */
-html:not(.js) .card {
+/* Without JS: plain blocks, centred. */
+html:not(.js) .cards {
     position: static;
     translate: none;
 }

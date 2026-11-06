@@ -1,17 +1,13 @@
 import { CursorSwarm } from './cursors.js';
-import { Intro } from './intro.js';
+import { SiteBuilder } from './build.js';
 
 const box = document.getElementById('box');
 const swarm = new CursorSwarm(document.getElementById('cursor-layer'), { max: 40 });
 
-const intro = new Intro({
+const builder = new SiteBuilder({
     swarm,
     label: box.querySelector('.box-label'),
-    card: document.getElementById('card'),
-    source: document.getElementById('intro-text'),
-    typed: document.getElementById('typed'),
-    caret: document.getElementById('caret'),
-    rest: document.getElementById('rest'),
+    cards: [...document.querySelectorAll('#cards .card')],
     status: document.getElementById('status'),
 });
 
@@ -30,7 +26,7 @@ box.addEventListener('click', (event) => {
     setTimeout(() => box.classList.remove('is-pressed'), 120);
 
     box.setAttribute('aria-disabled', 'true');
-    intro.run({ x, y }).finally(() => {
-        if (!intro.parked) box.removeAttribute('aria-disabled');
+    builder.run({ x, y }).finally(() => {
+        if (!builder.parked) box.removeAttribute('aria-disabled');
     });
 });

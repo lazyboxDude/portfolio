@@ -17,12 +17,18 @@
                 <span class="box-label">Build Website</span>
             </button>
 
-            <!-- Built live by the bot cursors (js/intro.js). The card is empty until the box is
-                 clicked. The sentence lives in the <noscript>: it is the no-JS fallback and the
-                 single source that js/intro.js reads and types. -->
-            <section id="card" class="card" aria-label="Introduction">
-                <p class="card-text"><noscript id="intro-text">Hi, welcome to my personal website</noscript><span id="typed"></span><span id="caret" class="caret" aria-hidden="true"></span><span id="rest" class="rest" aria-hidden="true"></span></p>
-            </section>
+            <!-- Built live by the bot cursors (js/build.js), one section per click. The cards are
+                 empty until built. Each sentence lives in a <noscript>: it is the no-JS fallback
+                 and the single source that js/build.js reads and types.
+                 data-prompt = button label while that section is the next one to build. -->
+            <div id="cards" class="cards">
+                <section class="card" aria-label="Introduction">
+                    <p class="card-text"><noscript>Hi, welcome to my personal website</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
+                </section>
+                <section class="card" aria-label="About me" data-prompt="Who are you?">
+                    <p class="card-text"><noscript>I'm Micael Gomes Fernandes, or online ._lazybox_.</noscript><span class="typed"></span><span class="caret" aria-hidden="true"></span><span class="rest" aria-hidden="true"></span></p>
+                </section>
+            </div>
         </div>
     </main>
 
