@@ -10,6 +10,8 @@
     --accent: #6c8cff;
     --accent-2: #b36cff;
     --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+    --card-radius: 20px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -120,9 +122,10 @@ html:not(.js) .next { display: none; }
 }
 
 .card {
+    position: relative;
     padding: 22px 26px;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 20px;
+    border-radius: var(--card-radius);
     background:
         radial-gradient(120% 140% at 0% 0%, rgba(108, 140, 255, 0.16), transparent 60%),
         #14161d;
@@ -149,6 +152,58 @@ html:not(.js) .next { display: none; }
 }
 
 @keyframes blink { 50% { opacity: 0; } }
+
+/* Selection frame with handles: shown while the layout-bot drags the card out. */
+.card-frame {
+    position: absolute;
+    inset: -6px;
+    border: 1px solid var(--accent);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+}
+
+.card.is-selected .card-frame { opacity: 1; }
+
+.handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+}
+
+.handle-tl { left: -5px;  top: -5px; }
+.handle-tr { right: -5px; top: -5px; }
+.handle-bl { left: -5px;  bottom: -5px; }
+.handle-br { right: -5px; bottom: -5px; }
+
+/* The accent border the design-bot draws: 4 corner arcs fade in, 4 edges grow along their side.
+   Hidden by default; js/build.js sets scale/opacity while drawing. */
+.corner,
+.edge {
+    position: absolute;
+    pointer-events: none;
+}
+
+.corner {
+    width: var(--card-radius);
+    height: var(--card-radius);
+    border: 0 solid var(--accent);
+    opacity: 0;
+}
+
+.corner-tl { left: -1px;  top: -1px;    border-width: 1.5px 0 0 1.5px; border-top-left-radius: var(--card-radius); }
+.corner-tr { right: -1px; top: -1px;    border-width: 1.5px 1.5px 0 0; border-top-right-radius: var(--card-radius); }
+.corner-br { right: -1px; bottom: -1px; border-width: 0 1.5px 1.5px 0; border-bottom-right-radius: var(--card-radius); }
+.corner-bl { left: -1px;  bottom: -1px; border-width: 0 0 1.5px 1.5px; border-bottom-left-radius: var(--card-radius); }
+
+.edge { background: var(--accent); }
+
+.edge-top    { left: calc(var(--card-radius) - 1px); right: calc(var(--card-radius) - 1px); top: -1px;    height: 1.5px; transform-origin: 0 50%;    scale: 0 1; }
+.edge-bottom { left: calc(var(--card-radius) - 1px); right: calc(var(--card-radius) - 1px); bottom: -1px; height: 1.5px; transform-origin: 100% 50%; scale: 0 1; }
+.edge-right  { top: calc(var(--card-radius) - 1px); bottom: calc(var(--card-radius) - 1px); right: -1px; width: 1.5px;  transform-origin: 50% 0;    scale: 1 0; }
+.edge-left   { top: calc(var(--card-radius) - 1px); bottom: calc(var(--card-radius) - 1px); left: -1px;  width: 1.5px;  transform-origin: 50% 100%; scale: 1 0; }
 
 /* With JS a card takes no space until a build starts (is-reserved), and stays invisible until
    the layout-bot starts dragging it out (is-shown). */
@@ -218,8 +273,8 @@ html:not(.js) .build {
 .fake-cursor-body {
     width: 100%;
     height: 100%;
-    /* Press feedback scales around the arrow tip. */
-    transform-origin: 2px 1.5px;
+    /* Press feedback scales around the pointer's hot spot (--hx/--hy, set per shape in cursors.js). */
+    transform-origin: var(--hx, 2px) var(--hy, 1.5px);
     transition: scale 0.12s ease;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
@@ -231,8 +286,8 @@ html:not(.js) .build {
 /* Multiplayer-style name tag: tells what job this bot has. */
 .fake-cursor-tag {
     position: absolute;
-    left: 16px;
-    top: 18px;
+    left: calc(var(--hx, 2px) + 14px);
+    top: calc(var(--hy, 1.5px) + 16px);
     padding: 2px 8px;
     border-radius: 999px;
     background: var(--cursor-color);
@@ -240,6 +295,24 @@ html:not(.js) .build {
     font: 600 11px/1.4 var(--font-sans);
     white-space: nowrap;
 }
+
+/* Inspector tag: a bot shows the real numbers it is working on (size, typography, border). */
+.inspector-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--cursor-color);
+    color: #0b0c10;
+    font: 500 11px/1.45 var(--font-mono);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    will-change: transform;
+}
+
+.inspector-tag.is-visible { opacity: 1; }
 
 .ripple {
     position: absolute;
@@ -270,4 +343,5 @@ html:not(.js) .build {
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
     .card.is-typing .caret { animation: none; }
+    .card-frame, .inspector-tag { transition: none; }
 }

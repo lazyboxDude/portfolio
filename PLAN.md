@@ -45,6 +45,19 @@ Was daraus für uns folgt:
 - **Finale/Signatur:** der Schwarm. Er steht für "ich kann Agenten orchestrieren" und passt zur Zielgruppe.
 - **Inhalt ist echt:** Hinter jeder gebauten Karte steckt ein echter CV-/Portfolio-Inhalt, kein Lorem ipsum.
 
+### Mockup (Referenz für das Endergebnis)
+
+Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k34tmtWv5
+(privater Artifact, nur für Micael sichtbar; die Quelldateien liegen bewusst nicht im Repo, weil das Deploy statisch und öffentlich ist).
+
+- **Board "Desktop"** (1440 px): Nav-Pill, Hero mit Headline "I build interfaces that *build themselves.*", Cursors mit Namensschildern,
+  Inspector-Labels und Auswahlrahmen · Streifen "Now" · Über mich · Projekte als Bento (Dienstplan mit Browser-Mockup, "This website", Archiv, Platzhalter) ·
+  Werdegang · Skills als Schwarm um einen Stapel aus fünf Layern mit Button "More agents" und Zähler · CTA mit CV-Download · Footer.
+- **Board "Mobil"** (390 px): Hero und Skills.
+- **Look:** dunkel (`#07090f`), Akzent Blau `#6f8cff` mit Cyan-Hauch, Inter + Instrument Serif kursiv für das Akzentwort + JetBrains Mono für Labels.
+  Job-Farben der Bots: layout blau `#7b95ff`, copy pink `#ff8fb8`, design gelb `#ffc766`, a11y grün `#6fe3a5`, motion violett `#b79bff`, dazu Cyan `#5fd4f0`.
+- Alles in `[Klammern]` ist ein Platzhalter für echte CV-Daten (siehe offene Frage 4). Cursors, Labels und Schwarm sind im Mockup Standbilder.
+
 ## Leitlinien
 
 - **Interaktion zuerst.** Jede Seite hat etwas zum Anfassen. Inhalt wird durch Interaktion freigeschaltet.
@@ -78,7 +91,7 @@ Was daraus für uns folgt:
 | 1 | Box + Cursor-Schwarm | erledigt, [PR #14](https://github.com/lazyboxDude/portfolio/pull/14): Box spawnt mehrere Mauszeiger, die herumwandern. |
 | 2 | Bots mit Jobs: Intro baut sich selbst | erledigt, [PR #15](https://github.com/lazyboxDude/portfolio/pull/15) und [PR #16](https://github.com/lazyboxDude/portfolio/pull/16): Cursors mit Job und Namensschild bauen die erste Karte. |
 | 3 | Folge von Bauschritten | erledigt: Teil 1 ([PR #17](https://github.com/lazyboxDude/portfolio/pull/17)): ein Klick pro Abschnitt, zweite Karte mit Name und Handle. Teil 2 ([PR #19](https://github.com/lazyboxDude/portfolio/pull/19)): Startbox verschwindet nach dem ersten Klick, Pill für die Folgeschritte, Bots mit Persönlichkeit (reagieren im Leerlauf auf den echten Mauszeiger und aufeinander, klicken ins Leere). |
-| 4 | **Cursor-Sprache** (Orbit/Linea) | Namensschilder als farbige Pills pro Job, mehr Bot-Typen mit eigener Bewegung: Text-Cursor (I-Beam, tippt), Drag-/Resize-Cursor (Auswahlrahmen mit Griffen), Zeichen-Cursor. Dazu **Inspector-Labels** (`640 · 92px / 0.98`, `175 × 67`, CSS-Werte), die beim Bauen kurz an den Elementen erscheinen. Die Reaktionen auf den echten Mauszeiger und aufeinander gibt es seit Schritt 3 (Teil 2), hier kommen sie für die neuen Bot-Typen dazu. Noch keine neuen Inhalte, nur das Handwerk. |
+| 4 | **Cursor-Sprache** (Orbit/Linea) | gebaut (siehe Status): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen mit Griffen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Akzentrahmen. Die Persönlichkeit im Leerlauf kommt aus Schritt 3 (Teil 2) und gilt auch für den neuen Bot. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
 | 5 | **Landingpage-Gerüst: Hero + Nav** (Linea) | Die Seite startet leer und baut sich zur echten Landingpage auf: Nav-Pill (getippt), Hero-Headline mit Serifen-Kursiv-Akzent, zwei Buttons (CV, Kontakt), Hintergrund-Glow. Der Box-Klick wird zum "Start"-Moment, danach geht es scroll-getrieben weiter. Look wird hier festgelegt (siehe offene Frage 3). |
 | 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | Jeder Abschnitt baut sich beim Erreichen live (IntersectionObserver, Bots wandern mit): Über mich, Werdegang/Timeline, Skills als Bento-Grid, Kontakt/CTA, Footer. Inhalte aus echten CV-Daten (Micael liefert sie, siehe offene Frage 4). Ohne-JS-Fallback von Anfang an (`<noscript>`-Muster aus Schritt 3). |
 | 7 | **Projekte als Mockups** | Projekte (Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) als Browser-/Phone-Mockups, die die Bots zusammensetzen (gekippt, mit Tiefe wie bei Orbit), mit Link zur Live-App oder zum Case. |
@@ -95,7 +108,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 
 - **Schritt 1 erledigt** (gemerged): Box + Cursor-Schwarm.
 - **Schritt 2 erledigt** (gemerged): Bots mit Jobs. Jeder Cursor hat einen Job und ein Namensschild (`layout-bot`, `copy-bot`).
-- **Schritt 3 erledigt** (Teil 1 gemerged, Teil 2 im PR #19): Folge von Bauschritten, Startbox, Persönlichkeit.
+- **Schritt 3 erledigt** (gemerged, Teil 1 [PR #17](https://github.com/lazyboxDude/portfolio/pull/17), Teil 2 [PR #19](https://github.com/lazyboxDude/portfolio/pull/19)): Folge von Bauschritten, Startbox, Persönlichkeit.
   - **Ablauf:** Der erste Klick auf die Startbox ("Build Website") lässt sie schrumpfen und ausblenden (danach `hidden`), die Bots platzen an der Klickstelle heraus.
     Die Box kommt nie wieder und es werden nie wieder Cursors gespawnt (nur die zwei Bots, `layout-bot` und `copy-bot`).
     Das `layout-bot` zieht die Karte auf (Skalierung ab der oberen linken Ecke folgt dem Cursor, mit Ripple beim "Mausdruck"), das `copy-bot` tippt den Satz und folgt dem Textcursor.
@@ -119,16 +132,26 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **`prefers-reduced-motion`:** Der Loop läuft nicht, also kein Anlauf, keine Reaktionen, keine Ripples. Die Box ist sofort weg, jeder Klick zeigt den nächsten Abschnitt sofort,
     die Cursors stehen still daneben, nach dem letzten gibt es keine Pill mehr.
   - Die Obergrenze von 40 DOM-Cursors bleibt als Sicherung im `CursorSwarm`.
-- **Plan umgebaut** (dieser Stand): Zielbild aus den Referenzvideos (Linea, Orbit, Bakelayer) eingearbeitet.
-  Roadmap von 8 auf 12 Schritte erweitert, das Endziel ist jetzt ausdrücklich "Portfolio + CV, das sich selbst baut".
-  **Nächster Schritt: 4 (Cursor-Sprache).**
+- **Plan umgebaut** (gemerged, [PR #18](https://github.com/lazyboxDude/portfolio/pull/18)): Zielbild aus den Referenzvideos (Linea, Orbit, Bakelayer) eingearbeitet.
+  Roadmap von 8 auf 12 Schritte erweitert, das Endziel ist jetzt ausdrücklich "Portfolio + CV, das sich selbst baut". Dazu ein Mockup als Referenz (Abschnitt "Mockup").
+- **Schritt 4 gebaut** (im PR #20): Cursor-Sprache. Noch keine neuen Inhalte, nur das Handwerk.
+  - **Drei Bots, drei Formen:** `layout-bot` (Pfeil, blau, scheu), `copy-bot` (I-Beam, pink, neugierig), `design-bot` (Stift, gelb, gesellig).
+    Konfiguration in `JOBS` (`js/build.js`: Name, Farbe, Form, Persönlichkeit), die Form wählt `Cursor.setKind('arrow' | 'text' | 'pen')` (`js/cursors.js`).
+    Jede Form hat ihren Hotspot (`--hx`/`--hy`), der Namens-Pill sitzt relativ dazu. `swarm.add()` nimmt jetzt `color` (Hex) statt `hue`.
+  - **Bauablauf pro Klick:** `layout-bot` zieht die Karte auf (Auswahlrahmen mit Griffen, Tag mit der Live-Größe, z. B. `556 × 80`),
+    danach tippt `copy-bot` (Tag mit der echten Typografie aus `getComputedStyle`, z. B. `500 · 22px / 1.55`), **gleichzeitig** zeichnet `design-bot`
+    den Akzentrahmen (4 Ecken blenden ein, 4 Kanten wachsen, nur `transform`/`opacity`; Tag `border 1.5px #6c8cff`). Die Rahmen-Teile erzeugt `Section` in `js/build.js`.
+  - **Inspector-Tags:** `cursor.inspect(text, x, y)` / `cursor.hideTag()`, Klasse `InspectorTag` in `js/cursors.js`, Stil `.inspector-tag` in `css/site.css`.
+  - **Leerlauf:** unverändert das Persönlichkeitssystem aus Schritt 3 (Teil 2), der `design-bot` ist als dritter Bot dabei und der I-Beam/Stift sind im Leerlauf sichtbar.
+  - **Reduced Motion:** Rahmen sofort fertig gezeichnet, keine Tags, Bots geparkt.
+  - Ein Bauschritt dauert ca. 8 Sekunden. **Nächster Schritt: 5 (Landingpage-Gerüst: Hero + Nav).**
 
 ## Offene Fragen an Micael
 
 1. **Sprache:** Englisch (passt zu einer internationalen AI-Firma) oder Deutsch? Aktuell: Englisch auf der Startseite.
 2. **Zielfirma/Rolle:** Wofür genau bewirbst du dich (Rolle, Firma)? Das bestimmt, was in Schritt 6 bis 9 gezeigt werden soll.
 3. **Look:** Die Referenzen gehen in zwei Richtungen: Linea hell und ruhig, Orbit/Bakelayer dunkel mit Glow.
-   Empfehlung: dunkel mit einem blauen Akzent (passt zu Bakelayer und zum jetzigen Stand), dazu ein Serifen-Kursiv-Akzentwort aus Linea für Wärme. Einverstanden?
+   Empfehlung (so ist das Mockup gebaut): dunkel mit einem blauen Akzent (passt zu Bakelayer und zum jetzigen Stand), dazu ein Serifen-Kursiv-Akzentwort aus Linea für Wärme. Einverstanden?
 4. **Inhalte (CV-Daten):** Ich brauche für Schritt 6 und 7 die echten Daten: Werdegang (Stationen, Zeiträume), Skills (3 bis 5 Ebenen für den Schwarm/die Struktur),
    welche Projekte rein sollen, Kontaktdaten und Links, ein aktuelles CV als PDF. Welche 3 bis 5 Dinge sollen Besucher:innen unbedingt über dich erfahren?
 5. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
@@ -140,5 +163,5 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 - Commit-Messages und Chat auf Deutsch, Code und Kommentare auf Englisch.
 - Lokal testen: `python3 -m http.server` im Repo-Root, dann `http://localhost:8000` öffnen.
   Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken (die Pill `#next` schwebt nicht).
-  Ein Bauschritt dauert ca. 9 Sekunden. In Tests auf Zustände warten (z. B. `#next` mit Klasse `is-ready` und Label "Who are you?" oder "Build again"), keine festen Pausen.
+  Ein Bauschritt dauert ca. 8 Sekunden. In Tests auf Zustände warten (z. B. `#next` mit Klasse `is-ready` und Label "Who are you?" oder "Build again"), keine festen Pausen.
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.
