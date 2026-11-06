@@ -1,5 +1,6 @@
 import { CursorSwarm } from './cursors.js';
 import { SiteBuilder } from './build.js';
+import { AgentField } from './agents.js';
 
 const box = document.getElementById('box');
 const next = document.getElementById('next');
@@ -32,3 +33,17 @@ box.addEventListener('click', (event) => {
 });
 
 next.addEventListener('click', (event) => builder.run(originOf(event, next)));
+
+// The swarm finale: hundreds of agents on a canvas, drawn from the same animation loop as the bots.
+const swarmStage = document.querySelector('.swarm');
+if (swarmStage) {
+    new AgentField({
+        stage: swarmStage,
+        canvas: document.getElementById('swarm-canvas'),
+        swarm,
+        counter: document.getElementById('swarm-count'),
+        more: document.getElementById('swarm-more'),
+        stack: document.getElementById('swarm-stack'),
+        layerButtons: [...swarmStage.querySelectorAll('.layer-btn')],
+    });
+}

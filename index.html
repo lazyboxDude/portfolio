@@ -307,6 +307,30 @@
             </div>
         </section>
 
+        <section id="swarm" class="section" data-section aria-labelledby="swarm-title">
+            <div class="wrap">
+                <p class="eyebrow" data-type>The stack, alive</p>
+                <h2 id="swarm-title" class="title" data-type>Press the button, <em class="accent">they multiply.</em></h2>
+                <p class="lede" data-type>The same five layers as a swarm. Every cursor is a small agent with a job. Add more of them and watch the layers fill up.</p>
+                <div class="swarm" data-box>
+                    <!-- Decorative picture, drawn by js/agents.js. The list on the right says the same in words. -->
+                    <canvas id="swarm-canvas" class="swarm-canvas" aria-hidden="true"></canvas>
+                    <ol class="layer-list" aria-label="The five layers, top to bottom">
+                        <li><button class="layer-btn" type="button" data-layer="4" aria-pressed="false"><span class="layer-dot" style="--c:#ff8fb8"></span><span><span class="layer-n">Layer 5</span>AI tools</span></button></li>
+                        <li><button class="layer-btn" type="button" data-layer="3" aria-pressed="false"><span class="layer-dot" style="--c:#ffc766"></span><span><span class="layer-n">Layer 4</span>Programming</span></button></li>
+                        <li><button class="layer-btn" type="button" data-layer="2" aria-pressed="false"><span class="layer-dot" style="--c:#6fe3a5"></span><span><span class="layer-n">Layer 3</span>Game engines</span></button></li>
+                        <li><button class="layer-btn" type="button" data-layer="1" aria-pressed="false"><span class="layer-dot" style="--c:#5fd4f0"></span><span><span class="layer-n">Layer 2</span>3D &amp; graphics</span></button></li>
+                        <li><button class="layer-btn" type="button" data-layer="0" aria-pressed="false"><span class="layer-dot" style="--c:#7b95ff"></span><span><span class="layer-n">Layer 1</span>Business &amp; operations</span></button></li>
+                    </ol>
+                    <div class="swarm-bar">
+                        <button id="swarm-more" class="btn btn-solid" type="button">More agents</button>
+                        <button id="swarm-stack" class="btn btn-ghost" type="button" aria-pressed="false" data-outline><span class="stack-label">Stack them up</span></button>
+                        <p id="swarm-count" class="swarm-count" role="status">16 agents · 5 layers</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="contact" class="section" data-section data-type-ms="3000" aria-labelledby="contact-title">
             <div class="wrap">
                 <div class="cta" data-box>

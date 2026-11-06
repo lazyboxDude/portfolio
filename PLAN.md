@@ -100,8 +100,8 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 4 | **Cursor-Sprache** (Orbit/Linea) | erledigt, [PR #20](https://github.com/lazyboxDude/portfolio/pull/20): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen mit Griffen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Akzentrahmen. Die Persönlichkeit im Leerlauf kommt aus Schritt 3 (Teil 2) und gilt auch für den neuen Bot. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
 | 5 | **Landingpage-Gerüst: Hero + Nav** (Linea) | gebaut (siehe Status): Nav-Pill, Hero mit Serifen-Kursiv-Akzent, zwei Buttons, Hintergrund-Glow. Die Seite ist echtes HTML und baut sich nach dem Klick auf die Startbox selbst (alle drei Bots, drei Spuren parallel). Look festgelegt (dunkel, blau), Schriften selbst gehostet. |
 | 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | gebaut (siehe Status): Über mich, Werdegang, Skills (fünf Ebenen), Kontakt mit CV-Download und Footer bauen sich beim Scrollen. Dazu die mehrsprachige CV-Seite `cv.html` statt PDF. |
-| 7 | **Projekte als Mockups** | gebaut (siehe Status): Dienstplan als Telefon mit echtem Screenshot, Aphonia als Poster, zwei Renders aus dem Archiv, diese Seite als Mini-Bild, Dolphin Rush. Mockups sind gekippt (CSS-3D) und richten sich beim Hover auf. |
-| 8 | **Schwarm-Finale** (Bakelayer) | Signatur der Seite: Ein Klick (z. B. "More agents") skaliert von wenigen auf hunderte Cursors (`agent-NNN`, Job-Namen), gezeichnet auf `<canvas>`, mit Verbindungslinien und Zähler. Der Schwarm sammelt sich zu einer geschichteten Struktur (CSS-3D oder Canvas), die für Micaels Skill-Ebenen steht. Harte Obergrenze, Frame-Budget, Reduced-Motion zeigt ein Standbild. |
+| 7 | **Projekte als Mockups** | erledigt, [PR #22](https://github.com/lazyboxDude/portfolio/pull/22): Dienstplan als Telefon mit echtem Screenshot, Aphonia als Poster, zwei Renders aus dem Archiv, diese Seite als Mini-Bild, Dolphin Rush. Mockups sind gekippt (CSS-3D) und richten sich beim Hover auf. |
+| 8 | **Schwarm-Finale** (Bakelayer) | gebaut (siehe Status): neuer Abschnitt `#swarm`. "More agents" vervielfacht den Schwarm (16, 48, 144, 432 bis 720 Agents auf `<canvas>`), auf dem Höchststand sammelt er sich zu den fünf Skill-Ebenen. Mit Zähler, Verbindungslinien, Frame-Budget und Standbild bei Reduced Motion. |
 | 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über eine serverseitige Funktion (Vercel Function oder Cloudflare Worker), der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
 | 11 | Feinschliff | Performance-Messung, Mobil, Reduced-Motion, Lighthouse, Cross-Browser, Sound optional (standardmäßig aus). |
@@ -168,7 +168,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Kontakt:** "Download CV" steht unten im Kontaktbereich und führt auf `cv.html`. Die Nav verlinkt About, Experience, Skills und Dienstplan. GitHub, LinkedIn, Archiv und die Rechtsseiten stehen im Footer.
   - **Altes CV-PDF** und `CV.txt` im Archiv: In Schritt 6 nur über `.assetsignore` ausgeschlossen, das bei Vercel nichts bewirkt. Seit Schritt 7 leitet `vercel.json` die Adressen unter `/archive/v1-2026-11/docs/` auf `/cv.html` um (bleiben im Repo und in der Git-Historie).
   - Gemerged als [PR #21](https://github.com/lazyboxDude/portfolio/pull/21).
-- **Schritt 7 gebaut** (siehe PR): Projekte als Mockups, neuer Abschnitt `#projects` zwischen "About" und "Experience". Nav: About, Projects, Experience, Skills.
+- **Schritt 7 erledigt** (gemerged, [PR #22](https://github.com/lazyboxDude/portfolio/pull/22)): Projekte als Mockups, neuer Abschnitt `#projects` zwischen "About" und "Experience". Nav: About, Projects, Experience, Skills.
   - **Fünf Karten:** Dienstplan (Web-App im Einsatz, Link auf die App), Aphonia (Moonflux Interactive, 2025, Links zu Steam und zum Studio), "Selected renders" (alle acht Arbeiten aus dem Archiv als Galerie mit Titel, Werkzeugen und Jahr, Link ins Archiv),
     "This website" (Mini-Bild dieser Seite mit den drei Bots) und Dolphin Rush (2023, nur Text). Alle Angaben stammen aus dem Dienstplan selbst und aus dem alten Portfolio im Archiv (`js/projects-data.js`), nichts ist erfunden.
   - **Mockups mit Tiefe:** `.tilt` kippt die Geräte per `perspective()`/`rotateY()`, `@media (hover: hover)` richtet sie beim Hover auf, mit Reduced Motion ohne Übergang.
@@ -183,7 +183,18 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
     Oder Proxy aus (graue Wolke, nur DNS), denn Vercel hat ein eigenes CDN. Im Repo lässt sich das nicht lösen. Die Apex-Domain `gomes-fernandes.ch` leitet mit 307 auf `www.gomes-fernandes.ch` um.
   - **Live geprüft (Stand Schritt 6):** Das alte CV-PDF (1,5 MB) und `CV.txt` sind unter `www.gomes-fernandes.ch/archive/v1-2026-11/docs/` noch öffentlich abrufbar, bis `vercel.json` deployt ist. Nach dem Deploy in Cloudflare "Purge Everything" (sonst kann der Edge-Cache das PDF noch ausliefern) und die Adresse prüfen: sie soll auf `/cv.html` umleiten.
   - **Weiterleitung:** `vercel.json` leitet `/archive/v1-2026-11/docs/*` auf `/cv.html` um (so wird auch der alte "Download"-Link im Archiv zur neuen CV-Seite).
-  - **Nächster Schritt: 8 (Schwarm-Finale).**
+- **Schritt 8 gebaut** (siehe PR): Schwarm-Finale, neuer Abschnitt `#swarm` zwischen "Skills" und "Kontakt" (Titel "Press the button, *they multiply.*").
+  - **Ablauf:** Es starten 16 Agents, die umherwandern. "More agents" verdreifacht den Schwarm (16, 48, 144, 432, dann bis zur Obergrenze). Auf dem Höchststand **sammeln sie sich von selbst** zu fünf Ebenen (isometrische Rauten, unten die breiteste),
+    der Zähler zeigt die echte Zahl ("720 agents · 5 layers"). "Stack them up" schaltet den Stapel auch von Hand (`aria-pressed`, der Text bleibt gleich). Der Zeiger scheucht Agents beiseite.
+  - **Ebenen = Skills:** Die fünf Ebenen sind die fünf Skill-Karten (Business, 3D, Engines, Programmieren, KI-Tools), je eine Farbe. In der Liste neben dem Bild (echte `<button>`s) hebt Hover, Fokus oder Tippen eine Ebene hervor, die anderen werden blasser.
+  - **Technik** (`js/agents.js`, `AgentField`): Zeichnen auf `<canvas>` (die 40 DOM-Cursors reichen hier nicht), aber **aus dem gemeinsamen Loop** (`CursorSwarm.onFrame`), es gibt weiterhin nur ein `requestAnimationFrame`. Ein vorgezeichnetes Sprite pro Ebene (`drawImage`), alle Verbindungslinien in einem Pfad,
+    nur die ersten 14 Agents zeigen ihren Namen (`agent-NNN`, `layout-agent` ...). Gezeichnet und bewegt wird nur, solange der Abschnitt im Bild ist (IntersectionObserver).
+  - **Obergrenzen und Budget:** 720 Agents (Breite ab 720 px), 360 auf dem Handy. Frisst das Zeichnen im Schnitt mehr als 10 ms pro Frame (45 Frames in Folge), entfallen die Linien und der Schwarm wächst nicht weiter (`degrade()`, Button "Enough for this device").
+    Gemessen im Headless-Browser: 60 fps mit 720 Agents.
+  - **Reduced Motion:** ein Standbild mit 240 Agents im Stapel, die Buttons sind weg (`[hidden]` gilt jetzt auch für Buttons, global in `css/site.css`). Ohne JS bleibt nur die Liste der Ebenen.
+  - **Barrierefreiheit:** Das Canvas ist `aria-hidden`, der Text daneben sagt dasselbe. Der Zähler ist `role="status"`. Die Bühne wird vom `layout-bot` aufgezogen (`data-box`), der Rahmen des Stack-Buttons vom `design-bot` gezeichnet.
+  - **Bau-Engine:** Ein `data-outline`-Element ohne Text und ohne eigene Form wartet auf die Form um es.
+  - **Nächster Schritt: 9 (AI-Element).** Das ist ein eigener Schritt mit eigener Absprache (siehe offene Frage 6).
 
 ## Offene Fragen an Micael
 
@@ -193,7 +204,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 4. **Zielfirma/Rolle:** Wofür genau bewirbst du dich (Rolle, Firma)? Das bestimmt, was in Schritt 7 bis 9 gezeigt werden soll und ob der CV eine Kurzprofil-Zeile bekommt.
 5. **Aphonia-Bilder:** Gibt es ein Titelbild oder Screenshots, die öffentlich sein dürfen? Sonst bleibt das Typografie-Poster.
 6. **AI-Element (Schritt 9):** Soll es ein echtes Modell im Hintergrund geben (kostet Geld, braucht einen Worker) oder reicht eine gebaute Illusion?
-7. **Schwarm-Struktur (Schritt 8):** Pyramide aus Layern (wie bei Bakelayer), oder etwas Eigenes? Die fünf Skill-Ebenen aus Schritt 6 sind die Grundlage.
+7. **Schwarm-Struktur (Schritt 8):** Ich habe die Pyramide aus fünf Ebenen gebaut (wie im Mockup, die Ebenen sind die Skill-Karten). Passt das, oder soll es etwas Eigenes sein (z. B. ein Logo)? Der Umbau betrifft nur `layout()` und `target()` in `js/agents.js`.
 8. **Weitere CV-Sprachen:** Deutsch und Englisch sind drin. Soll eine weitere dazu (z. B. Portugiesisch, Französisch)?
 9. **Cloudflare:** Bitte "Browser Cache TTL" auf "Respect Existing Headers" stellen und nach dem nächsten Deploy "Purge Everything" (siehe Cache-Hinweis in Schritt 7). Die Domain ist für die Sandbox freigegeben (`gomes-fernandes.ch` und `www`), ich kann die Live-Seite also prüfen.
 
