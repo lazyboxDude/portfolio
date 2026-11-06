@@ -1,6 +1,6 @@
 # Plan: Interaktive Bewerbungs-Website
 
-> Stand: 2026-11-06. Schritte 0 bis 8 sind gebaut und gemerged. **Nächster Schritt: 9 ("Echter Bau").**
+> Stand: 2026-11-06. Schritte 0 bis 8 sind gebaut und gemerged. **Schritt 9 ("Echter Bau") ist gebaut, aber noch ohne PR** (wartet auf Micaels Review). Danach: 10.
 > Inhalt: 0 Einstieg · 1 Ziel · 2 Zielbild · 3 Zusammenarbeit (verbindlich) · 4 Leitlinien · 5 Privatsphäre und Deployment ·
 > 6 Architektur heute · 7 Roadmap · 8 Erledigt · 9 Offene Fragen · 10 Arbeitsweise und QA · 11 Glossar
 
@@ -14,7 +14,7 @@
 3. Das Markenzeichen: **drei Bot-Cursors** (`layout-bot`, `copy-bot`, `design-bot`) bauen die Seite vor den Augen der Besucher:innen. Wer scrollt, löst den Bau des nächsten Abschnitts aus.
 4. Technik: statisches HTML, CSS und Vanilla-JS (ES-Module), **kein Build-Schritt, kein Framework**. Deploy über Vercel.
 5. Stand: Die Seite ist vollständig und live. Es fehlen das AI-Element, die Bewerbungs-Essentials (Vorschaubild beim Teilen) und der Feinschliff.
-6. **Wichtigste offene Kritik von Micael (2026-11-06):** "Die Cursors sind eher Kosmetik, statt dass sie die Website wirklich bauen." Das ist berechtigt (siehe 6.5) und Schritt 9.
+6. **Kritik von Micael (2026-11-06):** "Die Cursors sind eher Kosmetik, statt dass sie die Website wirklich bauen." Das war berechtigt und ist mit Schritt 9 umgesetzt (siehe 6.2 und 6.5, wartet auf Micaels Review).
 
 **Verbindliche Regeln in Kurzform** (Details in den genannten Abschnitten)
 - Chat und Commit-Messages auf **Deutsch**, Code und Kommentare auf Englisch.
@@ -164,12 +164,13 @@ Kurz, deutsch, zuerst das Ergebnis. Bei jedem Abschluss: was ist neu, was wurde 
 ### 6.1 Dateien
 | Datei | Zweck |
 |---|---|
-| `index.html` | Die Seite. **Der vollständige Inhalt steht als HTML im DOM.** Abschnitte: Hero (`data-section="hero"`), `#about`, `#projects`, `#experience`, `#skills`, `#swarm`, `#contact`, `footer` (`data-instant`). |
+| `index.html` | Die Seite als **Bauplan**: der vollständige Inhalt steht in `<noscript id="blueprint">` in `#site`. Ohne JS rendert der Browser ihn direkt, mit JS liest die Engine ihn und `#site` startet mit leeren Abschnitts-Hüllen. Abschnitte: Hero (`data-section="hero"`), `#about`, `#projects`, `#experience`, `#skills`, `#swarm`, `#contact`, `footer` (`data-instant`). Dazu außerhalb des Bauplans: Startbox, "Build again", Status, Quelltext-Panel, Cursor-Ebene. |
 | `css/site.css` | Alles Visuelle der Startseite. Tokens, Hero, Abschnitte, Karten, Mockups (`.tilt`), Galerie, Schwarm, Cursor, Inspector-Tags, Rahmen-Teile, Reduced Motion. |
-| `js/main.js` | Verdrahtung: erzeugt `CursorSwarm` (max 40), `SiteBuilder`, `AgentField`; Klick auf die Startbox und auf "Build again". |
+| `js/main.js` | Verdrahtung: erzeugt `CursorSwarm` (max 40), `SiteBuilder`, `SourcePanel`; startet `AgentField`, sobald die Bots den Abschnitt `#swarm` gebaut haben (und beendet ihn bei "Build again"); Klick auf die Startbox und auf "Build again"; Test-Haken `window.siteBuilder` (`pause()`/`resume()`). |
 | `js/cursors.js` | Cursor-System (siehe 6.3). |
 | `js/build.js` | Bau-Engine (siehe 6.2). |
 | `js/agents.js` | Schwarm-Finale auf `<canvas>` (siehe 6.4). |
+| `js/source.js` | "Show source": Panel mit dem echten, live entstehenden DOM des zuletzt geänderten Abschnitts (MutationObserver, pretty-printed, die letzten 34 Zeilen). Dekorativ (`aria-hidden`), der Schalter ist ein echter Button. |
 | `cv.html`, `css/cv.css`, `js/cv.js` | CV als Seite, Deutsch und Englisch (siehe 6.6). |
 | `fonts/`, `images/projects/`, `images/icons/` | Selbst gehostete Schriften (Inter, Instrument Serif), Projektbilder (Webp, zusammen ca. 0,5 MB), Favicon. |
 | `vercel.json`, `.assetsignore`, `CNAME` | Deploy-Konfiguration. |
@@ -177,14 +178,21 @@ Kurz, deutsch, zuerst das Ergebnis. Bei jedem Abschluss: was ist neu, was wurde 
 | `archive/v1-2026-11/` | Eingefrorene alte Seite. |
 
 ### 6.2 Bau-Engine (`js/build.js`)
-**Idee:** Das Markup sagt, was gebaut wird. Drei Bots arbeiten in **parallelen Spuren** und warten nur aufeinander, wo es nötig ist.
-- **Markup-Attribute:** `data-section` (Abschnitt; `="hero"` für den Hero, `data-instant` = ohne Bots, `data-type-ms` = Tippbudget), `data-box` (Form, die der `layout-bot` aufzieht; `="fast"` = kleine Wiederholer ohne Größen-Tag), `data-type` (Text, den der `copy-bot` tippt; `data-tag` zeigt die Typografie, `data-speed` überschreibt das Tempo), `data-underline` (Unterstreichung), `data-outline` (gezeichneter Rahmen, mit oder ohne `data-box`).
-- **Klassen:** `Typable` (macht aus einem Element pro Zeichen ein `span`, unsichtbar bis getippt, behält das Markup, legt eine `sr-only`-Kopie an), `Shape` (Aufziehen per `scale` ab oben links, Auswahlrahmen mit Griffen, gezeichneter Rahmen aus 8 Teilen), `Section` (sammelt Formen, Texte, Dekorationen eines Abschnitts), `SiteBuilder` (steuert alles).
-- **Ablauf:** `run()` nach dem Klick auf die Startbox baut den Hero (`buildSection`), danach beobachtet ein Scroll-Listener (`pump()`, `wanted()`) die Abschnitte und baut jeden, der in den Bildschirm kommt, **in Reihenfolge**. Übersprungene Abschnitte erscheinen sofort. `animate()` startet die drei Spuren: **layout** (`dragOut` je Form), **copy** (`typeText` je Text, wartet auf die Form um ihn), **design** (`lightUp`, `drawUnderline`, `drawOutline`, nimmt, was zuerst bereit ist).
+**Idee:** Das Markup (der Bauplan) sagt, was gebaut wird. Drei Bots arbeiten in **parallelen Spuren** und warten nur aufeinander, wo es nötig ist. **Seit Schritt 9 erzeugen sie die Knoten wirklich:** vor dem ersten Klick enthält `#site` nur leere Abschnitts-Hüllen.
+- **Markup-Attribute** (nur im Bauplan, die gebaute Seite trägt sie nicht): `data-section` (Abschnitt; `="hero"` für den Hero, `data-instant` = ohne Bots, `data-type-ms` = Tippbudget), `data-box` (Element, das der `layout-bot` erzeugt und aufzieht; `="fast"` = kleine Wiederholer ohne Größen-Tag), `data-type` (Text, den der `copy-bot` schreibt; `data-tag` zeigt die Typografie, `data-speed` überschreibt das Tempo), `data-underline` (Unterstreichung), `data-outline` (gezeichneter Rahmen, mit oder ohne `data-box`). Elemente ohne eines dieser Attribute kommen mit ihrem Elternelement ("statisch": Bilder, Canvas, Buttons im Schwarm, Leerraum). Sichtbarer Text gehört immer in `data-type`.
+- **Klassen:**
+  - `Section`: ein Abschnitt des Bauplans und seine Hülle (`shell`). Hält die Zuordnung Bauplan-Knoten → lebender Knoten (`map`), die Maße (`sizes`) und die Reservierungen (`locks`). `make()`/`create()` erzeugen Elemente, `instantBuild()` den fertigen Abschnitt auf einmal, `release()` gibt die Reservierungen frei.
+  - `Typable`: ein `data-type`-Element des Bauplans und der Schreibfortschritt. Der `copy-bot` erzeugt das leere Element und hängt die Zeichen an **echte Textknoten**; Inline-Elemente (Links, Akzentwort) entstehen, wenn ihr erstes Zeichen getippt wird.
+  - `Shape` (ein `data-box`): `prepare()` legt es unsichtbar an seinen Platz, `begin()` erzeugt es sichtbar (Auswahlrahmen mit Griffen), `end()` setzt den statischen Inhalt ein (blendet ein) und entfernt den Rahmen. `Outline`: erzeugt beim Zeichnen die acht Rahmenteile. Die Unterstreichung ist ein Element, das der `design-bot` beim Zeichnen anhängt, der Hintergrund-Glow wird vom `design-bot` aus dem Bauplan erzeugt (`showGlow()`).
+  - `SiteBuilder`: steuert alles (`run`, `pump`, `animate`, `measure`, `complete`, `reset`).
+- **Ruhiger Bau (Entscheidung Micael):** Jedes Element wird mit seiner **Endgröße** erzeugt (`min-width`/`min-height`, gemessen an einer Wegwerf-Kopie des Bauplans in der echten Seitenbreite, `measure()`), und beim Erzeugen eines Elements entstehen seine **Geschwister als unsichtbare Platzhalter** (Klasse `is-stub`, leer, mit Endgröße). Dadurch springt nichts (Grid/Flex platzieren alles sofort richtig), und die Seitenhöhe steht von Anfang an fest (jede Hülle reserviert ihre Endhöhe). Ist ein Abschnitt fertig, werden alle Reservierungen entfernt (`release()`). Der Aufzieh-Effekt bleibt `scale` (nur `transform`).
+- **Ablauf:** `run()` nach dem Klick auf die Startbox misst und baut den Hero (`buildSection`), danach beobachtet ein Scroll-Listener (`pump()`, `wanted()`) die Abschnitte und baut jeden, der in den Bildschirm kommt, **in Reihenfolge**. Übersprungene Abschnitte erscheinen sofort (`instantBuild`). `animate()` startet die drei Spuren: **layout** (`dragOut` je Form: Platzhalter anlegen, hinlaufen, erzeugen, aufziehen, Inhalt einsetzen), **copy** (`typeText` je Text, wartet auf die Form um ihn), **design** (`lightUp`, `drawUnderline`, `drawOutline`, nimmt, was zuerst bereit ist).
 - **Scroll-fest:** Ziele werden mit `anchor(el)` relativ zur Seite gemessen. `Cursor.chase()` folgt ihnen und meldet die Ankunft.
-- **Tempo:** Konstanten `ARRIVE`, `TYPE_ARRIVE` (Bots müssen nicht zur Ruhe kommen), `DEFAULT_TYPE_MS`, `SCROLL_TYPE_SPEED`. Bauzeiten: Hero ca. 15 s, Über mich 3 s, Projekte 9 s, Werdegang 5 bis 8 s, Skills 6 s, Schwarm 6 s, Kontakt 9 s.
-- **Fehlerfall:** Wirft ein Abschnitt, zeigt `showSection()` ihn sofort fertig (nie eine halbe Seite). **Reduced Motion:** `buildStatic()` zeigt alles sofort, Bots stehen still.
-- **Ohne JS:** alles sichtbar. Mit JS ist die Seite vor dem ersten Klick `visibility: hidden` und das Scrollen gesperrt.
+- **Tempo:** Konstanten `ARRIVE`, `TYPE_ARRIVE` (Bots müssen nicht zur Ruhe kommen), `DEFAULT_TYPE_MS`, `SCROLL_TYPE_SPEED`. Bauzeiten (gemessen, Desktop): Hero ca. 15 s, Über mich 3 s, Projekte 12 s, Werdegang 4 s, Skills 5 s, Schwarm 6 s, Kontakt 10 s, zusammen ca. 57 s (vor Schritt 9: ca. 57 s).
+- **Screenreader:** Bis ein Abschnitt fertig ist, steht vor seiner Hülle eine vollständige, unsichtbare Kopie (`.sr-only[data-sr]`, ohne IDs, Links/Buttons mit `tabindex="-1"`), die halbfertige Hülle ist `aria-hidden`. `complete()` entfernt die Kopie und das `aria-hidden`.
+- **Fehlerfall:** Wirft ein Abschnitt, ersetzt `showSection()` ihn sofort durch den fertigen (nie eine halbe Seite, nur eine Konsolenmeldung); die Spuren brechen ab (`section.cancelled`). **Reduced Motion:** `buildStatic()` baut alles sofort, Bots stehen still.
+- **Ohne JS:** der Bauplan (`<noscript>`) ist die Seite. Mit JS ist sie vor dem ersten Klick `visibility: hidden` und das Scrollen gesperrt.
+- **Test-Haken:** `window.siteBuilder.pause()`/`resume()` halten die Bots an. Dann steht die Seite unfertig still (Kausalitätsbeweis: ohne Bots entsteht nichts).
 
 ### 6.3 Cursor-System (`js/cursors.js`)
 - `CursorSwarm`: gemeinsamer `requestAnimationFrame`-Loop (`start`, `tick`), `onFrame(fn)`-Hooks, `ripple`, Mauszeiger-Tracking (`pointer`, Touch wird ignoriert), `add({x, y, color, label, kind, burst, personality})`.
@@ -195,49 +203,40 @@ Kurz, deutsch, zuerst das Ergebnis. Bei jedem Abschluss: was ist neu, was wurde 
 ### 6.4 Schwarm (`js/agents.js`, `AgentField`)
 Abschnitt `#swarm`. 16 Agents wandern, "More agents" verdreifacht (16, 48, 144, 432, bis Obergrenze 720, Handy 360), auf dem Höchststand sammeln sie sich zu fünf Ebenen (= die fünf Skill-Karten), Zähler zeigt die echte Zahl. Canvas, aber aus dem gemeinsamen Loop; Sprite je Ebene, Linien in einem Pfad, Namen nur für 14 Agents; Frame-Budget mit `degrade()`; Standbild bei Reduced Motion; Ebenen-Liste als echte Buttons hebt eine Ebene hervor; der Zeiger scheucht Agents weg.
 
-### 6.5 Was heute Kulisse ist (Grund für Schritt 9)
-Der gesamte Inhalt steht vom ersten Byte an im DOM. Die Bots **schalten nur um**: `visibility` an Formen, `opacity` an fertigen Zeichen-Spans, `scale` an fertigen Elementen, `scale` an fertigen Linien. Kein Bot erzeugt, schreibt, bemisst oder gestaltet etwas wirklich. Echt ist nur die Choreografie (Position, Tempo, Reihenfolge, Warten aufeinander).
-
-### 6.6 CV (`cv.html`)
-Pro Sprache ein `<article class="cv" lang id>`. Sprachwechsel ohne JS über `:target`, mit JS zusätzlich nach Browsersprache (`js/cv.js`). Druckstil für A4, "Save as PDF" öffnet den Druckdialog, der Seitentitel wird zum Dateinamen. Neue Sprache: Artikel kopieren, übersetzen, Link in die Toolbar. Enthält keine privaten Daten (5.1).
+### 6.5 Was Kulisse war und jetzt echt ist (Schritt 9)
+Bis Schritt 8 stand der gesamte Inhalt vom ersten Byte an im DOM, die Bots schalteten nur um (`visibility`, `opacity`, `scale`). Seit Schritt 9 gilt: Kein Knoten der Seite existiert, bevor ein Bot ihn erzeugt (Hüllen und `is-stub`-Platzhalter ausgenommen, siehe 6.2). **Weiterhin Inszenierung:** die Bewegung (Position, Tempo, Reihenfolge), das Aufziehen per `scale` und die Inspector-Tags. **Vereinfachungen:** Die Platzhalter reservieren Platz, statt dass die Seite wirklich wächst (Entscheidung Micael). Statischer Inhalt in einer Box (Bilder, Canvas, Buttons) wird nach dem Aufziehen in einem Zug eingesetzt, nicht einzeln gebaut.
 
 ## 7. Roadmap
 
 | # | Schritt | Stand |
 |---|---|---|
 | 0 bis 8 | Archiv, Box und Cursor, Bots mit Jobs, Bauschritte, Cursor-Sprache, Landingpage, Scroll-Bau und CV, Projekte, Schwarm | **erledigt** (8) |
-| **9** | **Echter Bau: die Bots erzeugen das DOM wirklich** | **nächster Schritt** |
+| **9** | **Echter Bau: die Bots erzeugen das DOM wirklich** | **gebaut, wartet auf Review und PR** (siehe unten und 8.2) |
 | 10 | Aufträge an die Bots (das AI-Element) | geplant |
 | 11 | Bewerbungs-Essentials (Vorschau beim Teilen, Metadaten) | geplant |
 | 12 | Feinschliff und Messung | geplant |
 
 Die Reihenfolge darf sich ändern. Wird die Zeit knapp: **11 vor 10 ziehen** (die Vorschau beim Teilen ist für eine Bewerbung wichtiger als das AI-Element).
 
-### Schritt 9: Echter Bau
-**Warum:** Siehe 6.5. Der Bau soll ursächlich sein: Ohne die Bots gibt es die Seite nicht. In den DevTools sieht man Elemente entstehen.
+### Schritt 9: Echter Bau (gebaut, wartet auf Micaels "so lassen")
+**Warum:** Der Bau soll ursächlich sein: Ohne die Bots gibt es die Seite nicht. In den DevTools sieht man Elemente entstehen.
 
-**Soll-Zustand**
-1. **Bauplan statt fertiger Seite.** Der Inhalt liegt als Bauplan bereit, das lebendige `#site` beginnt leer (nur Gerüst). Format und Ablageort sind **eine Absprache** (siehe "Entscheidungen"): (a) vollständige Seite in `<noscript>` (Standard: ohne JS steht die ganze Seite da, mit JS wird sie vom Bauplan gelesen), (b) `<template>`, (c) JSON. Empfehlung (a), weil Ohne-JS-Fallback und Screenreader erhalten bleiben und es nur eine Quelle gibt.
-2. **Der `layout-bot` erzeugt Elemente wirklich:** `createElement`, Attribute, Einfügen an der richtigen Stelle. Beim Aufziehen setzt er die **echte Größe** (Breite/Höhe bis zum Zielmaß, das aus dem Bauplan gemessen wird), danach wird sie freigegeben.
-3. **Der `copy-bot` schreibt echte Textknoten** Zeichen für Zeichen (kein Umschalten fertiger Spans). Für Links, Akzentwörter und Listen schreibt er in die jeweils richtigen Kindelemente.
-4. **Der `design-bot` setzt echte Gestaltung:** Klassen/Stile (z. B. Akzentfarbe, Rahmen), erzeugt Unterstreichung und Rahmen-Elemente zum Zeitpunkt des Zeichnens, schaltet den Glow über ein echtes Element.
-5. **Kausalität prüfbar:** Pausiert man die Bots (Test-Haken), steht die Seite unfertig still. Nach dem Bau entspricht das DOM (normalisiert) dem Bauplan.
-6. **Barrierefreiheit:** Eine vollständige Volltextkopie für Screenreader steht vom Start an im DOM (`sr-only`, `aria-live` bei Fortschritt), die gebauten Elemente sind danach ganz normale Elemente (Semantik, Tastatur).
-7. **Layout:** Die Seite wächst beim Bauen wirklich. Damit Scrollposition und Anker nicht springen, reserviert jeder Abschnitt seine Endhöhe (`min-height` aus der Messung) bis er fertig ist. Bots messen **live** (`getBoundingClientRect` je Frame auf echten Elementen) statt einmal.
+**Entschieden (Micael, 2026-11-06):** Bauplan in `<noscript>`; kleiner Schalter "Show source" mit dem live entstehenden DOM; ruhiger Bau mit reserviertem Platz; bei einem Fehler die fertige Seite sofort, still.
 
-**Offene Design-Absprachen in diesem Schritt**
-- Soll der echte Bau **sichtbar** werden, z. B. ein Schalter "Quelltext zeigen" (ein schmales Panel, in dem das HTML erscheint, während die Bots schreiben)? Das wäre ein starkes Signal für die Zielgruppe. Empfehlung: ja, aber klein und optional.
-- Tempo und Gefühl des echten Schreibens (Reflow beim Tippen ist sichtbar, anders als jetzt).
-- Was bei Abbruch/Fehler zu sehen sein soll.
+**Umgesetzt:** siehe 6.2. Bauplan statt fertiger Seite (`index.html`), `layout-bot` erzeugt Elemente und zieht sie auf, `copy-bot` schreibt echte Textknoten, `design-bot` erzeugt Glow, Unterstreichungen und Rahmenteile. Platzhalter und Endgrößen halten das Layout ruhig. Screenreader-Kopie je Abschnitt, Quelltext-Panel (`js/source.js`), Pause-Haken.
 
-**Aufteilung (max 3 bis 4 Agents, 3.5):** B zuerst (Bauplan-Format, `noscript`, Datenschutz-Check), dann A (Engine) und C (Optik, `apple-design`-Review) parallel, D (QA) läuft am Ende und bei Zwischenständen.
+**Gemessen (Headless-Chromium, Desktop 1440 × 900 und Handy 390 × 844):**
+- Vor dem Klick enthält `#site` nur leere Hüllen und je eine unsichtbare Textkopie (kein sichtbarer Inhalt).
+- Nach dem Bau entspricht das normalisierte DOM jedes Abschnitts dem Bauplan (Bot-Attribute, Unterstreichung, Rahmenteile ignoriert). Einzige Abweichung: `width`/`height` am Schwarm-Canvas, die `AgentField` zur Laufzeit setzt. Gilt auch für Reduced Motion, Sprung ans Ende, "Build again" und Handy.
+- Kein Layout-Springen: 26 beobachtete Elemente mit `id`, keines wich seit der ersten Sichtung um mehr als 2 px ab (Messung alle 40 ms); die Seitenhöhe bleibt über den ganzen Bau bei einem Wert (8008 px).
+- Pause-Test: Mit angehaltenen Bots bleibt das DOM identisch (Test auf zwei Momentaufnahmen im Abstand von 2,5 s), die Seite ist unfertig (Platzhalter vorhanden).
+- Fehler-Test (ein Bot wirft mitten im Abschnitt): der Abschnitt steht danach fertig und gleich dem Bauplan da, nur die Konsole zeigt den Fehler.
+- Bauzeiten wie vorher (Hero 14,9 s, zusammen ca. 57 s). Keine Konsolenfehler, keine fehlgeschlagenen Requests auf der Startseite und `cv.html`. Ohne JS sieht die Seite aus wie vorher (jetzt mit Unterstreichung).
+- `dienstplan.html`, `datenschutz.html`, `nutzungsbedingungen.html` sind unverändert. Ihre CDN-Anfragen (cdnjs) scheitern in der Sandbox, das hat nichts mit diesem Schritt zu tun.
 
-**Akzeptanzkriterien**
-- Vor dem Start enthält `#site` keine Inhaltsknoten (Test). Nach dem Bau stimmt das normalisierte DOM mit dem Bauplan überein (Test).
-- Der Pause-Test belegt die Kausalität. Ohne JS ist die Seite vollständig lesbar (Screenshot-Vergleich). Screenreader-Text vollständig (Test auf `sr-only` und Rollen).
-- Bauzeiten höchstens wie heute (Hero ca. 15 s), kein Layout-Springen beim Scrollen (Test: Scrollposition eines Ankers bleibt auf 2 px stabil), keine Konsolenfehler, Reduced Motion und Mobil wie bisher.
-- Schwarm, CV und Dienstplan unverändert funktionsfähig.
-- **Risiken:** Reflow-Kosten (Messungen pro Frame begrenzen), Sprünge im Layout, doppelte Quelle für Inhalt, Suchmaschinen/Vorschau-Bots, die kein JS ausführen (die OG-Tags in Schritt 11 liegen im statischen `<head>`).
+**Nicht geprüft:** Safari und Firefox, echte Geräte, Screenreader (die Struktur ist vorhanden: Kopie je Abschnitt, `aria-hidden` auf der Hülle), Lighthouse. `code-review` und `simplify` laufen vor dem PR.
+
+**Bewusst offen:** Das Quelltext-Panel zeigt die letzten 34 Zeilen des zuletzt geänderten Abschnitts (Aussehen und Länge sind ein Vorschlag, siehe 9.7).
 
 ### Schritt 10: Aufträge an die Bots (AI-Element)
 **Idee:** Die Cursors nehmen **echte Aufträge** an und verändern die Seite wirklich (das ist erst nach Schritt 9 glaubwürdig). Besucher:innen sehen z. B. Chips und ein Eingabefeld: "Make it German", "Light theme", "Show only projects", "Skip the animation", "Explain this section".
@@ -272,6 +271,7 @@ Die Reihenfolge darf sich ändern. Wird die Zeit knapp: **11 vor 10 ziehen** (di
 - **5 und 6** Landingpage und Scroll-Bau, Über mich, Werdegang, Skills, Kontakt, CV als Seite, [PR #21](https://github.com/lazyboxDude/portfolio/pull/21).
 - **7** Projekte als Mockups (Dienstplan, Aphonia, Galerie, diese Seite, Dolphin Rush) und Weiterleitung der alten CV-Dateien, [PR #22](https://github.com/lazyboxDude/portfolio/pull/22).
 - **8** Schwarm-Finale, [PR #23](https://github.com/lazyboxDude/portfolio/pull/23).
+- **9** Echter Bau (gebaut, noch kein PR).
 
 ### 8.2 Entscheidungsprotokoll
 | Datum | Entscheidung | Von |
@@ -284,6 +284,10 @@ Die Reihenfolge darf sich ändern. Wird die Zeit knapp: **11 vor 10 ziehen** (di
 | 2026-11 | Deploy über Vercel, Domain GoDaddy, DNS/Proxy Cloudflare | Micael |
 | 2026-11 | Schwarm-Struktur: Pyramide aus fünf Ebenen (ungeprüft, siehe offene Fragen) | Agent |
 | 2026-11-06 | Cursors sollen die Seite **wirklich** bauen (Schritt 9), Plan ausführlicher, mehr Design-Absprachen, Skills und bis zu 3 bis 4 Agents | Micael |
+| 2026-11-06 | Bauplan liegt in `<noscript>` (eine Quelle, ohne JS ist die Seite da) | Micael |
+| 2026-11-06 | "Show source": kleiner Schalter, Panel standardmäßig zu | Micael |
+| 2026-11-06 | Ruhiger Bau: Platz wird reserviert, nichts springt (statt sichtbar wachsender Seite) | Micael |
+| 2026-11-06 | Bei Fehler oder Abbruch die fertige Seite sofort, still (nur Konsolenmeldung) | Micael |
 
 ## 9. Offene Fragen an Micael
 1. **Lebenslauf-Details:** Bei zwei Stationen weichen Lebenslauf und Zeugnis ab (ein Zeitraum, eine Berufsbezeichnung). Die Seite zeigt vorläufig die belegte Variante. Details im Chat besprechen, nicht hier.
@@ -292,7 +296,7 @@ Die Reihenfolge darf sich ändern. Wird die Zeit knapp: **11 vor 10 ziehen** (di
 4. **Aphonia:** Gibt es ein Titelbild oder Screenshots, die öffentlich sein dürfen? Sonst bleibt das Typografie-Poster. Dolphin Rush hat keinen Link, weil unklar ist, ob das Spiel noch spielbar ist.
 5. **Schwarm-Struktur:** Pyramide aus fünf Ebenen gebaut. Passt das, oder etwas Eigenes? (Nur `layout()` und `target()` in `js/agents.js`.)
 6. **AI-Element (Schritt 10):** Echtes Modell im Hintergrund (Kosten, serverseitiger Aufruf) oder Regelwerk? Welche Aufträge?
-7. **Quelltext zeigen (Schritt 9):** Soll der echte Bau sichtbar werden (Panel mit dem entstehenden HTML)?
+7. **Quelltext-Panel (Schritt 9):** Ja, ist gebaut. Bitte Aussehen, Länge (34 Zeilen) und Platz (unten links) ansehen und sagen, ob es so bleibt.
 8. **Weitere CV-Sprachen** (z. B. Portugiesisch, Französisch)?
 9. **Cloudflare:** "Browser Cache TTL" auf "Respect Existing Headers" stellen und nach Deploys "Purge Everything" (siehe 5.2).
 10. **Indexierung:** Soll die Seite von Suchmaschinen gefunden werden (Schritt 11)?
@@ -307,6 +311,7 @@ Die Reihenfolge darf sich ändern. Wird die Zeit knapp: **11 vor 10 ziehen** (di
 ### 10.2 Lokal testen
 - Server im Repo-Root: `python3 -m http.server 8765`. Browser-Tests mit Playwright (in der Umgebung vorinstalliert, `require('playwright')`, kein Installieren).
 - `#box` schwebt dauerhaft: in Tests mit `{ force: true }` klicken. Auf Zustände warten (alle `.ch` eines Abschnitts mit Klasse `on` und alle `[data-box]` mit `is-shown`, `#next` mit `is-ready`, `#status`), keine festen Pausen. Abschnitte bauen sich erst beim Hinscrollen: mit `window.scrollTo({ top, behavior: 'instant' })` springen (das normale Scrollen ist weich). Bei Zeitmessungen keine Screenshots mitlaufen lassen.
+- **Bau anhalten:** `window.siteBuilder.pause()` / `resume()` (Kausalitäts-Test). Die Abschnitte stehen als Hüllen in `#site`, der fertige Abschnitt hat kein `aria-hidden` mehr; darauf kann ein Test warten.
 - **Testmatrix für jeden PR:** Desktop 1440, Handy 390 (ohne Überlauf), **ohne JS**, **Reduced Motion**, Sprung ans Seitenende, "Build again", CV-Seite (Deutsch/Englisch, mit und ohne JS), Konsolenfehler und fehlgeschlagene Requests (müssen leer sein), die drei geschützten Seiten laden.
 - Die Skripte der bisherigen Läufe liegen in der Übergabe-Zip unter `qa/`.
 

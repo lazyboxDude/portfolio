@@ -82,7 +82,7 @@ a { color: inherit; }
 .glow {
     position: fixed;
     inset: 0;
-    z-index: 0;
+    z-index: -1; /* inside #site (its own stacking context): behind the page content */
     overflow: hidden;
     pointer-events: none;
     opacity: 0;
@@ -292,6 +292,18 @@ h1 {
 }
 
 .js .underline { scale: 0 1; }
+
+/* Without JS there is no design-bot: the underline is simply there. */
+html:not(.js) [data-underline]::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.02em;
+    height: max(2px, 0.035em);
+    border-radius: 2px;
+    background: var(--accent);
+}
 
 .lede {
     max-width: 620px;
@@ -852,15 +864,18 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
 .footer-links a { color: var(--accent-soft); text-decoration: none; }
 .footer-links a:hover { color: #fff; text-decoration: underline; }
 
-/* ---- Built live: shapes and characters ----------------------------------- */
+/* ---- Built live (js/build.js) --------------------------------------------- */
 
-/* Shapes the layout-bot drags out: the bot holds the bottom-right corner, so scale grows from the top-left. */
-[data-box] { transform-origin: 0 0; }
-.js [data-box]:not(.is-shown) { visibility: hidden; }
+/* A stub holds the place (and the reserved size) of an element a bot has not made visible yet. */
+.is-stub { visibility: hidden; }
 
-/* Typed text: one span per character, revealed by the copy-bot (layout never shifts). */
-.ch { opacity: 0; }
-.ch.on { opacity: 1; }
+/* Content that comes along with a box fades in when the layout-bot has finished dragging it. */
+.bp-in { animation: bp-in 0.4s ease both; }
+
+@keyframes bp-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
 
 /* Selection frame with handles: shown while the layout-bot drags a shape out. */
 .sel-frame {
@@ -1034,6 +1049,124 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
     .tilt, .tile img, .layer-btn { transition: none; }
     .box { animation: none; transition: none; }
     .next, .btn, .glow, .sel-frame, .inspector-tag { transition: none; }
+    .bp-in { animation: none; }
+    .source, .source-toggle { transition: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
+}
+
+/* ---- "Show source": the live DOM while the bots write it (js/source.js) ---- */
+
+.source-toggle {
+    position: fixed;
+    z-index: 6;
+    left: 16px;
+    bottom: 16px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px 9px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(16, 20, 34, 0.62);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    color: var(--muted);
+    font: 500 13px/1 var(--font-sans);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, scale 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Only offered once the page is being built (and only with JS). */
+.js.is-live .source-toggle { display: inline-flex; }
+.source-toggle:hover { color: var(--fg); border-color: rgba(255, 255, 255, 0.28); }
+.source-toggle:active { scale: 0.96; transition-duration: 0.08s; }
+.source-toggle[aria-expanded="true"] { color: var(--accent-soft); border-color: rgba(108, 140, 255, 0.5); }
+.source-toggle-icon { font: 600 12px/1 var(--font-mono); color: var(--accent-soft); }
+
+.source {
+    position: fixed;
+    z-index: 6;
+    left: 16px;
+    bottom: 62px;
+    width: min(440px, calc(100vw - 32px));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top-color: rgba(255, 255, 255, 0.24); /* light catching the top edge of the material */
+    border-radius: 18px;
+    background: rgba(9, 12, 22, 0.72);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    /* The panel grows out of its toggle (bottom left) and goes back the same way. */
+    transform-origin: 0 100%;
+    opacity: 0;
+    scale: 0.94;
+    translate: 0 8px;
+    transition: opacity 0.22s ease, scale 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), translate 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+}
+
+.source.is-open { opacity: 1; scale: 1; translate: 0 0; pointer-events: auto; }
+
+.source-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font: 500 12px/1 var(--font-mono);
+    color: var(--muted);
+}
+
+.source-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6fe3a5;
+    box-shadow: 0 0 10px #6fe3a5;
+}
+
+.source-title { color: var(--fg); }
+.source-count { margin-left: auto; }
+.source-close { border: 0; background: none; color: var(--muted); font: 400 18px/1 var(--font-sans); cursor: pointer; padding: 0 2px; }
+.source-close:hover { color: var(--fg); }
+
+.source-body {
+    margin: 0;
+    padding: 12px 14px 14px;
+    height: 296px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font: 400 11.5px/1.55 var(--font-mono);
+    color: #c9d3f2;
+    white-space: pre;
+    tab-size: 2;
+}
+
+.source-body code { display: block; font: inherit; }
+.s-ln { display: block; overflow: hidden; text-overflow: ellipsis; }
+.s-tg { color: #8fa6ff; }
+.s-at { color: #ffc766; }
+.s-av { color: #6fe3a5; }
+.s-tx { color: #f2f5ff; }
+.s-caret { display: inline-block; width: 7px; height: 13px; margin-top: 2px; background: var(--accent); animation: s-blink 1s steps(2, start) infinite; }
+
+@keyframes s-blink { to { visibility: hidden; } }
+
+@media (max-width: 640px) {
+    .source { bottom: 58px; }
+    .source-body { height: 40svh; }
+    .source-toggle { left: 12px; bottom: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .s-caret { animation: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .source, .source-toggle { -webkit-backdrop-filter: none; backdrop-filter: none; background: #0b0f1c; }
 }

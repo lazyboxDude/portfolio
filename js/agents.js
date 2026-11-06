@@ -90,21 +90,30 @@ export class AgentField {
 
         this.spawn(START, false);
         this.unsubscribe = swarm.onFrame((dt, now) => this.frame(dt, now));
-        new IntersectionObserver(([entry]) => {
+        this.visibility = new IntersectionObserver(([entry]) => {
             this.visible = entry.isIntersecting;
             if (this.visible) swarm.start(); // make sure the shared loop is running
-        }, { threshold: 0.05 }).observe(stage);
+        }, { threshold: 0.05 });
+        this.visibility.observe(stage);
         this.say();
+    }
+
+    /** The section is torn down (the page is built again): stop drawing and let go of the elements. */
+    destroy() {
+        this.unsubscribe?.();
+        this.visibility?.disconnect();
+        this.resize?.disconnect();
     }
 
     // ---- Setup ------------------------------------------------------------
 
     bind() {
-        new ResizeObserver(() => {
+        this.resize = new ResizeObserver(() => {
             this.measure();
             this.layout();
             if (this.reduced) { this.snapToTargets(); this.draw(0); }
-        }).observe(this.canvas);
+        });
+        this.resize.observe(this.canvas);
 
         this.more.addEventListener('click', () => this.grow());
         this.stack.addEventListener('click', () => this.setStacked(!this.stacked));

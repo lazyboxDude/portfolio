@@ -14,25 +14,27 @@
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <!-- Background glow: the design-bot switches it on (js/build.js). -->
-    <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
-
     <!-- Start box: vanishes after the first click and never comes back. -->
     <button id="box" class="box" type="button">
         <span class="box-label">Build Website</span>
     </button>
 
-    <!-- The page itself. With JS it is built live by the bot cursors (js/build.js), one data-section at a
-         time: the hero after the first click, every other section when it scrolls into view.
-         data-box    = a shape the layout-bot drags out (hidden until then; "fast" = quicker, no size tag)
-         data-type   = text the copy-bot types, character by character
+    <!-- The page itself, as a BLUEPRINT. Everything inside <noscript> is the complete page:
+         - Without JS the browser simply renders it (and so do crawlers and link previews).
+         - With JS the engine (js/build.js) reads it, and #site starts out as empty section shells.
+           The three bot cursors then CREATE the elements from the blueprint, live: nothing of the
+           page exists in the DOM before a bot makes it.
+         Markup conventions (they only mean something to the bots, they are not copied to the page):
+         data-section = a part of the page, built when it scrolls into view ("hero" = after the first click;
+                        data-instant = no bots; data-type-ms = how long typing the whole section may take)
+         data-box     = an element the layout-bot creates and drags out ("fast" = quicker, no size tag)
+         data-type    = text the copy-bot writes into the element, character by character
+                        (data-tag = shows the real typography while typing, data-speed = typing speed)
          data-underline / data-outline = something the design-bot draws (data-outline works with or without data-box)
-         data-tag    = the copy-bot shows the real typography while typing it
-         data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
-         data-instant = the section simply appears when it scrolls into view, no bots
-         Without JS everything is simply visible. Screen readers get all text at once. -->
+         Elements without any of these come along with their parent. Write all visible text with data-type. -->
     <div id="site" class="site" tabindex="-1">
-
+        <noscript id="blueprint">
+        <div class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
         <div class="s-hero" data-section="hero" data-type-ms="4200">
             <header>
                 <nav id="nav" class="nav" data-box aria-label="Main">
@@ -357,6 +359,7 @@
                 </ul>
             </div>
         </footer>
+        </noscript>
     </div>
 
     <!-- Builds everything again once the whole page is built; label is set by js/build.js -->
@@ -364,6 +367,20 @@
 
     <!-- Announces build progress to screen readers -->
     <p id="status" class="sr-only" role="status"></p>
+
+    <!-- "Show source": the page's real DOM, live, while the bots write it (js/source.js). Only with JS. -->
+    <button id="source-toggle" class="source-toggle" type="button" aria-expanded="false" aria-controls="source">
+        <span class="source-toggle-icon" aria-hidden="true">&lt;/&gt;</span><span>Show source</span>
+    </button>
+    <aside id="source" class="source" aria-hidden="true" hidden>
+        <div class="source-head">
+            <span class="source-dot"></span>
+            <span class="source-title">#hero</span>
+            <span class="source-count"></span>
+            <button class="source-close" type="button" tabindex="-1" aria-label="Close source">×</button>
+        </div>
+        <pre class="source-body"><code></code></pre>
+    </aside>
 
     <!-- Fake cursors are spawned into this layer by js/cursors.js -->
     <div id="cursor-layer" class="cursor-layer" aria-hidden="true"></div>

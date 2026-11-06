@@ -16,7 +16,7 @@ Pro PR genau ein Roadmap-Schritt, danach `PLAN.md` (Erledigt, Entscheidungen, of
 Statisches HTML, CSS und Vanilla-JS (ES-Module), kein Build-Schritt, kein Framework. Deploy über Vercel (statisch, Konfiguration in `vercel.json`). Domain bei GoDaddy, DNS und Proxy über Cloudflare.
 
 ## Struktur
-- `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/agents.js`: die interaktive Startseite (Bau-Engine, Cursor-System, Schwarm).
+- `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/agents.js`, `js/source.js`: die interaktive Startseite (Bau-Engine, Cursor-System, Schwarm, Quelltext-Panel). **Der Inhalt der Seite steht als Bauplan in `<noscript id="blueprint">` in `index.html`**, die Bots erzeugen daraus das DOM. Neue Inhalte gehören dorthin, mit `data-box`/`data-type` (siehe Kommentar in `index.html` und `PLAN.md` 6.2).
 - `dienstplan.html`: eigenständige Web-App im Betrieb, nicht kaputtmachen.
 - `datenschutz.html`, `nutzungsbedingungen.html`: Rechtsseiten für die Google-Kalender-Integration des Dienstplans. Nutzen `css/hub.css` und `js/socials.js`.
 - `archive/v1-2026-11/`: eingefrorene alte Website, nicht ändern.
