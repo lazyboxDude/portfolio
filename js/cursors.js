@@ -5,11 +5,41 @@
 // modes:
 //   hold   - chase a fixed point (moveTo) and stay there
 //   follow - chase a point that is recomputed every frame (follow)
-//   wander - roam around the viewport at random
-// Jobs (see intro.js) are written as async functions that await moveTo()/click().
+//   wander - roam around the viewport at random (see reactions.js for how idle bots react)
+// Jobs (see build.js) are written as async functions that await moveTo()/click().
+//
+// Visual language (the "cursor language" of the site):
+//   - every bot has a job colour and a name pill ("layout-bot")
+//   - the pointer shape tells the job: arrow (layout), I-beam (copy), pencil (design)
+//   - while working, a bot can show an inspector tag with the real numbers it is touching
 
-const HOT_X = 2;   // arrow tip inside the 22px SVG, so x/y mean "where it points"
-const HOT_Y = 1.5;
+const KINDS = {
+    arrow: {
+        hot: [2, 1.5], // where the shape "points", so x/y mean the click position
+        svg: `
+<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+  <path d="M2 1.5 L2 17 L6.2 13.2 L9 19.6 L11.8 18.4 L9 12.2 L14.8 12.2 Z"
+        fill="var(--cursor-color)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>`,
+    },
+    text: {
+        hot: [11, 11],
+        svg: `
+<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round">
+  <path d="M7.5 3.5 H14.5 M11 3.5 V18.5 M7.5 18.5 H14.5" stroke="#fff" stroke-width="4.2"/>
+  <path d="M7.5 3.5 H14.5 M11 3.5 V18.5 M7.5 18.5 H14.5" stroke="var(--cursor-color)" stroke-width="2"/>
+</svg>`,
+    },
+    pen: {
+        hot: [3, 19.5],
+        svg: `
+<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3 19.5 L4.2 14.6 L15 3.8 Q16.2 2.6 17.6 3.8 L18.2 4.4 Q19.4 5.8 18.2 7 L7.4 17.8 Z"
+        fill="var(--cursor-color)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M4.2 14.6 L7.4 17.8" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>
+</svg>`,
+    },
+};
 
 const SPRING = 11;                          // pull towards the target
 const DAMPING = 4.2;                        // slightly under-damped -> small overshoot
@@ -18,21 +48,38 @@ const MAX_DT = 0.05;                        // clamp so a background tab doesn't
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const rand = (min, max) => min + Math.random() * (max - min);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const prefersReducedMotion = () => REDUCED_MOTION.matches;
 export { DRAG_DAMPING };
 
-const ARROW_SVG = `
-<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
-  <path d="M2 1.5 L2 17 L6.2 13.2 L9 19.6 L11.8 18.4 L9 12.2 L14.8 12.2 Z"
-        fill="var(--cursor-color)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
-</svg>`;
+/** A small mono label that shows real numbers ("640 x 92", "500 · 22px / 1.55"). Moves with transform only. */
+class InspectorTag {
+    constructor(layer, color) {
+        this.el = document.createElement('div');
+        this.el.className = 'inspector-tag';
+        this.el.style.setProperty('--cursor-color', color);
+        layer.appendChild(this.el);
+        this.text = '';
+    }
+
+    show(text, x, y) {
+        if (text !== this.text) {
+            this.text = text;
+            this.el.textContent = text;
+        }
+        this.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        this.el.classList.add('is-visible');
+    }
+
+    hide() { this.el.classList.remove('is-visible'); }
+}
 
 class Cursor {
-    constructor(swarm, { x, y, hue, label, burst }) {
+    constructor(swarm, { x, y, color, label, burst, kind }) {
         this.swarm = swarm;
-        this.color = `hsl(${hue} 85% 62%)`;
+        this.color = color;
         this.x = x; this.y = y;
         this.tx = x; this.ty = y;
         this.vx = 0; this.vy = 0;
@@ -41,20 +88,23 @@ class Cursor {
         this.follower = null;
         this.retarget = 0;
         this.arrival = null;
+        this.tag = null;
 
         const el = document.createElement('div');
         el.className = 'fake-cursor is-new';
-        el.style.setProperty('--cursor-color', this.color);
-        el.innerHTML = `<div class="fake-cursor-body">${ARROW_SVG}</div>`;
+        el.style.setProperty('--cursor-color', color);
+        el.innerHTML = '<div class="fake-cursor-body"></div>';
         if (label) {
-            const tag = document.createElement('span');
-            tag.className = 'fake-cursor-tag';
-            tag.textContent = label;
-            el.appendChild(tag);
+            const name = document.createElement('span');
+            name.className = 'fake-cursor-tag';
+            name.textContent = label;
+            el.appendChild(name);
         }
         el.addEventListener('animationend', () => el.classList.remove('is-new'), { once: true });
         swarm.layer.appendChild(el);
         this.el = el;
+        this.body = el.firstElementChild;
+        this.setKind(kind);
 
         if (burst && !REDUCED_MOTION.matches) {
             const angle = rand(0, Math.PI * 2);
@@ -64,6 +114,18 @@ class Cursor {
         }
         this.render();
     }
+
+    /** Swap the pointer shape: 'arrow', 'text' (I-beam) or 'pen'. */
+    setKind(kind = 'arrow') {
+        const shape = KINDS[kind] ?? KINDS.arrow;
+        this.kind = kind;
+        this.hot = shape.hot;
+        this.body.innerHTML = shape.svg;
+        this.el.style.setProperty('--hx', `${shape.hot[0]}px`);
+        this.el.style.setProperty('--hy', `${shape.hot[1]}px`);
+    }
+
+    get idle() { return this.mode === 'wander'; }
 
     /** Glide to (x, y). Resolves once the cursor is within `tolerance` px and slower than `settleSpeed` px/s. */
     moveTo(x, y, { tolerance = 4, settleSpeed = 40, damping = DAMPING, timeout = 5000 } = {}) {
@@ -99,6 +161,16 @@ class Cursor {
         this.swarm.start();
     }
 
+    /** While wandering: head for (x, y) now and only pick a new random target after `seconds`. */
+    detour(x, y, seconds) {
+        if (this.mode !== 'wander') return false;
+        const pad = 24;
+        this.tx = clamp(x, pad, Math.max(pad, window.innerWidth - pad));
+        this.ty = clamp(y, pad, Math.max(pad, window.innerHeight - pad));
+        this.retarget = seconds;
+        return true;
+    }
+
     /** Jump to (x, y) without animation. */
     place(x, y) {
         this.settle();
@@ -120,6 +192,15 @@ class Cursor {
         this.swarm.ripple(this.x, this.y, this.color);
         await sleep(120);
     }
+
+    /** Show an inspector tag in the bot's colour at (x, y). Call again to move or change it. */
+    inspect(text, x, y) {
+        if (REDUCED_MOTION.matches) return;
+        this.tag ??= new InspectorTag(this.swarm.layer, this.color);
+        this.tag.show(text, x, y);
+    }
+
+    hideTag() { this.tag?.hide(); }
 
     pickTarget() {
         const pad = 24;
@@ -162,7 +243,7 @@ class Cursor {
 
     render() {
         this.el.style.transform =
-            `translate3d(${(this.x - HOT_X).toFixed(1)}px, ${(this.y - HOT_Y).toFixed(1)}px, 0)`;
+            `translate3d(${(this.x - this.hot[0]).toFixed(1)}px, ${(this.y - this.hot[1]).toFixed(1)}px, 0)`;
     }
 }
 
@@ -184,9 +265,9 @@ export class CursorSwarm {
     get count() { return this.cursors.length; }
 
     /** Add a cursor at (x, y). `burst` flings it outwards. Returns null when full. */
-    add({ x, y, hue = 220, label = '', burst = false }) {
+    add({ x, y, color = '#6c8cff', label = '', kind = 'arrow', burst = false }) {
         if (this.cursors.length >= this.max) return null;
-        const cursor = new Cursor(this, { x, y, hue, label, burst });
+        const cursor = new Cursor(this, { x, y, color, label, kind, burst });
         this.cursors.push(cursor);
         return cursor;
     }

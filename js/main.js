@@ -1,8 +1,10 @@
 import { CursorSwarm } from './cursors.js';
 import { SiteBuilder } from './build.js';
+import { enableReactions } from './reactions.js';
 
 const box = document.getElementById('box');
 const swarm = new CursorSwarm(document.getElementById('cursor-layer'), { max: 40 });
+enableReactions(swarm); // idle bots dodge, follow and greet
 
 const builder = new SiteBuilder({
     swarm,
