@@ -89,9 +89,9 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 |---|---------|----------|
 | 0 | Archiv + leerer Root | erledigt, [PR #13](https://github.com/lazyboxDude/portfolio/pull/13) |
 | 1 | Box + Cursor-Schwarm | erledigt, [PR #14](https://github.com/lazyboxDude/portfolio/pull/14): Box spawnt mehrere Mauszeiger, die herumwandern. |
-| 2 | Bots mit Jobs: Intro baut sich selbst | erledigt: Cursors mit Job und Namensschild bauen die erste Karte. |
-| 3 | Folge von Bauschritten | erledigt (Teil 1, [PR #17](https://github.com/lazyboxDude/portfolio/pull/17)): ein Klick pro Abschnitt, zweite Karte mit Name und Handle. Der offene Teil 2 geht in Schritt 4 und 5 auf. |
-| 4 | **Cursor-Sprache** (Orbit/Linea) | gebaut (siehe Status): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Rahmen, Reaktionen auf Mauszeiger und aufeinander. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
+| 2 | Bots mit Jobs: Intro baut sich selbst | erledigt, [PR #15](https://github.com/lazyboxDude/portfolio/pull/15) und [PR #16](https://github.com/lazyboxDude/portfolio/pull/16): Cursors mit Job und Namensschild bauen die erste Karte. |
+| 3 | Folge von Bauschritten | erledigt: Teil 1 ([PR #17](https://github.com/lazyboxDude/portfolio/pull/17)): ein Klick pro Abschnitt, zweite Karte mit Name und Handle. Teil 2 ([PR #19](https://github.com/lazyboxDude/portfolio/pull/19)): Startbox verschwindet nach dem ersten Klick, Pill für die Folgeschritte, Bots mit Persönlichkeit (reagieren im Leerlauf auf den echten Mauszeiger und aufeinander, klicken ins Leere). |
+| 4 | **Cursor-Sprache** (Orbit/Linea) | gebaut (siehe Status): Job-Farben, drei Pointer-Formen (Pfeil, I-Beam, Stift), Auswahlrahmen mit Griffen, Inspector-Labels mit echten Werten, `design-bot` zeichnet den Akzentrahmen. Die Persönlichkeit im Leerlauf kommt aus Schritt 3 (Teil 2) und gilt auch für den neuen Bot. Die weiteren Bots aus dem Mockup (`a11y-bot`, `motion-bot`) kommen mit den Inhalten in Schritt 6 und 7. |
 | 5 | **Landingpage-Gerüst: Hero + Nav** (Linea) | Die Seite startet leer und baut sich zur echten Landingpage auf: Nav-Pill (getippt), Hero-Headline mit Serifen-Kursiv-Akzent, zwei Buttons (CV, Kontakt), Hintergrund-Glow. Der Box-Klick wird zum "Start"-Moment, danach geht es scroll-getrieben weiter. Look wird hier festgelegt (siehe offene Frage 3). |
 | 6 | **Scroll-getriebenes Bauen + CV-Abschnitte** | Jeder Abschnitt baut sich beim Erreichen live (IntersectionObserver, Bots wandern mit): Über mich, Werdegang/Timeline, Skills als Bento-Grid, Kontakt/CTA, Footer. Inhalte aus echten CV-Daten (Micael liefert sie, siehe offene Frage 4). Ohne-JS-Fallback von Anfang an (`<noscript>`-Muster aus Schritt 3). |
 | 7 | **Projekte als Mockups** | Projekte (Dienstplan-App, ausgewählte Arbeiten aus dem Archiv) als Browser-/Phone-Mockups, die die Bots zusammensetzen (gekippt, mit Tiefe wie bei Orbit), mit Link zur Live-App oder zum Case. |
@@ -108,35 +108,43 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 
 - **Schritt 1 erledigt** (gemerged): Box + Cursor-Schwarm.
 - **Schritt 2 erledigt** (gemerged): Bots mit Jobs. Jeder Cursor hat einen Job und ein Namensschild (`layout-bot`, `copy-bot`).
-- **Schritt 3 erledigt** (gemerged, Teil 1): Folge von Bauschritten.
-  - Jeder Klick auf die Box baut den nächsten Abschnitt: das `layout-bot` zieht die Karte auf
-    (Skalierung ab der oberen linken Ecke folgt dem Cursor, mit Ripple beim "Mausdruck"), das `copy-bot` tippt den Satz und folgt dem Textcursor.
-  - Aktuelle Folge: 1. "Hi, welcome to my personal website" (Button: "Build Website"),
-    2. "I'm Micael Gomes Fernandes, or online ._lazybox_." (Button davor: "Who are you?"). Danach heißt der Button "Build again" und baut von vorn.
-  - Weitere Abschnitte sind weitere `<section class="card">` in `#cards` (`index.html`). Der Button-Text davor steht in `data-prompt`.
-    Die Karten wachsen nach unten, bereits gebaute Karten wandern nie.
-  - Code: `js/cursors.js` (`CursorSwarm` mit gemeinsamem rAF-Loop, `Cursor` mit `moveTo`/`follow`/`wander`/`click`),
-    `js/build.js` (`SiteBuilder` und `Section`, früher `js/intro.js`), `js/reactions.js` (ab Schritt 4), `js/main.js` (Verdrahtung).
-  - Jeder Satz steht in einem `<noscript>` in der jeweiligen Karte. Ohne JS sind alle Sätze sofort sichtbar (Button ausgeblendet).
+- **Schritt 3 erledigt** (gemerged, Teil 1 [PR #17](https://github.com/lazyboxDude/portfolio/pull/17), Teil 2 [PR #19](https://github.com/lazyboxDude/portfolio/pull/19)): Folge von Bauschritten, Startbox, Persönlichkeit.
+  - **Ablauf:** Der erste Klick auf die Startbox ("Build Website") lässt sie schrumpfen und ausblenden (danach `hidden`), die Bots platzen an der Klickstelle heraus.
+    Die Box kommt nie wieder und es werden nie wieder Cursors gespawnt (nur die zwei Bots, `layout-bot` und `copy-bot`).
+    Das `layout-bot` zieht die Karte auf (Skalierung ab der oberen linken Ecke folgt dem Cursor, mit Ripple beim "Mausdruck"), das `copy-bot` tippt den Satz und folgt dem Textcursor.
+  - **Folge:** 1. "Hi, welcome to my personal website", 2. "I'm Micael Gomes Fernandes, or online ._lazybox_." (Pill davor: "Who are you?").
+    Danach heißt die Pill "Build again" und baut von vorn. Weitere Abschnitte sind weitere `<section class="card">` in `#cards` (`index.html`),
+    der Pill-Text davor steht in `data-prompt`.
+  - **Pill statt Box:** Die Pill (`#next`) liegt unter den Karten und ist nur sichtbar, solange kein Bau läuft. Danach bekommt sie den Fokus (Tastatur).
+    Während des Baus liegt der Fokus auf `#build`, damit er nie auf `<body>` fällt.
+    Die Karten (`#build`) starten dort, wo die Box war, wachsen nach unten, und gebaute Karten wandern nie.
+    Ungebaute Karten belegen keinen Platz (`display: none` bis `is-reserved`).
+  - **Persönlichkeit** (`js/cursors.js`): Jeder Cursor hat `shyness`, `curiosity` und `sociability`. Sie gelten nur im Leerlauf (`idle()`), nicht bei der Arbeit.
+    `layout-bot` ist scheu: hält Abstand zum echten Mauszeiger und flieht, je schneller die Maus, desto früher.
+    `copy-bot` ist neugierig: geht zum Mauszeiger und umkreist ihn. Ruht die Maus länger als 4 s, verliert er das Interesse.
+    Idle-Cursors halten Abstand zueinander, hängen manchmal beieinander ab und klicken ab und zu ins Leere (Ripple).
+    Touch wird ignoriert (es gibt dort keinen Hover).
+  - **Code:** `js/cursors.js` (`CursorSwarm` mit gemeinsamem rAF-Loop und Mauszeiger-Tracking, `Cursor` mit `moveTo`/`follow`/`idle`/`click`),
+    `js/build.js` (`SiteBuilder` und `Section`, früher `js/intro.js`), `js/main.js` (Verdrahtung).
+  - **Ohne JS und Barrierefreiheit:** Jeder Satz steht in einem `<noscript>` in der jeweiligen Karte. Ohne JS sind alle Sätze sofort sichtbar (Buttons ausgeblendet).
     Mit JS liest `js/build.js` sie und entfernt das Element: vor dem Bau ist eine Karte komplett leer, der Text kommt erst beim Bau ins DOM.
     Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
-  - `prefers-reduced-motion`: kein Anlauf, keine Ripples. Jeder Klick zeigt den nächsten Abschnitt sofort, die Cursors stehen still daneben, nach dem letzten kein Replay.
+  - **`prefers-reduced-motion`:** Der Loop läuft nicht, also kein Anlauf, keine Reaktionen, keine Ripples. Die Box ist sofort weg, jeder Klick zeigt den nächsten Abschnitt sofort,
+    die Cursors stehen still daneben, nach dem letzten gibt es keine Pill mehr.
   - Die Obergrenze von 40 DOM-Cursors bleibt als Sicherung im `CursorSwarm`.
-- **Plan umgebaut:** Zielbild aus den Referenzvideos (Linea, Orbit, Bakelayer) eingearbeitet.
-  Roadmap von 8 auf 12 Schritte erweitert, das Endziel ist jetzt ausdrücklich "Portfolio + CV, das sich selbst baut".
-  Dazu ein Mockup als Referenz (siehe Abschnitt "Mockup").
-- **Schritt 4 gebaut** (siehe PR): Cursor-Sprache. Noch keine neuen Inhalte, nur das Handwerk.
-  - **Drei Bots, drei Formen:** `layout-bot` (Pfeil, blau), `copy-bot` (I-Beam, pink), `design-bot` (Stift, gelb). Konfiguration in `JOBS` (`js/build.js`),
-    die Form wählt `Cursor.setKind('arrow' | 'text' | 'pen')` (`js/cursors.js`, jede Form hat ihren Hotspot, der Namens-Pill sitzt relativ dazu).
+- **Plan umgebaut** (gemerged, [PR #18](https://github.com/lazyboxDude/portfolio/pull/18)): Zielbild aus den Referenzvideos (Linea, Orbit, Bakelayer) eingearbeitet.
+  Roadmap von 8 auf 12 Schritte erweitert, das Endziel ist jetzt ausdrücklich "Portfolio + CV, das sich selbst baut". Dazu ein Mockup als Referenz (Abschnitt "Mockup").
+- **Schritt 4 gebaut** (im PR #20): Cursor-Sprache. Noch keine neuen Inhalte, nur das Handwerk.
+  - **Drei Bots, drei Formen:** `layout-bot` (Pfeil, blau, scheu), `copy-bot` (I-Beam, pink, neugierig), `design-bot` (Stift, gelb, gesellig).
+    Konfiguration in `JOBS` (`js/build.js`: Name, Farbe, Form, Persönlichkeit), die Form wählt `Cursor.setKind('arrow' | 'text' | 'pen')` (`js/cursors.js`).
+    Jede Form hat ihren Hotspot (`--hx`/`--hy`), der Namens-Pill sitzt relativ dazu. `swarm.add()` nimmt jetzt `color` (Hex) statt `hue`.
   - **Bauablauf pro Klick:** `layout-bot` zieht die Karte auf (Auswahlrahmen mit Griffen, Tag mit der Live-Größe, z. B. `556 × 80`),
     danach tippt `copy-bot` (Tag mit der echten Typografie aus `getComputedStyle`, z. B. `500 · 22px / 1.55`), **gleichzeitig** zeichnet `design-bot`
     den Akzentrahmen (4 Ecken blenden ein, 4 Kanten wachsen, nur `transform`/`opacity`; Tag `border 1.5px #6c8cff`). Die Rahmen-Teile erzeugt `Section` in `js/build.js`.
   - **Inspector-Tags:** `cursor.inspect(text, x, y)` / `cursor.hideTag()`, Klasse `InspectorTag` in `js/cursors.js`, Stil `.inspector-tag` in `css/site.css`.
-  - **Reaktionen** (`js/reactions.js`, hängt am gemeinsamen Frame-Loop): Bots im Leerlauf weichen dem echten Mauszeiger aus,
-    gehen ab und zu neugierig zu ihm hin und treffen sich ab und zu zu zweit und begrüßen sich mit einem Klick. Steuerung nur über `cursor.detour()` für Bots im `wander`-Modus.
-    Mit `prefers-reduced-motion` passiert nichts, Touch wird ignoriert.
+  - **Leerlauf:** unverändert das Persönlichkeitssystem aus Schritt 3 (Teil 2), der `design-bot` ist als dritter Bot dabei und der I-Beam/Stift sind im Leerlauf sichtbar.
   - **Reduced Motion:** Rahmen sofort fertig gezeichnet, keine Tags, Bots geparkt.
-  - Ein Bauschritt dauert jetzt ca. 8 Sekunden. **Nächster Schritt: 5 (Landingpage-Gerüst: Hero + Nav).**
+  - Ein Bauschritt dauert ca. 8 Sekunden. **Nächster Schritt: 5 (Landingpage-Gerüst: Hero + Nav).**
 
 ## Offene Fragen an Micael
 
@@ -154,6 +162,6 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
 - Branch: der Chat bekommt einen Branch vorgegeben. Pro Schritt ein PR gegen `main`. Ist der PR gemerged, den Branch neu von `main` starten.
 - Commit-Messages und Chat auf Deutsch, Code und Kommentare auf Englisch.
 - Lokal testen: `python3 -m http.server` im Repo-Root, dann `http://localhost:8000` öffnen.
-  Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken.
-  Ein Bauschritt dauert ca. 8 Sekunden. In Tests auf Zustände warten (z. B. Label "Who are you?" oder "Build again"), keine festen Pausen.
+  Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken (die Pill `#next` schwebt nicht).
+  Ein Bauschritt dauert ca. 8 Sekunden. In Tests auf Zustände warten (z. B. `#next` mit Klasse `is-ready` und Label "Who are you?" oder "Build again"), keine festen Pausen.
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.

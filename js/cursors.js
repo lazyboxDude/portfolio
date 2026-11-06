@@ -5,17 +5,23 @@
 // modes:
 //   hold   - chase a fixed point (moveTo) and stay there
 //   follow - chase a point that is recomputed every frame (follow)
-//   wander - roam around the viewport at random (see reactions.js for how idle bots react)
+//   idle   - off duty: roam around and react (see Cursor.think)
 // Jobs (see build.js) are written as async functions that await moveTo()/click().
 //
-// Visual language (the "cursor language" of the site):
-//   - every bot has a job colour and a name pill ("layout-bot")
-//   - the pointer shape tells the job: arrow (layout), I-beam (copy), pencil (design)
-//   - while working, a bot can show an inspector tag with the real numbers it is touching
+// Visual language: every bot has a job colour and a name pill ("layout-bot"), the pointer shape
+// tells the job (arrow = layout, I-beam = copy, pencil = design), and while working a bot can show
+// an inspector tag with the real numbers it is touching.
+//
+// Off-duty behaviour comes from a small personality per cursor:
+//   shyness     > 0.5  keeps its distance from the real mouse pointer and flees when it comes close
+//   curiosity   > 0.5  walks over to the real mouse pointer and circles it
+//   sociability        chance to hang out near another idle cursor instead of roaming alone
+// Idle cursors also keep a little distance from each other and click now and then.
 
+// Pointer shapes. `hot` is the point inside the 22px SVG that "points", so x/y mean the click position.
 const KINDS = {
     arrow: {
-        hot: [2, 1.5], // where the shape "points", so x/y mean the click position
+        hot: [2, 1.5],
         svg: `
 <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
   <path d="M2 1.5 L2 17 L6.2 13.2 L9 19.6 L11.8 18.4 L9 12.2 L14.8 12.2 Z"
@@ -47,14 +53,17 @@ const DRAG_DAMPING = 2 * Math.sqrt(SPRING); // critically damped -> no overshoot
 const MAX_DT = 0.05;                        // clamp so a background tab doesn't teleport cursors
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+const POINTER_ATTENTION_MS = 4000; // the real pointer counts as "there" this long after its last move
+const SEPARATION = 64;             // idle cursors push each other apart below this distance (px)
+const ORBIT_RADIUS = 110;          // how closely a curious cursor circles the real pointer (px)
+
 const rand = (min, max) => min + Math.random() * (max - min);
-const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const prefersReducedMotion = () => REDUCED_MOTION.matches;
 export { DRAG_DAMPING };
 
-/** A small mono label that shows real numbers ("640 x 92", "500 · 22px / 1.55"). Moves with transform only. */
+/** A small mono label that shows real numbers ("640 × 92", "500 · 22px / 1.55"). Moves with transform only. */
 class InspectorTag {
     constructor(layer, color) {
         this.el = document.createElement('div');
@@ -77,7 +86,7 @@ class InspectorTag {
 }
 
 class Cursor {
-    constructor(swarm, { x, y, color, label, burst, kind }) {
+    constructor(swarm, { x, y, color, label, burst, kind, personality }) {
         this.swarm = swarm;
         this.color = color;
         this.x = x; this.y = y;
@@ -90,15 +99,21 @@ class Cursor {
         this.arrival = null;
         this.tag = null;
 
+        this.personality = {
+            shyness: rand(0, 1), curiosity: rand(0, 1), sociability: rand(0, 1), ...personality,
+        };
+        this.orbit = rand(0, Math.PI * 2);
+        this.clickTimer = rand(4, 9); // seconds until the next idle click
+
         const el = document.createElement('div');
         el.className = 'fake-cursor is-new';
-        el.style.setProperty('--cursor-color', color);
+        el.style.setProperty('--cursor-color', this.color);
         el.innerHTML = '<div class="fake-cursor-body"></div>';
         if (label) {
-            const name = document.createElement('span');
-            name.className = 'fake-cursor-tag';
-            name.textContent = label;
-            el.appendChild(name);
+            const tag = document.createElement('span');
+            tag.className = 'fake-cursor-tag';
+            tag.textContent = label;
+            el.appendChild(tag);
         }
         el.addEventListener('animationend', () => el.classList.remove('is-new'), { once: true });
         swarm.layer.appendChild(el);
@@ -125,8 +140,6 @@ class Cursor {
         this.el.style.setProperty('--hy', `${shape.hot[1]}px`);
     }
 
-    get idle() { return this.mode === 'wander'; }
-
     /** Glide to (x, y). Resolves once the cursor is within `tolerance` px and slower than `settleSpeed` px/s. */
     moveTo(x, y, { tolerance = 4, settleSpeed = 40, damping = DAMPING, timeout = 5000 } = {}) {
         this.settle();
@@ -152,23 +165,13 @@ class Cursor {
         this.swarm.start();
     }
 
-    /** Roam around the viewport (the "off duty" behaviour). */
-    wander() {
+    /** Go off duty: roam around and react to the real pointer and to other idle cursors. */
+    idle() {
         this.settle();
-        this.mode = 'wander';
+        this.mode = 'idle';
         this.damping = DAMPING;
-        this.pickTarget();
+        this.retarget = 0;
         this.swarm.start();
-    }
-
-    /** While wandering: head for (x, y) now and only pick a new random target after `seconds`. */
-    detour(x, y, seconds) {
-        if (this.mode !== 'wander') return false;
-        const pad = 24;
-        this.tx = clamp(x, pad, Math.max(pad, window.innerWidth - pad));
-        this.ty = clamp(y, pad, Math.max(pad, window.innerHeight - pad));
-        this.retarget = seconds;
-        return true;
     }
 
     /** Jump to (x, y) without animation. */
@@ -202,11 +205,85 @@ class Cursor {
 
     hideTag() { this.tag?.hide(); }
 
-    pickTarget() {
+    /** Aim at (x, y), kept inside the viewport. */
+    aim(x, y) {
         const pad = 24;
-        this.tx = rand(pad, Math.max(pad + 1, window.innerWidth - pad));
-        this.ty = rand(pad, Math.max(pad + 1, window.innerHeight - pad));
-        this.retarget = rand(1.2, 3.5); // seconds until the next wander target
+        this.tx = Math.min(Math.max(x, pad), Math.max(pad + 1, window.innerWidth - pad));
+        this.ty = Math.min(Math.max(y, pad), Math.max(pad + 1, window.innerHeight - pad));
+    }
+
+    /** Roam: usually a random spot, sometimes next to another idle cursor. */
+    pickWanderTarget() {
+        const others = this.swarm.cursors.filter((c) => c !== this && c.mode === 'idle');
+        if (others.length && Math.random() < this.personality.sociability) {
+            const buddy = others[Math.floor(Math.random() * others.length)];
+            const angle = rand(0, Math.PI * 2), radius = rand(80, 160);
+            this.aim(buddy.x + Math.cos(angle) * radius, buddy.y + Math.sin(angle) * radius);
+        } else {
+            this.aim(rand(0, window.innerWidth), rand(0, window.innerHeight));
+        }
+        this.retarget = rand(1.2, 3.5); // seconds until the next target
+    }
+
+    /** Off-duty decisions, once per frame. */
+    think(dt, now) {
+        const { shyness, curiosity } = this.personality;
+        const p = this.swarm.pointer;
+
+        // Don't stack on top of each other.
+        for (const o of this.swarm.cursors) {
+            if (o === this || o.mode !== 'idle') continue;
+            const dx = this.x - o.x, dy = this.y - o.y;
+            const d = Math.hypot(dx, dy) || 1;
+            if (d < SEPARATION) {
+                const push = (SEPARATION - d) * 30 * dt;
+                this.vx += (dx / d) * push;
+                this.vy += (dy / d) * push;
+            }
+        }
+
+        // Click into the void every now and then.
+        this.clickTimer -= dt;
+        if (this.clickTimer <= 0) {
+            this.clickTimer = rand(6, 14);
+            this.click();
+        }
+
+        // React to the real mouse pointer while it is moving.
+        if (p.active && now - p.lastMove < POINTER_ATTENTION_MS) {
+            const dx = this.x - p.x, dy = this.y - p.y;
+            const d = Math.hypot(dx, dy) || 1;
+            const scare = 170 + Math.min(p.speed, 1500) * 0.12; // a fast pointer is scarier
+            if (shyness > 0.5 && d < scare) {
+                this.flee(dx / d, dy / d, p);
+                return;
+            }
+            if (curiosity > 0.5) {
+                this.orbit += dt * 1.1;
+                this.aim(p.x + Math.cos(this.orbit) * ORBIT_RADIUS, p.y + Math.sin(this.orbit) * ORBIT_RADIUS);
+                return;
+            }
+        }
+
+        this.retarget -= dt;
+        if (this.retarget <= 0) this.pickWanderTarget();
+    }
+
+    /** Run away from the pointer; along the wall if the way straight away is blocked. */
+    flee(ux, uy, p) {
+        const dist = 240;
+        const pad = 24;
+        const w = window.innerWidth, h = window.innerHeight;
+        const options = [[ux, uy], [-uy, ux], [uy, -ux]].map(([ax, ay]) => ({
+            x: Math.min(Math.max(this.x + ax * dist, pad), Math.max(pad + 1, w - pad)),
+            y: Math.min(Math.max(this.y + ay * dist, pad), Math.max(pad + 1, h - pad)),
+        }));
+        let best = options[0];
+        for (const o of options) {
+            if (Math.hypot(o.x - p.x, o.y - p.y) > Math.hypot(best.x - p.x, best.y - p.y)) best = o;
+        }
+        this.tx = best.x;
+        this.ty = best.y;
     }
 
     /** Resolve a pending moveTo() promise (arrived, superseded or timed out). */
@@ -221,9 +298,8 @@ class Cursor {
         if (this.mode === 'follow') {
             const p = this.follower();
             this.tx = p.x; this.ty = p.y;
-        } else if (this.mode === 'wander') {
-            this.retarget -= dt;
-            if (this.retarget <= 0) this.pickTarget();
+        } else if (this.mode === 'idle') {
+            this.think(dt, now);
         }
 
         const dx = this.tx - this.x, dy = this.ty - this.y;
@@ -257,17 +333,32 @@ export class CursorSwarm {
         this.max = max;
         this.cursors = [];
         this.hooks = new Set();
+        // The real mouse pointer (touch is ignored: there is no hover on touch screens).
+        this.pointer = { x: 0, y: 0, speed: 0, lastMove: 0, active: false };
         this.last = 0;
         this.running = false;
         this.tick = this.tick.bind(this);
+
+        window.addEventListener('pointermove', (e) => {
+            if (e.pointerType === 'touch') return;
+            const p = this.pointer;
+            const now = performance.now();
+            const dt = Math.max(1, now - p.lastMove) / 1000;
+            p.speed += (Math.hypot(e.clientX - p.x, e.clientY - p.y) / dt - p.speed) * 0.3;
+            p.x = e.clientX;
+            p.y = e.clientY;
+            p.lastMove = now;
+            p.active = true;
+        }, { passive: true });
+        document.documentElement.addEventListener('pointerleave', () => { this.pointer.active = false; });
     }
 
     get count() { return this.cursors.length; }
 
     /** Add a cursor at (x, y). `burst` flings it outwards. Returns null when full. */
-    add({ x, y, color = '#6c8cff', label = '', kind = 'arrow', burst = false }) {
+    add({ x, y, color = '#6c8cff', label = '', kind = 'arrow', burst = false, personality }) {
         if (this.cursors.length >= this.max) return null;
-        const cursor = new Cursor(this, { x, y, color, label, kind, burst });
+        const cursor = new Cursor(this, { x, y, color, label, kind, burst, personality });
         this.cursors.push(cursor);
         return cursor;
     }
@@ -299,6 +390,7 @@ export class CursorSwarm {
     tick(now) {
         const dt = Math.min(MAX_DT, (now - this.last) / 1000);
         this.last = now;
+        this.pointer.speed *= Math.pow(0.05, dt); // the pointer "calms down" when it stops moving
 
         for (const c of this.cursors) c.step(dt, now);
         for (const hook of this.hooks) hook(dt, now);

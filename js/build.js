@@ -1,7 +1,8 @@
 // The build "job": bot cursors construct the page one section at a time.
-// Every click on the box builds the next section, with three bots at work:
+// The first click on the start box makes it vanish and builds the first section; after that a
+// small pill below the cards builds the next one. Each build has three bots at work:
 //   1. layout-bot (arrow) drags out the card: the scale from the top-left corner follows the cursor,
-//      a selection frame with handles and a live size tag ("560 x 96") show what is being dragged
+//      a selection frame with handles and a live size tag ("556 × 80") show what is being dragged
 //   2. copy-bot (I-beam) walks to the card and types its sentence, following the text caret,
 //      with a tag that shows the real typography ("500 · 22px / 1.55")
 //   3. design-bot (pencil) draws the accent border around the finished card while the text is typed
@@ -14,15 +15,17 @@ import { DRAG_DAMPING, prefersReducedMotion } from './cursors.js';
 const MIN_SCALE = 0.02; // never scale to exactly 0 (keeps the card measurable)
 const DRAG_MS = 800;
 const DRAW_MS = 1500;
-const TAG_GAP = 28;     // inspector tags sit this far above the card (or 8px below it)
+const TAG_GAP = 28; // inspector tags sit this far above the card (or 8px below it)
 const NEXT_LABEL = 'Next';
 const REPLAY_LABEL = 'Build again';
+const BOX_EXIT_MS = 400; // keep in sync with .box.is-gone in site.css
 
-// One job per bot: name pill, colour and pointer shape. Colours stay readable under dark pill text.
+// One job per bot: name pill, colour, pointer shape (see cursors.js) and off-duty personality:
+// one shy, one curious, one sociable. Colours stay readable under the dark pill text.
 const JOBS = {
-    layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow' },
-    copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text' },
-    design: { label: 'design-bot', color: '#ffc766', kind: 'pen' },
+    layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow', personality: { shyness: 1, curiosity: 0.1, sociability: 0.3 } },
+    copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text', personality: { shyness: 0.1, curiosity: 1, sociability: 0.6 } },
+    design: { label: 'design-bot', color: '#ffc766', kind: 'pen', personality: { shyness: 0.3, curiosity: 0.3, sociability: 0.9 } },
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -79,9 +82,14 @@ class Section {
         this.collapse();
     }
 
-    /** Empty state: no text anywhere in the card, card hidden. */
+    /** Take the card's space in the layout while it is still invisible (so it can be measured). */
+    reserve() {
+        this.el.classList.add('is-reserved');
+    }
+
+    /** Empty state: no text anywhere in the card, card gone from the layout. */
     collapse() {
-        this.el.classList.remove('is-shown', 'is-typing', 'is-selected');
+        this.el.classList.remove('is-reserved', 'is-shown', 'is-typing', 'is-selected');
         this.el.style.scale = '';
         this.typed.textContent = '';
         this.rest.textContent = '';
@@ -150,27 +158,34 @@ class Section {
 }
 
 export class SiteBuilder {
-    constructor({ swarm, label, cards, status }) {
+    constructor({ swarm, box, build, next, cards, status }) {
         this.swarm = swarm;
-        this.label = label;
+        this.box = box;     // start box: gone after the first click
+        this.build = build; // container of the cards and the pill
+        this.next = next;   // pill below the cards that builds the next section
+        this.nextLabel = next.querySelector('.next-label');
         this.status = status;
         this.sections = cards.map((el) => new Section(el));
 
-        this.index = 0;       // next section to build
-        this.builder = null;  // layout-bot
-        this.typist = null;   // copy-bot
+        this.index = 0;      // next section to build
+        this.builder = null; // layout-bot
+        this.typist = null;  // copy-bot
         this.designer = null; // design-bot
         this.busy = false;
-        this.parked = false;  // reduced motion: everything built once, no replay
+        this.parked = false; // reduced motion: everything built once, no replay
     }
 
-    /** Build the next section (or start over after the last one). `origin` is where new cursors burst out. */
+    /** Build the next section (or start over after the last one). `origin` is where the bots burst out (first run only). */
     async run(origin) {
         if (this.busy || this.parked) return;
         this.busy = true;
+        this.next.classList.remove('is-ready');
+        this.hideBox();
+        this.build.focus({ preventScroll: true }); // keep keyboard focus somewhere sensible while building
         try {
             if (this.index >= this.sections.length) this.reset();
             const section = this.sections[this.index];
+            section.reserve();
             section.fill();
             section.el.scrollIntoView({ block: 'nearest' });
 
@@ -179,10 +194,19 @@ export class SiteBuilder {
 
             this.index++;
             this.parked = prefersReducedMotion() && this.index >= this.sections.length;
-            this.updateLabel();
+            this.updateUi();
         } finally {
             this.busy = false;
         }
+    }
+
+    /** The start box dissolves on the first click and never comes back. */
+    hideBox() {
+        const { box } = this;
+        if (box.hidden || box.classList.contains('is-gone')) return;
+        box.classList.add('is-gone');
+        if (prefersReducedMotion()) box.hidden = true;
+        else setTimeout(() => { box.hidden = true; }, BOX_EXIT_MS);
     }
 
     reset() {
@@ -190,15 +214,17 @@ export class SiteBuilder {
         this.index = 0;
     }
 
-    updateLabel() {
+    /** Announce the result and offer the next step (unless everything is built for good). */
+    updateUi() {
         const total = this.sections.length;
-        if (this.index < total) {
-            this.label.textContent = this.sections[this.index].prompt;
-            this.status.textContent = `Section ${this.index} of ${total} built.`;
-        } else {
-            this.label.textContent = this.parked ? 'Built' : REPLAY_LABEL;
-            this.status.textContent = 'Website built.';
-        }
+        const done = this.index >= total;
+        this.status.textContent = done ? 'Website built.' : `Section ${this.index} of ${total} built.`;
+        if (this.parked) return;
+
+        this.nextLabel.textContent = done ? REPLAY_LABEL : this.sections[this.index].prompt;
+        this.next.classList.add('is-ready');
+        this.next.focus({ preventScroll: true });
+        this.next.scrollIntoView({ block: 'nearest' });
     }
 
     ensureBots(origin, burst) {
@@ -211,6 +237,7 @@ export class SiteBuilder {
 
     buildStatic(section, origin) {
         this.ensureBots(origin, false);
+        section.reserve();
         section.typed.textContent = section.text;
         section.rest.textContent = '';
         section.el.classList.add('is-shown');
@@ -226,7 +253,6 @@ export class SiteBuilder {
     // ---- Animated build ---------------------------------------------------
 
     async buildAnimated(section, origin) {
-        this.label.textContent = 'Building…';
         this.status.textContent = 'Building the website…';
 
         // Measure the final card rect while it is still invisible at full size.
@@ -242,12 +268,12 @@ export class SiteBuilder {
         ]);
 
         await this.dragOut(section, r);
-        builder.wander();
+        builder.idle();
 
         // The card is complete now: the copy-bot types while the design-bot draws the border.
         await Promise.all([this.type(section), this.draw(section, r)]);
-        typist.wander();
-        designer.wander();
+        typist.idle();
+        designer.idle();
     }
 
     /** layout-bot presses at the top-left corner and drags to the bottom-right one. */

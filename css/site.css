@@ -28,16 +28,10 @@ body {
 }
 
 .stage {
+    position: relative;
     min-height: 100%;
     display: grid;
     place-items: center;
-}
-
-/* Holds the box; the card hangs below it so the box never moves when the card appears. */
-.hero {
-    position: relative;
-    display: grid;
-    justify-items: center;
 }
 
 .sr-only {
@@ -96,18 +90,33 @@ body {
 
 .box-label { pointer-events: none; }
 
-/* Without JS the button does nothing, so hide it. */
-html:not(.js) .box { display: none; }
+/* The start box dissolves on the first click (js/build.js hides it for good afterwards). */
+.box.is-gone {
+    transform: scale(0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.5, 0, 0.8, 0.4), opacity 0.35s ease;
+}
+
+/* Without JS the buttons do nothing, so hide them. */
+html:not(.js) .box,
+html:not(.js) .next { display: none; }
 
 /* ---- The cards (built live by the bots) --------------------------------- */
 
-/* Hangs below the box and grows downwards, so earlier cards never move when a new one is built. */
-.cards {
+/* Starts where the box was and grows downwards, so earlier cards never move when a new one is built. */
+.build {
     position: absolute;
-    top: calc(100% + 32px);
+    top: calc(50% - 64px);
     left: 50%;
     translate: -50% 0;
     width: min(560px, calc(100vw - 32px));
+    display: grid;
+    gap: 16px;
+    outline: none; /* only receives programmatic focus while building */
+}
+
+.cards {
     display: grid;
     gap: 16px;
 }
@@ -196,13 +205,45 @@ html:not(.js) .box { display: none; }
 .edge-right  { top: calc(var(--card-radius) - 1px); bottom: calc(var(--card-radius) - 1px); right: -1px; width: 1.5px;  transform-origin: 50% 0;    scale: 1 0; }
 .edge-left   { top: calc(var(--card-radius) - 1px); bottom: calc(var(--card-radius) - 1px); left: -1px;  width: 1.5px;  transform-origin: 50% 100%; scale: 1 0; }
 
-/* With JS the card stays hidden until the layout-bot starts dragging it out. */
+/* With JS a card takes no space until a build starts (is-reserved), and stays invisible until
+   the layout-bot starts dragging it out (is-shown). */
+.js .card { display: none; }
+.js .card.is-reserved,
+.js .card.is-shown { display: block; }
 .js .card:not(.is-shown) { visibility: hidden; }
 
+/* ---- The pill that builds the next section ------------------------------ */
+
+.next {
+    justify-self: center;
+    padding: 13px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background:
+        radial-gradient(120% 200% at 0% 0%, rgba(108, 140, 255, 0.3), transparent 60%),
+        radial-gradient(120% 200% at 100% 100%, rgba(179, 108, 255, 0.25), transparent 60%),
+        #14161d;
+    color: var(--fg);
+    font: 600 16px/1 var(--font-sans);
+    cursor: pointer;
+    box-shadow: 0 14px 40px -16px rgba(108, 140, 255, 0.55);
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.next:hover { transform: scale(1.06); border-color: rgba(255, 255, 255, 0.35); }
+.next:active { transform: scale(0.96); transition-duration: 0.08s; }
+.next:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* Only offered while no build is running. */
+.js .next:not(.is-ready) { visibility: hidden; }
+
 /* Without JS: plain blocks, centred. */
-html:not(.js) .cards {
+html:not(.js) .build {
     position: static;
     translate: none;
+    margin: 0 auto;
+    padding: 24px 0;
 }
 
 @keyframes float {
@@ -298,6 +339,7 @@ html:not(.js) .cards {
 
 @media (prefers-reduced-motion: reduce) {
     .box { animation: none; transition: none; }
+    .next { transition: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
     .card.is-typing .caret { animation: none; }
