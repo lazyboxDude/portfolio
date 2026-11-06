@@ -62,7 +62,7 @@ Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Sc
     mit JS tippen ihn die Bots. Screenreader bekommen den ganzen Satz auf einmal (`sr-only`) und eine `role="status"`-Meldung.
   - `prefers-reduced-motion`: kein Anlauf, keine Ripples. Karte und Text sind sofort da, die Cursors stehen still daneben, kein Replay.
   - Die Obergrenze von 40 Cursors bleibt als Sicherung im `CursorSwarm`. Die Zähler-Anzeige ("Enough!") aus Schritt 1 entfällt.
-  - Der Intro-Satz ist vorläufig, genau wie von Micael vorgegeben (nur das Backtick-Apostroph in "i`m" wurde zu "I'm"). Er steht in `index.html` im `#typed`-Element.
+  - Der Intro-Satz ist vorläufig: "Hi, welcome to my personal website". Er steht in `index.html` im `#typed`-Element. Name und Handle (Micael Gomes Fernandes, ._lazybox_) kommen später dazu.
 
 ## Offene Fragen an Micael
 
