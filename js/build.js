@@ -22,12 +22,12 @@ import { DRAG_DAMPING, prefersReducedMotion } from './cursors.js';
 import { anchor, clamp, easeInOut, pageRect, part } from './geometry.js';
 import { Grid, Guides, MIN_SIZE, Shell, guidePlan } from './layout.js';
 
-const DRAG_MS = 560;
-const DRAG_FAST_MS = 280;
-const FRAME_MS = 380;      // setting padding and gap
-const FRAME_FAST_MS = 170;
-const FIX_HOLD_MS = 160;   // after a miss the bot stands there for a moment, then corrects itself
-const GRID_MS = 500;       // drawing the columns of a grid
+const DRAG_MS = 500;
+const DRAG_FAST_MS = 250;
+const FRAME_MS = 300;      // setting padding and gap
+const FRAME_FAST_MS = 140;
+const FIX_HOLD_MS = 120;   // after a miss the bot stands there for a moment, then corrects itself
+const GRID_MS = 420;       // drawing the columns of a grid
 const BIG_AREA = 20000;    // shapes bigger than this (px²) may overshoot; every third one does
 const DRAW_MS = 900;
 const TAG_GAP = 28;      // inspector tags sit this far above an element (or 8px below it)
@@ -602,7 +602,8 @@ export class SiteBuilder {
             oy = sign * clamp(m.h * 0.2, 6, 18);
         }
         const misses = ox !== 0 || oy !== 0;
-        const SETTLE = { tolerance: 6, settleSpeed: 200, timeout: 1000, damping: DRAG_DAMPING };
+        const SETTLE = { tolerance: 10, settleSpeed: 450, timeout: 650, damping: DRAG_DAMPING };
+        const MISS = { tolerance: 6, settleSpeed: 200, timeout: 1000, damping: DRAG_DAMPING }; // slow enough that the miss shows
         const corner = () => { const r = a(); return { x: r.right, y: r.bottom }; };
 
         await builder.chase(() => { const r = a(); return { x: r.left, y: r.top }; }, fast ? ARRIVE_FAST : ARRIVE);
@@ -642,7 +643,7 @@ export class SiteBuilder {
             // Small repeated shapes do not wait for the bot to come to a stop: the next shape is next.
             if (!fast) {
                 // A miss: the bot lets go a few pixels too far (or too short), sees the tag, and corrects.
-                await builder.chase(misses ? () => { const r = a(); return { x: r.right + ox, y: r.bottom + oy }; } : corner, SETTLE);
+                await builder.chase(misses ? () => { const r = a(); return { x: r.right + ox, y: r.bottom + oy }; } : corner, misses ? MISS : SETTLE);
                 if (misses) {
                     await sleep(FIX_HOLD_MS);
                     await builder.chase(corner, SETTLE);
@@ -658,7 +659,7 @@ export class SiteBuilder {
         swarm.ripple(to.right, to.bottom, builder.color);
         if (!fast) {
             builder.inspect(`${Math.round(m.w)} × ${Math.round(m.h)}`, tag);
-            await sleep(150); // let the final size sink in before the tag goes
+            await sleep(90); // let the final size sink in before the tag goes
         }
         guides.hold(fast ? 120 : 250);
         if (section.cancelled) return;
@@ -706,7 +707,7 @@ export class SiteBuilder {
         }
         builder.inspect(shell.label(1, 1), tag);
         builder.release();
-        if (!shape.fast) await sleep(60);
+        if (!shape.fast) await sleep(40);
         shell.frameEnd();
     }
 
