@@ -12,7 +12,9 @@
 // tells the job (arrow = layout, I-beam = copy, pencil = design, magnifier = a11y, spark = motion), and while working a bot can show
 // an inspector tag with the real numbers it is touching.
 //
-// Off-duty behaviour comes from a small personality per cursor:
+// Off-duty roaming (idle mode) is currently not used by the build job: it parks its bots calmly
+// where the next work is (SiteBuilder.rest), because bots whirling around while the visitor scrolls hurt the UX.
+// The roaming comes from a small personality per cursor:
 //   shyness     > 0.5  keeps its distance from the real mouse pointer and flees when it comes close
 //   curiosity   > 0.5  walks over to the real mouse pointer and circles it
 //   sociability        chance to hang out near another idle cursor instead of roaming alone

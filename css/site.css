@@ -633,7 +633,8 @@ html:not(.js) .btn-ghost { border-color: var(--accent); }
     border-bottom: 1px solid #1d2740;
 }
 
-.row:last-child { border-bottom: 0; }
+/* last-of-type, not last-child: the bots add helper nodes at the end of a box while it is built. */
+.row:last-of-type { border-bottom: 0; }
 
 .when {
     flex: 0 0 200px;
@@ -876,9 +877,85 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
 
 /* ---- Built live: shapes and characters ----------------------------------- */
 
-/* Shapes the layout-bot drags out: the bot holds the bottom-right corner, so scale grows from the top-left. */
-[data-box] { transform-origin: 0 0; }
+/* Shapes the layout-bot builds (js/layout.js). Hidden until the bot starts on them. */
 .js [data-box]:not(.is-shown) { visibility: hidden; }
+
+/* 1. The drag. The element already has its final size (nothing around it moves) but looks empty; the
+      .shell inside it is the box the bot really resizes (width/height, no scale), wearing the element's
+      own classes, so it has the same background, border and corner radius. */
+.js .is-building {
+    background: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.js .is-building > :not([data-fx]) { visibility: hidden; }
+
+/* 2. Auto-layout. The element is pinned (contain: layout size, set by the bot) while padding and gap go from
+      0 to their real values: the children show as dashed outlines and flow into place. */
+.js .site .is-framing > :not([data-fx]) {
+    visibility: visible;
+    outline: 1px dashed rgba(123, 149, 255, 0.65);
+    outline-offset: -1px;
+}
+
+.js .site .is-framing > :not([data-fx]) * { visibility: hidden; }
+
+/* A card that is not built yet only shows as an outline here, without its fill. */
+.js .site .is-framing > [data-box]:not(.is-shown) {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.pad-band {
+    position: absolute;
+    inset: 0;
+    border: 0 solid rgba(123, 149, 255, 0.16);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.is-filled > :not([data-fx]) { animation: fill-in 0.4s ease both; }
+
+@keyframes fill-in { from { opacity: 0; } }
+
+/* [data-grid]: the real columns, drawn before the cards (behind them: negative z-index inside .site). */
+.grid-col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    border: 0 dashed rgba(123, 149, 255, 0.4);
+    border-width: 0 1px;
+    background: rgba(123, 149, 255, 0.06);
+    transform-origin: 50% 0;
+    scale: 1 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.grid-col.is-closing { opacity: 0; }
+
+/* Snap lines (in the cursor layer): edges that really line up. */
+.snap-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    background: #5fd4f0;
+    transform-origin: 0 0;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    will-change: transform;
+}
+
+.snap-line.is-visible { opacity: 0.9; }
 
 /* Typed text: one span per character, revealed by the copy-bot (layout never shifts). */
 .ch { opacity: 0; }
@@ -1070,7 +1147,7 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
     html { scroll-behavior: auto; }
     .tilt, .tile img, .layer-btn { transition: none; }
     .box { animation: none; transition: none; }
-    .next, .btn, .glow, .sel-frame, .inspector-tag, .a11y-ring { transition: none; }
+    .next, .btn, .glow, .sel-frame, .inspector-tag, .a11y-ring, .grid-col, .snap-line { transition: none; }
     .glow.is-moving .glow-a, .glow.is-moving .glow-b { animation: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
