@@ -118,7 +118,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   Die Karten-Folge ("Hi, welcome ..." und "I'm Micael ...") ist in Schritt 5 durch die Landingpage ersetzt. Was davon gilt weiter:
   - **Startbox:** Der erste Klick auf die Box ("Build Website") lässt sie schrumpfen und ausblenden (danach `hidden`), die Bots platzen an der Klickstelle heraus.
     Die Box kommt nie wieder, es werden nie wieder Cursors gespawnt (nur die drei Bots).
-  - **Persönlichkeit** (`js/cursors.js`): Jeder Cursor hat `shyness`, `curiosity` und `sociability`. Sie gelten nur im Leerlauf (`idle()`), nicht bei der Arbeit.
+  - **Persönlichkeit** (`js/cursors.js`, vom Bau seit der Nachbesserung nach Schritt 8 nicht mehr benutzt, die Bots warten dort ruhig): Jeder Cursor hat `shyness`, `curiosity` und `sociability`. Sie gelten nur im Leerlauf (`idle()`), nicht bei der Arbeit.
     Scheu = hält Abstand zum echten Mauszeiger und flieht (je schneller die Maus, desto früher). Neugierig = geht zum Mauszeiger und umkreist ihn, verliert nach 4 s Ruhe das Interesse.
     Idle-Cursors halten Abstand zueinander, hängen manchmal beieinander ab und klicken ab und zu ins Leere (Ripple). Touch wird ignoriert.
   - **Code:** `js/cursors.js` (`CursorSwarm` mit gemeinsamem rAF-Loop und Mauszeiger-Tracking, `Cursor` mit `moveTo`/`follow`/`idle`/`click`), `js/main.js` (Verdrahtung).
@@ -152,7 +152,7 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - Die Einschränkung aus Schritt 3 bleibt: Scrollt man mitten im Bau, stimmen die Bot-Positionen nicht mehr (der Hero passt in einen Bildschirm). Das Scroll-getriebene Bauen kommt in Schritt 6.
 - **Schritt 6 gebaut** (im PR, zusammen mit Schritt 5): Scroll-getriebenes Bauen, CV-Abschnitte, mehrsprachiger CV.
   - **Seitenaufbau** (`index.html`): Hero · Über mich · Werdegang · Skills · Kontakt · Footer. Jeder Block ist ein `data-section`.
-    Der Hero baut sich nach dem Klick auf die Startbox, **jeder weitere Abschnitt, wenn er in den Bildschirm scrollt**. Vor dem Klick ist Scrollen gesperrt.
+    Der Hero baut sich nach dem Klick auf die Startbox, **jeder weitere Abschnitt, wenn er in den Bildschirm scrollt** (seit der Nachbesserung nach Schritt 8: schon kurz davor, siehe dort). Vor dem Klick ist Scrollen gesperrt.
     Wer an einen späteren Abschnitt springt (Anker, Scrollbalken), sieht alle übersprungenen Abschnitte sofort fertig, nur der Abschnitt im Bild wird gebaut. Der Footer erscheint ohne Bots (`data-instant`).
     "Build again" (`#next`) steht am Ende der Seite und erscheint erst, wenn alles gebaut ist. Es scrollt nach oben und baut von vorn.
   - **Die Bau-Engine ist jetzt allgemein** (`js/build.js`): Sie liest das Markup und baut jeden Abschnitt mit denselben drei Spuren.
@@ -195,6 +195,14 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Barrierefreiheit:** Das Canvas ist `aria-hidden`, der Text daneben sagt dasselbe. Der Zähler ist `role="status"`. Die Bühne wird vom `layout-bot` aufgezogen (`data-box`), der Rahmen des Stack-Buttons vom `design-bot` gezeichnet.
   - **Bau-Engine:** Ein `data-outline`-Element ohne Text und ohne eigene Form wartet auf die Form um es.
   - **Nächster Schritt: 9 (AI-Element).** Das ist ein eigener Schritt mit eigener Absprache (siehe offene Frage 6).
+- **Nachbesserung Cursor-Logik (nach Schritt 8):** Die Bots schwirrten nach dem Bau im Bild herum, und neue Abschnitte begannen erst, wenn man schon hinscrollte. Jetzt (`js/build.js`):
+  - **Vorausbauen:** Ein Abschnitt wird gebaut, sobald seine Oberkante weniger als `LOOKAHEAD` (0,8) Bildschirmhöhen unter dem unteren Bildrand liegt. Nach dem Hero baut sich also gleich "About", ohne dass man scrollt;
+    wer kontinuierlich scrollt, findet die Seite schon vor oder sieht die Bots mitten im Bau. Die Bots zielen auf Seitenpositionen (`anchor()`), arbeiten also unter dem Bildrand und kommen beim Scrollen ins Bild.
+  - **Kein Herumwandern mehr:** `idle()` wird im Bau nicht mehr benutzt. Ein Bot ohne Aufgabe wartet an der "Baufront" am unteren Bildrand (`SiteBuilder.restPoint`, x je Bot versetzt).
+    Steht alles, parken die drei Bots gestapelt unten rechts. Sie reagieren nicht mehr auf den Mauszeiger.
+  - **Überscrollt:** Scrollt man an einem Abschnitt vorbei, der gerade gebaut wird, wird er sofort fertiggestellt (`skipPast()`), und die Bots machen mit dem nächsten weiter.
+  - Die Persönlichkeit (scheu/neugierig/gesellig, Schritt 3 Teil 2) steckt noch in `js/cursors.js` (`idle()`), wird aber vom Bau nicht mehr gerufen. Kann bei Bedarf entfernt werden.
+  - **Bekannte Folge:** Der Abschnitt direkt unter dem Hero baut sich, bevor man ihn sieht, wenn man im Hero liest. Wer das Bauen mehr sehen will, senkt `LOOKAHEAD`.
 
 ## Offene Fragen an Micael
 
