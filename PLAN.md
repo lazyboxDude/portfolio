@@ -196,6 +196,9 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Bau-Engine:** Ein `data-outline`-Element ohne Text und ohne eigene Form wartet auf die Form um es.
   - **Nächster Schritt: 9 (AI-Element).** Das ist ein eigener Schritt mit eigener Absprache (siehe offene Frage 6).
 
+- **Vorbereitung für Design-Bots** (kein Roadmap-Schritt, nur Werkzeug): `DESIGN.md` (Ist-Zustand der Tokens, Spielregeln, Bau-Vertrag, Leitplanken), `tools/shoot.mjs` und `tools/check.mjs` (mit `tools/lib.mjs`), `.gitignore` für `screenshots/`.
+  Die Seite wird für Screenshots im fertigen Zustand aufgenommen (Reduced Motion, Cursor-Ebene ausgeblendet, `--bots` zeigt sie). Die Check-Skripte ignorieren Fehler von fremden Hosts (CDNs der Nebenseiten, in der Sandbox blockiert).
+
 ## Offene Fragen an Micael
 
 1. **Läbesruum, Zeitraum:** Der Lebenslauf nennt 05.2021 bis 02.2024, das Arbeitszeugnis 25.01.2023 bis 13.02.2024. Die Website und der CV zeigen vorläufig **2023 bis 2024** (das, was das Zeugnis belegt). Welches Datum stimmt?
@@ -219,4 +222,6 @@ Entschieden: Alle acht Renders werden gezeigt, Aphonia und Dolphin Rush bleiben 
   Der Hero baut sich in ca. 15 Sekunden, jeder weitere Abschnitt in 3 bis 9 Sekunden. In Tests auf Zustände warten (z. B. alle `.ch` eines Abschnitts mit Klasse `on` und alle `[data-box]` mit `is-shown`, oder `#next` mit Klasse `is-ready`), keine festen Pausen.
   Weitere Abschnitte bauen sich erst, wenn man hinscrollt: im Test mit `window.scrollTo({ top, behavior: 'instant' })` springen (das Standard-Scrollen ist weich).
   Bei Zeitmessungen keine Screenshots mitlaufen lassen, sie verfälschen die Dauer.
+- **Design-Änderungen** (Optik verbessern, auch durch einen Design-Bot): `DESIGN.md` lesen. `node tools/shoot.mjs` macht Screenshots des fertigen Zustands (Desktop, Tablet, Mobil, pro Abschnitt) nach `screenshots/`,
+  `node tools/check.mjs` prüft Leitplanken (Konsolenfehler, horizontales Scrollen, Seite ohne JS, nichts bleibt versteckt, Kontrast der Farb-Tokens, Nebenseiten laden). Beides ohne Installation, wenn Playwright da ist.
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.
