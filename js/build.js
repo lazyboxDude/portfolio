@@ -3,8 +3,10 @@
 // data-section) is built when it scrolls into view. Afterwards a small pill builds everything again.
 //
 // Who does what (the markup says what to build, see index.html):
-//   layout-bot (arrow)  drags out every data-box: nav pill, buttons, cards, chips ...
-//                       A selection frame with handles and a live size tag ("980 × 56") show the drag.
+//   layout-bot (arrow)  builds every data-box for real (js/layout.js): it drags out a box with a real
+//                       width and height (selection frame, live size tag "980 × 56", snap lines, now and
+//                       then an overshoot it corrects), then sets padding and gap ("pad 24 32 · gap 16")
+//                       so the children flow into place. [data-grid] containers get their columns first.
 //   copy-bot (I-beam)   types every data-type text, character by character, with a tag that shows
 //                       the real typography ("600 · 96px / 1.00 · -0.035em") for data-tag texts.
 //   design-bot (pencil) switches the glow on (hero), draws data-underline words and data-outline shapes.
@@ -17,10 +19,16 @@
 // are revealed one by one. With prefers-reduced-motion everything is shown at once, bots parked.
 
 import { DRAG_DAMPING, prefersReducedMotion } from './cursors.js';
+import { anchor, clamp, easeInOut, pageRect, part } from './geometry.js';
+import { Grid, Guides, MIN_SIZE, Shell, guidePlan } from './layout.js';
 
-const MIN_SCALE = 0.02; // never scale to exactly 0 (keeps the shape measurable)
-const DRAG_MS = 650;
-const DRAG_FAST_MS = 380;
+const DRAG_MS = 560;
+const DRAG_FAST_MS = 280;
+const FRAME_MS = 380;      // setting padding and gap
+const FRAME_FAST_MS = 170;
+const FIX_HOLD_MS = 160;   // after a miss the bot stands there for a moment, then corrects itself
+const GRID_MS = 500;       // drawing the columns of a grid
+const BIG_AREA = 20000;    // shapes bigger than this (px²) may overshoot; every third one does
 const DRAW_MS = 900;
 const TAG_GAP = 28;      // inspector tags sit this far above an element (or 8px below it)
 const REPLAY_LABEL = 'Build again';
@@ -33,7 +41,7 @@ const AVG_CHAR_MS = 42;       // average delay per character at speed 1
 // How exactly a bot has to arrive before its job goes on. Close and fast enough is enough: the
 // next movement (follow) catches up anyway, and waiting for a full stop made every step crawl.
 const ARRIVE = { tolerance: 30, settleSpeed: 600, timeout: 1500 };
-const ARRIVE_FAST = { tolerance: 60, settleSpeed: 900, timeout: 900 };
+const ARRIVE_FAST = { tolerance: 80, settleSpeed: 1000, timeout: 700 };
 // Typing starts while the copy-bot is still a few steps away: it follows the caret and catches up.
 const TYPE_ARRIVE = { tolerance: 90, settleSpeed: 4000, timeout: 900 };
 
@@ -46,8 +54,6 @@ const JOBS = {
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 /** A promise that is resolved from outside (the bots wait for each other with these). */
 const defer = () => {
@@ -63,31 +69,8 @@ function typingDelay(ch, speed) {
     return (28 + Math.random() * 28) * speed;
 }
 
-const part = (className) => {
-    const el = document.createElement('span');
-    el.className = className;
-    el.setAttribute('aria-hidden', 'true');
-    return el;
-};
-
 /** Wait for the web fonts (the layout must be final before the bots measure it), but never for long. */
 const fontsReady = () => Promise.race([document.fonts?.ready ?? Promise.resolve(), sleep(FONT_WAIT_MS)]);
-
-/**
- * The rect of an element in viewport coordinates that keeps up when the page scrolls.
- * Measure once (before the element is scaled), call the returned function as often as needed.
- */
-function anchor(el) {
-    const r = el.getBoundingClientRect();
-    const x0 = window.scrollX, y0 = window.scrollY;
-    return () => {
-        const dx = x0 - window.scrollX, dy = y0 - window.scrollY;
-        return {
-            left: r.left + dx, top: r.top + dy, right: r.right + dx, bottom: r.bottom + dy,
-            width: r.width, height: r.height,
-        };
-    };
-}
 
 // ---- Text the copy-bot types ------------------------------------------------
 
@@ -177,25 +160,21 @@ class Typable {
 
 // ---- Shapes the layout-bot drags out ----------------------------------------
 
-/** An element that is dragged out (scale from the top-left corner), and optionally outlined by the design-bot. */
+/** An element the layout-bot builds (see layout.js), and optionally outlined by the design-bot. */
 class Shape {
     constructor(el) {
         this.el = el;
         this.fast = el.dataset.box === 'fast'; // repeated small things: quicker, no size tag
+        this.shell = new Shell(el);
+        this.done = false; // built: other shapes may align to it
         this.pieces = null;
-
-        // Selection frame with handles, shown while the layout-bot drags the shape.
-        const frame = part('sel-frame');
-        for (const corner of ['tl', 'tr', 'bl', 'br']) frame.append(part(`handle handle-${corner}`));
-        el.append(frame);
     }
 
-    select(on) { this.el.classList.toggle('is-selected', on); }
-
-    /** Hidden again: not shown, not selected, outline erased. */
+    /** Hidden again: not shown, outline erased. */
     collapse() {
-        this.el.classList.remove('is-shown', 'is-selected');
-        this.el.style.scale = '';
+        this.shell.cleanup();
+        this.el.classList.remove('is-shown');
+        this.done = false;
         for (const piece of this.pieces ?? []) {
             piece.style.scale = '';
             piece.style.opacity = '';
@@ -262,6 +241,12 @@ class Section {
         this.texts = [...el.querySelectorAll('[data-type]')].map((e) => new Typable(e));
         this.textOf = new Map(this.texts.map((t) => [t.el, t]));
 
+        // [data-grid]: the bot draws the real columns first, then drags the cards (its children) into them.
+        this.grids = [...el.querySelectorAll('[data-grid]')]
+            .map((e) => new Grid(e, this.shapes.filter((s) => s.el.parentElement === e)))
+            .filter((g) => g.shapes.length);
+        this.gridOf = new Map(this.grids.flatMap((g) => g.shapes.map((s) => [s, g])));
+
         // What the design-bot draws: an underline below data-underline words, the outline of data-outline shapes.
         this.decos = [];
         for (const e of el.querySelectorAll('[data-underline]')) {
@@ -291,6 +276,7 @@ class Section {
     /** Empty again, ready to be built. */
     reset() {
         for (const shape of [...this.shapes, ...this.outlined]) shape.collapse();
+        for (const g of this.grids) g.cleanup();
         for (const t of this.texts) t.hideAll();
         for (const d of this.decos) if (d.line) d.line.style.scale = '';
         this.state = 'idle';
@@ -299,10 +285,11 @@ class Section {
 
     /** The finished section, instantly. */
     showAll() {
+        for (const g of this.grids) g.cleanup();
         for (const shape of this.shapes) {
-            shape.el.style.scale = '';
-            shape.select(false);
+            shape.shell.cleanup(); // a build that was cut short leaves nothing behind
             shape.el.classList.add('is-shown');
+            shape.done = true;
         }
         for (const t of this.texts) t.revealAll();
         for (const d of this.decos) {
@@ -337,6 +324,8 @@ export class SiteBuilder {
         this.parked = false;  // reduced motion: built once, no replay
         this.current = null;  // the section being built right now
         this.frame = 0;
+        this.guides = new Guides(swarm.layer); // snap lines
+        this.bigCount = 0;    // big shapes built so far: every third one overshoots and corrects itself
 
         const onScroll = () => {
             if (this.frame) return;
@@ -381,6 +370,8 @@ export class SiteBuilder {
     /** Back to the empty page (the glow fades out on its own). */
     reset() {
         this.live = false;
+        this.bigCount = 0;
+        this.guides.clear();
         for (const s of this.sections) s.reset();
         this.glow.classList.remove('is-on');
     }
@@ -483,7 +474,10 @@ export class SiteBuilder {
         const layout = (async () => {
             for (const shape of section.shapes) {
                 if (section.cancelled) return;
-                await this.dragOut(shape);
+                const grid = section.gridOf.get(shape);
+                if (grid && !grid.opened) await this.openGrid(grid);
+                await this.dragOut(shape, section);
+                if (grid && --grid.pending === 0) grid.close();
                 boxReady.get(shape).resolve();
             }
             builder.idle();
@@ -534,56 +528,186 @@ export class SiteBuilder {
         this.glow.classList.add('is-on');
     }
 
-    /** layout-bot presses at the top-left corner of a shape and drags to the bottom-right one. */
-    async dragOut(shape) {
-        const { builder, swarm } = this;
-        const el = shape.el;
-        const fast = shape.fast;
-        const ms = fast ? DRAG_FAST_MS : DRAG_MS;
-        const a = anchor(el); // measured now, while the shape is not scaled yet
+    /** Where the bot's inspector tag sits for a shape: just above its top-left corner. */
+    tagAbove(a) {
+        return () => { const q = a(); return { x: q.left, y: Math.max(4, q.top - TAG_GAP) }; };
+    }
 
-        await builder.chase(() => { const r = a(); return { x: r.left, y: r.top }; }, fast ? ARRIVE_FAST : ARRIVE);
+    /** layout-bot draws the columns of a [data-grid] along its top edge; the cards are dragged into them next. */
+    async openGrid(grid) {
+        const { builder, swarm } = this;
+        const a = anchor(grid.el);
+        const { count, gap } = grid.open();
+
+        await builder.chase(() => { const r = a(); return { x: r.left, y: r.top + 6 }; }, ARRIVE_FAST);
+        const tag = this.tagAbove(a);
+        builder.inspect(`grid ${count} ${count === 1 ? 'col' : 'cols'} · gap ${gap}`, tag);
+        swarm.ripple(a().left, a().top + 6, builder.color);
+        builder.press();
 
         const t0 = performance.now();
-        el.style.scale = `${MIN_SCALE} ${MIN_SCALE}`;
-        el.classList.add('is-shown');
-        if (!fast) shape.select(true);
+        const progress = () => easeInOut(clamp((performance.now() - t0) / GRID_MS, 0, 1));
+        builder.follow(() => { const r = a(); return { x: r.left + r.width * progress(), y: r.top + 6 }; }, { damping: DRAG_DAMPING });
+        const stop = swarm.onFrame(() => grid.progress(progress()));
+        await sleep(GRID_MS);
+        stop();
+        grid.progress(1);
+        builder.release();
+        await sleep(120);
+        builder.hideTag();
+    }
+
+    /** Edges that line up with what already stands: neighbours, the parent's inner edges, grid columns, the page centre. */
+    snapPlan(shape, section, a) {
+        const targets = [];
+        for (const s of section.shapes) {
+            if (s === shape || !s.done) continue;
+            const r = s.el.getBoundingClientRect();
+            if (s.el.contains(shape.el)) {
+                // the parent: its inner edges (inside border and padding) are what the child aligns to
+                const { pad, border } = s.shell.m;
+                targets.push(pageRect({
+                    left: r.left + border[1] + pad[3], top: r.top + border[0] + pad[0],
+                    right: r.right - border[1] - pad[1], bottom: r.bottom - border[0] - pad[2],
+                }));
+            } else {
+                targets.push(pageRect(r));
+            }
+        }
+        const grid = section.gridOf.get(shape);
+        if (grid) targets.push(...grid.targets());
+        return guidePlan(pageRect(a()), targets, [document.documentElement.clientWidth / 2]);
+    }
+
+    /**
+     * layout-bot builds a shape for real: it presses at the top-left corner and drags a box with a real
+     * width and height to the bottom-right one (every now and then too far or too small, then it
+     * corrects), then sets the padding and the gap so that the children flow in (frameOut).
+     */
+    async dragOut(shape, section) {
+        const { builder, swarm, guides } = this;
+        const el = shape.el;
+        const fast = shape.fast;
+        const shell = shape.shell;
+        const a = anchor(el);
+        const m = shell.measure(); // the finished size, while nothing has been changed yet
+        const ms = fast ? DRAG_FAST_MS : DRAG_MS;
+
+        // Every third big shape misses: too far (+) or too small (-) by a few pixels, then the bot corrects.
+        let ox = 0, oy = 0;
+        if (!fast && m.w * m.h > BIG_AREA && this.bigCount++ % 3 === 0) {
+            const sign = (this.bigCount - 1) / 3 % 2 === 0 ? 1 : -1;
+            const room = Math.max(0, document.documentElement.clientWidth - 8 - a().right);
+            ox = sign * Math.min(clamp(m.w * 0.08, 10, 40), sign > 0 ? room : Infinity);
+            oy = sign * clamp(m.h * 0.2, 6, 18);
+        }
+        const misses = ox !== 0 || oy !== 0;
+        const SETTLE = { tolerance: 6, settleSpeed: 200, timeout: 1000, damping: DRAG_DAMPING };
+        const corner = () => { const r = a(); return { x: r.right, y: r.bottom }; };
+
+        await builder.chase(() => { const r = a(); return { x: r.left, y: r.top }; }, fast ? ARRIVE_FAST : ARRIVE);
+        if (section.cancelled) return;
+
+        guides.arm(this.snapPlan(shape, section, a));
+        const t0 = performance.now();
+        shell.begin();
+        if (!fast) shell.select(true);
         const from = a();
         swarm.ripple(from.left, from.top, builder.color); // the "mouse down" of the drag
         builder.press();
 
         builder.follow(() => {
-            const p = easeInOut(clamp((performance.now() - t0) / ms, 0, 1));
             const r = a();
-            return { x: r.left + r.width * p, y: r.top + r.height * p };
+            const k = easeInOut(clamp((performance.now() - t0) / ms, 0, 1));
+            return { x: r.left + m.w * k, y: r.top + m.h * k };
         }, { damping: DRAG_DAMPING });
 
-        // The far corner is glued to the cursor, so the scale follows its real position.
+        // The far corner is glued to the cursor: the box's real width and height follow its real position.
+        const tag = this.tagAbove(a);
         const stop = swarm.onFrame(() => {
             const r = a();
-            const sx = clamp((builder.x - r.left) / r.width, MIN_SCALE, 1);
-            const sy = clamp((builder.y - r.top) / r.height, MIN_SCALE, 1);
-            el.style.scale = `${sx.toFixed(3)} ${sy.toFixed(3)}`;
-            if (!fast) builder.inspect(`${Math.round(r.width * sx)} × ${Math.round(r.height * sy)}`, () => { const q = a(); return { x: q.left, y: Math.max(4, q.top - TAG_GAP) }; });
+            const w = clamp(builder.x - r.left, MIN_SIZE, m.w + Math.max(ox, 0));
+            const h = clamp(builder.y - r.top, MIN_SIZE, m.h + Math.max(oy, 0));
+            shell.resize(w, h);
+            const px = window.scrollX, py = window.scrollY;
+            guides.update({
+                left: r.left + px, cx: r.left + w / 2 + px, right: r.left + w + px,
+                top: r.top + py, cy: r.top + h / 2 + py, bottom: r.top + h + py,
+            }, performance.now() - t0);
+            if (!fast) builder.inspect(`${Math.round(w)} × ${Math.round(h)}`, tag);
         });
 
-        await sleep(ms);
-        // Small repeated shapes do not wait for the bot to come to a stop: the next shape is next.
-        if (!fast) {
-            await builder.chase(() => { const r = a(); return { x: r.right, y: r.bottom }; },
-                { tolerance: 6, settleSpeed: 200, timeout: 1000, damping: DRAG_DAMPING });
+        try {
+            await sleep(ms);
+            // Small repeated shapes do not wait for the bot to come to a stop: the next shape is next.
+            if (!fast) {
+                // A miss: the bot lets go a few pixels too far (or too short), sees the tag, and corrects.
+                await builder.chase(misses ? () => { const r = a(); return { x: r.right + ox, y: r.bottom + oy }; } : corner, SETTLE);
+                if (misses) {
+                    await sleep(FIX_HOLD_MS);
+                    await builder.chase(corner, SETTLE);
+                }
+            }
+        } finally {
+            stop();
         }
-        stop();
 
-        el.style.scale = '';
+        shell.resize(m.w, m.h); // exactly the finished size: the tag shows what the layout really is
         builder.release();
         const to = a();
         swarm.ripple(to.right, to.bottom, builder.color);
         if (!fast) {
+            builder.inspect(`${Math.round(m.w)} × ${Math.round(m.h)}`, tag);
             await sleep(150); // let the final size sink in before the tag goes
-            builder.hideTag();
-            shape.select(false);
         }
+        guides.hold(fast ? 120 : 250);
+        if (section.cancelled) return;
+        shell.swap();
+        shape.done = true;
+
+        if (m.frames) await this.frameOut(shape, section, a);
+        else shell.restore();
+        if (!fast || m.frames) builder.hideTag();
+    }
+
+    /**
+     * Auto-layout: the element is pinned to its size and starts with padding 0 and gap 0, so its children
+     * are stacked in the corner (dashed outlines). The bot pulls the padding in from the bottom-right
+     * corner, then the gap opens; the numbers in the tag count up and the children flow into place.
+     */
+    async frameOut(shape, section, a) {
+        const { builder, swarm } = this;
+        const shell = shape.shell;
+        const m = shell.m;
+        const ms = shape.fast ? FRAME_FAST_MS : FRAME_MS;
+
+        shell.frameBegin();
+        const t0 = performance.now();
+        const prog = () => clamp((performance.now() - t0) / ms, 0, 1);
+        const fp = () => easeInOut(clamp(prog() / 0.7, 0, 1));       // padding first ...
+        const fg = () => easeInOut(clamp((prog() - 0.3) / 0.7, 0, 1)); // ... the gap opens a little later
+        const tag = this.tagAbove(a);
+        builder.press();
+        builder.follow(() => {
+            const r = a();
+            const f = fp();
+            return { x: r.right - m.pad[1] * f, y: r.bottom - m.pad[2] * f };
+        }, { damping: DRAG_DAMPING });
+        const stop = swarm.onFrame(() => {
+            shell.frameStep(fp(), fg());
+            builder.inspect(shell.label(fp(), fg()), tag);
+        });
+
+        try {
+            await sleep(ms);
+        } finally {
+            stop();
+            shell.frameStep(1, 1);
+        }
+        builder.inspect(shell.label(1, 1), tag);
+        builder.release();
+        if (!shape.fast) await sleep(60);
+        shell.frameEnd();
     }
 
     /** copy-bot walks to the start of a text, then types it while following the last character. */
