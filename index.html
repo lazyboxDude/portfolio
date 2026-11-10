@@ -16,10 +16,14 @@
 <body>
     <!-- The page itself. With JS it is built live by the bot cursors (js/build.js), one data-section at a
          time: the hero after the first click, every other section when it scrolls into view.
-         data-box    = a shape the layout-bot drags out (hidden until then; "fast" = quicker, no size tag)
+         data-box    = a shape the layout-bot builds: a real drag (width/height), then padding and gap (hidden until then;
+                       "fast" = quicker, no size tag). data-frame="none" skips the padding/gap step.
+         data-grid   = on the parent of data-box cards in a CSS grid: the bot draws the real columns first
          data-type   = text the copy-bot types, character by character
          data-underline / data-outline = something the design-bot draws (data-outline works with or without data-box)
          data-tag    = the copy-bot shows the real typography while typing it
+         data-a11y   = the a11y-bot checks it (focus ring + real contrast); only on elements with a solid background
+         .tilt       = a mockup the motion-bot tilts in from flat (see --t in css/site.css); none in the Editorial look
          data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
          data-dock-after = once this text is typed, the box (below) flies to its corner
          data-instant = the section simply appears when it scrolls into view, no bots
@@ -38,7 +42,7 @@
                         <li><a href="#experience" data-type>Experience</a></li>
                         <li><a href="#skills" data-type>Skills</a></li>
                     </ul>
-                    <a id="nav-cta" class="nav-cta" href="#contact" data-box><span data-type>Contact</span></a>
+                    <a id="nav-cta" class="nav-cta" href="#contact" data-box data-a11y><span data-type>Contact</span></a>
                 </nav>
             </header>
 
@@ -85,8 +89,8 @@
 
                 <h1 id="headline" data-type data-tag data-speed="0.7" data-dock-after>Micael Gomes Fernandes</h1>
                 <div class="hero-copy">
-                    <p class="tagline" data-type data-tag>Game designer, 3D artist and tool builder. I build interfaces that <em class="accent" data-underline>build themselves.</em></p>
-                    <p class="lede" data-type>This page builds itself: a small team of cursor bots lays it out, writes it and draws it, live. Everything is plain HTML, CSS and JavaScript.</p>
+                    <p class="tagline" data-type data-tag data-a11y>Game designer, 3D artist and tool builder. I build interfaces that <em class="accent" data-underline>build themselves.</em></p>
+                    <p class="lede" data-type data-a11y>This page builds itself: a small team of cursor bots lays it out, writes it, draws it, checks it and sets it in motion, live. Everything is plain HTML, CSS and JavaScript.</p>
                     <div class="actions">
                         <a id="hello" class="btn btn-solid btn-lg" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>Say hello</span></a>
                         <a id="work-link" class="btn btn-ghost btn-lg" href="#projects" data-box data-outline><span data-type>See my work</span></a>
@@ -106,7 +110,7 @@
                 <div class="about">
                     <div class="about-text">
                         <p data-type>I'm a game designer and co-founder of Moonflux Interactive. I shape the player experience and keep the technical and game design documentation that connects ideas to development.</p>
-                        <p data-type>My background is mixed on purpose: a commercial apprenticeship, a diploma in Game Art &amp; 3D Animation at SAE Zürich and live operation of cinema technology at Cinema 8. I also build my own tools, like Dienstplan, a shift-planning web app with PDF import and Google Calendar integration, and this page.</p>
+                        <p data-type data-a11y>My background is mixed on purpose: a commercial apprenticeship, a diploma in Game Art &amp; 3D Animation at SAE Zürich and live operation of cinema technology at Cinema 8. I also build my own tools, like Dienstplan, a shift-planning web app with PDF import and Google Calendar integration, and this page.</p>
                     </div>
                     <ul class="chips" aria-label="Focus">
                         <li class="chip" data-box="fast"><span data-type>Game design</span></li>
@@ -122,14 +126,14 @@
             <div class="wrap">
                 <p class="eyebrow" data-type>Projects</p>
                 <h2 id="projects-title" class="title title-xl" data-type>Things I made, <em class="accent">and use.</em></h2>
-                <div class="cells" data-box>
-                    <article class="cell" aria-labelledby="p-dienstplan">
+                <div class="cells" data-grid>
+                    <article class="cell" data-box aria-labelledby="p-dienstplan">
                         <p class="cell-top"><span class="num" aria-hidden="true" data-type>01</span><span class="eyebrow" data-type>Web app · in use</span></p>
                         <h3 id="p-dienstplan" data-type>Dienstplan</h3>
                         <p class="cell-text" data-type>Drop in the monthly roster as a PDF, pick your name and get your shifts, your target hours and an export for your calendar or Notion. The file stays on your device.</p>
-                        <p class="cell-links"><a class="link" href="dienstplan.html" data-type data-underline>Open the app</a></p>
+                        <p class="cell-links"><a class="link" href="dienstplan.html" data-type data-underline data-a11y>Open the app</a></p>
                     </article>
-                    <article class="cell" aria-labelledby="p-aphonia">
+                    <article class="cell" data-box aria-labelledby="p-aphonia">
                         <p class="cell-top"><span class="num" aria-hidden="true" data-type>02</span><span class="eyebrow" data-type>Game · Moonflux Interactive · 2025</span></p>
                         <h3 id="p-aphonia" data-type>Aphonia</h3>
                         <p class="cell-text" data-type>A narrative puzzle game about the erosion of sound and the act of listening. You accompany Leelo, a mute being who notices what others no longer do. In development, built with Unity.</p>
@@ -138,10 +142,10 @@
                             <a class="link" href="https://moonflux-interactive.com" data-type data-underline>Moonflux Interactive</a>
                         </p>
                     </article>
-                    <article class="cell" aria-labelledby="p-site">
+                    <article class="cell" data-box aria-labelledby="p-site">
                         <p class="cell-top"><span class="num" aria-hidden="true" data-type>03</span><span class="eyebrow" data-type>Experiment · this page</span></p>
                         <h3 id="p-site" data-type>This website</h3>
-                        <p class="cell-text" data-type>Three cursor bots with jobs lay it out, write it and draw it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
+                        <p class="cell-text" data-type>Five cursor bots with jobs lay it out, write it, draw it, check it and animate it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
                         <p class="cell-links"><a class="link" href="https://github.com/lazyboxDude/portfolio" data-type data-underline>See the source</a></p>
                     </article>
                 </div>
@@ -222,7 +226,7 @@
                         <p class="when" data-type>11.2024 – today</p>
                         <div class="what">
                             <h3 data-type>Game Designer &amp; Co-founder</h3>
-                            <p class="where" data-type>Moonflux Interactive, Zürich</p>
+                            <p class="where" data-type data-a11y>Moonflux Interactive, Zürich</p>
                             <p data-type>Co-design, concept and strategic planning of the whole player experience. Structured documentation of technical and game design as the interface to development.</p>
                         </div>
                     </li>
@@ -273,11 +277,11 @@
             <div class="wrap">
                 <p class="eyebrow" data-type>Skills</p>
                 <h2 id="skills-title" class="title title-xl" data-type>Five layers, <em class="accent">one stack.</em></h2>
-                <ul class="skills">
+                <ul class="skills" data-grid>
                     <li class="skill" data-box="fast">
                         <p class="layer" data-type>Layer 1</p>
                         <h3 data-type>Business &amp; operations</h3>
-                        <p data-type>Kaufmann EFZ · e-commerce · live operation · documentation · MS Office</p>
+                        <p data-type data-a11y>Kaufmann EFZ · e-commerce · live operation · documentation · MS Office</p>
                     </li>
                     <li class="skill" data-box="fast">
                         <p class="layer" data-type>Layer 2</p>
@@ -309,7 +313,7 @@
                 <p class="eyebrow" data-type>The stack, alive</p>
                 <h2 id="swarm-title" class="title" data-type>Press the button, <em class="accent">they multiply.</em></h2>
                 <p class="lede" data-type>The same five layers as a swarm. Every cursor is a small agent with a job. Add more of them and watch the layers fill up.</p>
-                <div class="swarm" data-box>
+                <div class="swarm" data-box data-frame="none">
                     <!-- Decorative picture, drawn by js/agents.js. The list on the right says the same in words. -->
                     <canvas id="swarm-canvas" class="swarm-canvas" aria-hidden="true"></canvas>
                     <ol class="layer-list" aria-label="The five layers, top to bottom">
@@ -320,7 +324,7 @@
                         <li><button class="layer-btn" type="button" data-layer="0" aria-pressed="false"><span class="layer-dot" style="--c:#7b95ff"></span><span><span class="layer-n">Layer 1</span>Business &amp; operations</span></button></li>
                     </ol>
                     <div class="swarm-bar">
-                        <button id="swarm-more" class="btn btn-solid" type="button">More agents</button>
+                        <button id="swarm-more" class="btn btn-solid" type="button" data-a11y>More agents</button>
                         <button id="swarm-stack" class="btn btn-ghost" type="button" aria-pressed="false" data-outline><span class="stack-label">Stack them up</span></button>
                         <p id="swarm-count" class="swarm-count" role="status">16 agents · 5 layers</p>
                     </div>
@@ -335,7 +339,7 @@
                     <h2 id="contact-title" class="title" data-type>Let's build something <em class="accent" data-underline>together.</em></h2>
                     <p class="lede" data-type>Questions, ideas or a project? Write me. My CV is a PDF in German and English, made on the spot from this site.</p>
                     <div class="actions">
-                        <a class="btn btn-solid" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>micael@gomes-fernandes.ch</span></a>
+                        <a class="btn btn-solid" href="mailto:micael@gomes-fernandes.ch" data-box data-a11y><span data-type>micael@gomes-fernandes.ch</span></a>
                         <a class="btn btn-ghost" href="cv.html" data-box data-outline><span data-type>Download CV</span></a>
                     </div>
                 </div>

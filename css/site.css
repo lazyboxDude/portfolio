@@ -117,6 +117,20 @@ html:not(.js) .glow { opacity: 1; }
     background: radial-gradient(closest-side, rgba(255, 199, 102, 0.22), rgba(255, 199, 102, 0));
 }
 
+/* The motion-bot sets the glow drifting: two slow, offset loops (transform only). */
+.glow.is-moving .glow-a { will-change: translate; animation: drift-a 26s ease-in-out infinite alternate; }
+.glow.is-moving .glow-b { will-change: translate; animation: drift-b 31s ease-in-out infinite alternate; }
+
+@keyframes drift-a {
+    from { translate: 0 0; }
+    to   { translate: 12vw 9vh; }
+}
+
+@keyframes drift-b {
+    from { translate: 0 0; }
+    to   { translate: -10vw 12vh; }
+}
+
 /* ---- The box: start button in the hero, later the bots' home (js/dock.js) ----------------------- */
 
 /* A free slot between the label and the name. On desktop the box stands in it and reaches down behind the name;
@@ -590,10 +604,8 @@ html:not(.js) .btn-ghost { border-color: var(--fg); }
 
 .title .accent { letter-spacing: -0.01em; }
 
-/* The frame of a block of cells. The cells are separated by the same line. */
-.cells,
+/* Framed blocks: 1px ink. */
 .renders,
-.cell-slim,
 .timeline {
     position: relative;
     border: 1px solid var(--fg);
@@ -646,18 +658,19 @@ html:not(.js) .btn-ghost { border-color: var(--fg); }
 .cells {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 56px;
+    margin: 56px 1px 0 0;
 }
 
+/* Every cell has its own frame (the layout-bot builds them one by one); neighbours share a line. */
 .cell {
     position: relative;
     display: flex;
     flex-direction: column;
     min-height: 370px;
+    margin: 0 -1px -1px 0;
     padding: 28px;
+    border: 1px solid var(--fg);
 }
-
-.cells > .cell + .cell { border-left: 1px solid var(--fg); }
 
 .cell-top {
     display: flex;
@@ -714,8 +727,7 @@ html:not(.js) .btn-ghost { border-color: var(--fg); }
 .link .underline { height: 1px; bottom: 6px; background: currentColor; }
 html:not(.js) .link { border-bottom: 1px solid var(--fg); }
 
-.renders,
-.cell-slim { margin-top: -1px; }
+.renders { margin-top: 0; } /* the last row of cells overlaps its bottom line */
 
 .renders-head { padding: 28px; }
 
@@ -766,7 +778,7 @@ html:not(.js) .link { border-bottom: 1px solid var(--fg); }
     font: 500 11px/1.5 var(--font-mono);
 }
 
-.cell-slim { min-height: 0; }
+.cell-slim { min-height: 0; margin: -1px 0 0; }
 .cell-slim h3 { margin-top: 24px; }
 
 /* Experience: one frame, the rows are ruled; the dates are the mono column */
@@ -862,7 +874,6 @@ html:not(.js) .link { border-bottom: 1px solid var(--fg); }
 
 @media (max-width: 900px) {
     .cells { grid-template-columns: 1fr; }
-    .cells > .cell + .cell { border-left: 0; border-top: 1px solid var(--fg); }
     .cell { min-height: 0; }
     .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .gallery > li:not(:nth-child(4n + 1)) { border-left: 0; }
@@ -1046,9 +1057,85 @@ html:not(.js) .cta .btn-ghost { border-color: var(--bg); }
 
 /* ---- Built live: shapes and characters ----------------------------------- */
 
-/* Shapes the layout-bot drags out: the bot holds the bottom-right corner, so scale grows from the top-left. */
-[data-box] { transform-origin: 0 0; }
+/* Shapes the layout-bot builds (js/layout.js). Hidden until the bot starts on them. */
 .js [data-box]:not(.is-shown) { visibility: hidden; }
+
+/* 1. The drag. The element already has its final size (nothing around it moves) but looks empty; the
+      .shell inside it is the box the bot really resizes (width/height, no scale), wearing the element's
+      own classes, so it has the same background, border and corner radius. */
+.js .is-building {
+    background: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.js .is-building > :not([data-fx]) { visibility: hidden; }
+
+/* 2. Auto-layout. The element is pinned (contain: layout size, set by the bot) while padding and gap go from
+      0 to their real values: the children show as dashed outlines and flow into place. */
+.js .site .is-framing > :not([data-fx]) {
+    visibility: visible;
+    outline: 1px dashed rgba(123, 149, 255, 0.65);
+    outline-offset: -1px;
+}
+
+.js .site .is-framing > :not([data-fx]) * { visibility: hidden; }
+
+/* A card that is not built yet only shows as an outline here, without its fill. */
+.js .site .is-framing > [data-box]:not(.is-shown) {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.pad-band {
+    position: absolute;
+    inset: 0;
+    border: 0 solid rgba(123, 149, 255, 0.16);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.is-filled > :not([data-fx]) { animation: fill-in 0.4s ease both; }
+
+@keyframes fill-in { from { opacity: 0; } }
+
+/* [data-grid]: the real columns, drawn before the cards (behind them: negative z-index inside .site). */
+.grid-col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    border: 0 dashed rgba(123, 149, 255, 0.4);
+    border-width: 0 1px;
+    background: rgba(123, 149, 255, 0.06);
+    transform-origin: 50% 0;
+    scale: 1 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.grid-col.is-closing { opacity: 0; }
+
+/* Snap lines (in the cursor layer): edges that really line up. */
+.snap-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    background: #5fd4f0;
+    transform-origin: 0 0;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    will-change: transform;
+}
+
+.snap-line.is-visible { opacity: 0.9; }
 
 /* Typed text: one span per character, revealed by the copy-bot (layout never shifts). */
 .ch { opacity: 0; }
@@ -1127,7 +1214,7 @@ html:not(.js) .cta .btn-ghost { border-color: var(--bg); }
     left: 0;
     width: 22px;
     height: 22px;
-    will-change: transform;
+    will-change: translate;
 }
 
 .fake-cursor-body {
@@ -1169,10 +1256,25 @@ html:not(.js) .cta .btn-ghost { border-color: var(--bg); }
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.15s ease;
-    will-change: transform;
+    will-change: translate;
 }
 
 .inspector-tag.is-visible { opacity: 1; }
+
+/* Focus ring the a11y-bot holds around the element it checks (size set by js/a11y.js). */
+.a11y-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 2px solid var(--cursor-color);
+    box-shadow: 0 0 0 4px rgba(111, 227, 165, 0.16);
+    opacity: 0;
+    scale: 0.96;
+    transition: opacity 0.18s ease, scale 0.18s ease;
+    will-change: translate;
+}
+
+.a11y-ring.is-visible { opacity: 1; scale: 1; }
 
 .ripple {
     position: absolute;
@@ -1216,7 +1318,8 @@ html:not(.js) .cta .btn-ghost { border-color: var(--bg); }
     .tile img, .layer-btn, .link, .footer-links a { transition: none; }
     .box, .box-lid, .box-gap, .box-count, .box-tip { transition: none; }
     .box-wrap.is-start .box-art { animation: none; }
-    .btn, .nav-links a, .nav-cta, .glow, .sel-frame, .inspector-tag { transition: none; }
+    .btn, .nav-links a, .nav-cta, .glow, .sel-frame, .inspector-tag, .a11y-ring, .grid-col, .snap-line { transition: none; }
+    .glow.is-moving .glow-a, .glow.is-moving .glow-b { animation: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
 }

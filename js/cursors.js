@@ -9,7 +9,7 @@
 // Jobs (see build.js) are written as async functions that await moveTo()/click().
 //
 // Visual language: every bot has a job colour and a name pill ("layout-bot"), the pointer shape
-// tells the job (arrow = layout, I-beam = copy, pencil = design), and while working a bot can show
+// tells the job (arrow = layout, I-beam = copy, pencil = design, magnifier = a11y, spark = motion), and while working a bot can show
 // an inspector tag with the real numbers it is touching.
 //
 // Off duty (idle mode) a bot either roams (no `at` given: currently not used by the build job, bots whirling
@@ -49,9 +49,29 @@ const KINDS = {
   <path d="M4.2 14.6 L7.4 17.8" stroke="var(--fg)" stroke-width="1.2" stroke-linecap="round"/>
 </svg>`,
     },
+    // a11y-bot: a magnifier. The lens centre is the hot spot.
+    lens: {
+        hot: [9, 9],
+        svg: `
+<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round">
+  <path d="M13.4 13.4 L19.6 19.6" stroke="#fff" stroke-width="5.2"/>
+  <path d="M13.4 13.4 L19.6 19.6" stroke="var(--cursor-color)" stroke-width="2.8"/>
+  <circle cx="9" cy="9" r="5.6" fill="var(--cursor-color)" fill-opacity="0.35" stroke="#fff" stroke-width="3.6"/>
+  <circle cx="9" cy="9" r="5.6" stroke="var(--cursor-color)" stroke-width="1.8"/>
+</svg>`,
+    },
+    // motion-bot: a four-pointed spark. The middle is the hot spot.
+    spark: {
+        hot: [11, 11],
+        svg: `
+<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+  <path d="M11 1.5 Q11.9 9.1 20.5 11 Q11.9 12.9 11 20.5 Q10.1 12.9 1.5 11 Q10.1 9.1 11 1.5 Z"
+        fill="var(--cursor-color)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>`,
+    },
 };
 
-const SPRING = 11;                          // pull towards the target
+const SPRING = 11;                         // pull towards the target
 const DAMPING = 4.2;                        // slightly under-damped -> small overshoot
 const DRAG_DAMPING = 2 * Math.sqrt(SPRING); // critically damped -> no overshoot while dragging
 const MAX_DT = 0.05;                        // clamp so a background tab doesn't teleport cursors
@@ -70,7 +90,10 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export const prefersReducedMotion = () => REDUCED_MOTION.matches;
 export { DRAG_DAMPING };
 
-/** A small mono label that shows real numbers ("640 × 92", "500 · 22px / 1.55"). Moves with transform only. */
+// Positions use the `translate` property, not `transform`: the individual `scale` property (pop-in,
+// ripple, focus ring) is applied *after* `transform`, so a translate in `transform` would be scaled too.
+
+/** A small mono label that shows real numbers ("640 × 92", "500 · 22px / 1.55"). Moves with translate only. */
 class InspectorTag {
     constructor(layer, color) {
         this.el = document.createElement('div');
@@ -85,8 +108,10 @@ class InspectorTag {
         if (text !== this.text) {
             this.text = text;
             this.el.textContent = text;
+            this.width = this.el.offsetWidth; // measured only when the text changes
         }
-        this.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        x = Math.min(x, Math.max(4, window.innerWidth - this.width - 6)); // never cut off at the right edge
+        this.el.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
         this.el.classList.add('is-visible');
         this.visible = true;
     }
@@ -148,7 +173,7 @@ class Cursor {
         this.render();
     }
 
-    /** Swap the pointer shape: 'arrow', 'text' (I-beam) or 'pen'. */
+    /** Swap the pointer shape: 'arrow', 'text' (I-beam), 'pen', 'lens' (magnifier) or 'spark'. */
     setKind(kind = 'arrow') {
         const shape = KINDS[kind] ?? KINDS.arrow;
         this.kind = kind;
@@ -458,8 +483,7 @@ class Cursor {
     }
 
     render() {
-        this.el.style.transform =
-            `translate3d(${(this.x - this.hot[0]).toFixed(1)}px, ${(this.y - this.hot[1]).toFixed(1)}px, 0)`;
+        this.el.style.translate = `${(this.x - this.hot[0]).toFixed(1)}px ${(this.y - this.hot[1]).toFixed(1)}px`;
     }
 }
 
@@ -530,7 +554,7 @@ export class CursorSwarm {
         const ring = document.createElement('div');
         ring.className = 'ripple';
         ring.style.setProperty('--cursor-color', color);
-        ring.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        ring.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
         ring.addEventListener('animationend', () => ring.remove(), { once: true });
         this.layer.appendChild(ring);
     }

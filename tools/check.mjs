@@ -13,6 +13,7 @@ const check = (name, ok, detail = '') => {
     console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? `: ${detail}` : ''}`);
 };
 
+const BOTS = 5; // layout, copy, design, a11y, motion
 const IDS = ['box', 'box-wrap', 'box-count', 'cursor-layer', 'site', 'glow', 'status', 'swarm-canvas', 'swarm-count', 'swarm-more', 'swarm-stack', 'headline', 'hello', 'nav', 'nav-cta'];
 
 /** Runs in the page: contrast of every visible text node against the first opaque ancestor background. */
@@ -149,7 +150,7 @@ try {
         });
         const m = label === 'desktop' ? { w: 120, edge: 24 } : { w: 72, edge: 16 };
         check(`[${label}] box docked bottom right (${m.w}px, ${m.edge}px margin), no replay pill`, dock.parent === 'BODY' && dock.position === 'fixed' && dock.w === m.w && dock.right === m.edge && dock.bottom === m.edge && !dock.next, JSON.stringify(dock));
-        check(`[${label}] reduced motion: 3 bots home, box locked, status role, graphic hidden`, dock.home === 3 && dock.badge === '3' && dock.role === 'status' && dock.disabled === 'true' && dock.art === 'true', `${dock.home} home, label "${dock.label}"`);
+        check(`[${label}] reduced motion: all bots home, box locked, status role, graphic hidden`, dock.home === BOTS && dock.badge === String(BOTS) && dock.role === 'status' && dock.disabled === 'true' && dock.art === 'true', `${dock.home} home, label "${dock.label}"`);
         await ctx.close();
     }
 
@@ -181,24 +182,24 @@ try {
 
         // Idle bots walk home one by one; the badge, the tooltip and the (calm) live region follow.
         let home = true;
-        try { await page.waitForFunction(() => document.querySelectorAll('.fake-cursor.is-home').length === 3 && document.getElementById('box').getAttribute('aria-disabled') === 'false', null, { timeout: 90000 }); } catch { home = false; }
-        check('idle bots walk home into the box (3 at home, box clickable again)', home);
+        try { await page.waitForFunction((n) => document.querySelectorAll('.fake-cursor.is-home').length === n && document.getElementById('box').getAttribute('aria-disabled') === 'false', BOTS, { timeout: 90000 }); } catch { home = false; }
+        check('idle bots walk home into the box (all at home, box clickable again)', home);
         await page.hover('#box');
         await page.waitForTimeout(300); // the tooltip fades in
         const shown = await page.evaluate(() => ({ badge: document.querySelector('.box-count-n').textContent, tip: document.querySelector('.box-tip').textContent, tipOpacity: getComputedStyle(document.querySelector('.box-tip')).opacity }));
-        check('badge says 3, tooltip says "3 home", it shows on hover', shown.badge === '3' && shown.tip === '3 home' && shown.tipOpacity === '1', JSON.stringify(shown));
+        check('badge and tooltip count the bots at home, the tooltip shows on hover', shown.badge === String(BOTS) && shown.tip === `${BOTS} home` && shown.tipOpacity === '1', JSON.stringify(shown));
         await page.waitForTimeout(1200);
         const said = await page.evaluate(() => document.querySelector('#box-count .sr-only').textContent);
-        check('live region says it once, calmly', said === '3 bots are at home.', said);
+        check('live region says it once, calmly', said === `${BOTS} bots are at home.`, said);
 
         // A section that comes into reach calls only the bots it needs out of the box.
         await page.evaluate(() => window.scrollTo({ top: document.getElementById('experience').offsetTop - 100, behavior: 'instant' }));
         let out = true;
-        try { await page.waitForFunction(() => document.querySelectorAll('.fake-cursor.is-home').length < 3, null, { timeout: 8000 }); } catch { out = false; }
+        try { await page.waitForFunction((n) => document.querySelectorAll('.fake-cursor.is-home').length < n, BOTS, { timeout: 8000 }); } catch { out = false; }
         const homeNow = await page.evaluate(() => document.querySelectorAll('.fake-cursor.is-home').length);
         check('a section being built calls bots out of the box (not all of them)', out && homeNow >= 1, `${homeNow} still home`);
         let calm = true;
-        try { await page.waitForFunction(() => document.querySelectorAll('.fake-cursor.is-home').length === 3, null, { timeout: 90000 }); } catch { calm = false; }
+        try { await page.waitForFunction((n) => document.querySelectorAll('.fake-cursor.is-home').length === n, BOTS, { timeout: 90000 }); } catch { calm = false; }
         check('after the work they all go home again', calm);
 
         // Click on the docked box: all bots out, everything is built again; the box ignores clicks meanwhile.
@@ -212,6 +213,27 @@ try {
         try { await page.waitForFunction(HERO_BUILT, null, { timeout: 60000 }); } catch { again = false; }
         check('the replay builds the hero again', again);
         check('no console or script errors during the build', !errors.length, errors.join(' | '));
+        await ctx.close();
+    }
+
+    // ---- Scrolling through while the bots build must never hang the build ------------------------
+    if (!quick) {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        await startBuild(page);
+        await page.waitForFunction(HERO_BUILT, null, { timeout: 60000 });
+        await page.evaluate(() => window.scrollTo({ top: document.getElementById('projects').offsetTop - 60, behavior: 'instant' }));
+        await page.waitForTimeout(5000); // stand still in the middle of a build, then run past everything
+        for (let y = 0; y < 12000; y += 500) {
+            await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), y);
+            await page.waitForTimeout(600);
+        }
+        let done = true;
+        try { await page.waitForFunction(() => document.getElementById('box').getAttribute('aria-disabled') === 'false', null, { timeout: 90000 }); } catch { done = false; }
+        const left = await page.evaluate(() => document.querySelectorAll('#site [data-section] .ch:not(.on)').length);
+        check('scrolling past the building sections does not hang the build (box clickable, all text there)', done && left === 0, `${left} characters missing`);
         await ctx.close();
     }
 
