@@ -28,6 +28,8 @@
          data-type   = text the copy-bot types, character by character
          data-underline / data-outline = something the design-bot draws (data-outline works with or without data-box)
          data-tag    = the copy-bot shows the real typography while typing it
+         data-a11y   = the a11y-bot checks it (focus ring + real contrast); only on elements with a solid background
+         .tilt       = a mockup the motion-bot tilts in from flat (see --t in css/site.css)
          data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
          data-instant = the section simply appears when it scrolls into view, no bots
          Without JS everything is simply visible. Screen readers get all text at once. -->
@@ -43,14 +45,14 @@
                         <li><a href="#experience" data-type>Experience</a></li>
                         <li><a href="#skills" data-type>Skills</a></li>
                     </ul>
-                    <a id="nav-cta" class="btn btn-solid btn-small" href="#contact" data-box><span data-type>Contact</span></a>
+                    <a id="nav-cta" class="btn btn-solid btn-small" href="#contact" data-box data-a11y><span data-type>Contact</span></a>
                 </nav>
             </header>
 
             <main class="hero">
                 <p class="eyebrow" data-type>Micael Gomes Fernandes · ._lazybox_</p>
-                <h1 id="headline" data-type data-tag data-speed="0.7">I build interfaces that <em class="accent" data-underline>build themselves.</em></h1>
-                <p class="lede" data-type data-tag>This page builds itself: a small team of cursor bots lays it out, writes it and draws it, live. Everything is plain HTML, CSS and JavaScript.</p>
+                <h1 id="headline" data-type data-tag data-a11y data-speed="0.7">I build interfaces that <em class="accent" data-underline>build themselves.</em></h1>
+                <p class="lede" data-type data-tag data-a11y>This page builds itself: a small team of cursor bots lays it out, writes it, draws it, checks it and sets it in motion, live. Everything is plain HTML, CSS and JavaScript.</p>
                 <div class="actions">
                     <a id="about-link" class="btn btn-solid" href="#about" data-box><span data-type>About me</span></a>
                     <a id="hello" class="btn btn-ghost" href="mailto:micael@gomes-fernandes.ch" data-box data-outline><span data-type>Say hello</span></a>
@@ -65,7 +67,7 @@
                 <div class="about">
                     <div class="about-text">
                         <p data-type>I'm a game designer and co-founder of Moonflux Interactive. I shape the player experience and keep the technical and game design documentation that connects ideas to development.</p>
-                        <p data-type>My background is mixed on purpose: a commercial apprenticeship, a diploma in Game Art &amp; 3D Animation at SAE Zürich and live operation of cinema technology at Cinema 8. I also build my own tools, like Dienstplan, a shift-planning web app with PDF import and Google Calendar integration, and this page.</p>
+                        <p data-type data-a11y>My background is mixed on purpose: a commercial apprenticeship, a diploma in Game Art &amp; 3D Animation at SAE Zürich and live operation of cinema technology at Cinema 8. I also build my own tools, like Dienstplan, a shift-planning web app with PDF import and Google Calendar integration, and this page.</p>
                     </div>
                     <ul class="chips" aria-label="Focus">
                         <li class="chip" data-box="fast"><span data-type>Game design</span></li>
@@ -89,7 +91,7 @@
                             <h3 id="p-dienstplan" data-type>Dienstplan</h3>
                             <p data-type>Drop in the monthly roster as a PDF, pick your name and get your shifts, your target hours and an export for your calendar or Notion. The file stays on your device.</p>
                             <div class="project-links">
-                                <a class="btn btn-ghost btn-small" href="dienstplan.html" data-outline><span data-type>Open the app</span></a>
+                                <a class="btn btn-ghost btn-small" href="dienstplan.html" data-outline data-a11y><span data-type>Open the app</span></a>
                             </div>
                         </div>
                         <div class="device" data-box="fast">
@@ -122,7 +124,7 @@
                         <div class="project-text">
                             <p class="eyebrow" data-type>Experiment · this page</p>
                             <h3 id="p-site" data-type>This website</h3>
-                            <p data-type>Three cursor bots with jobs lay it out, write it and draw it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
+                            <p data-type>Five cursor bots with jobs lay it out, write it, draw it, check it and animate it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
                         </div>
                         <div class="device" aria-hidden="true">
                             <div class="tilt tilt-l">
@@ -139,6 +141,8 @@
                                     <span class="mini-cur mini-cur-a"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#7b95ff" stroke="#06080d" stroke-width="1"/></svg><b style="background:#7b95ff">layout-bot</b></span>
                                     <span class="mini-cur mini-cur-b"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#ff8fb8" stroke="#06080d" stroke-width="1"/></svg><b style="background:#ff8fb8">copy-bot</b></span>
                                     <span class="mini-cur mini-cur-c"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#ffc766" stroke="#06080d" stroke-width="1"/></svg><b style="background:#ffc766">design-bot</b></span>
+                                    <span class="mini-cur mini-cur-d"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.4" cy="7.4" r="4.6" fill="#6fe3a5" fill-opacity="0.35" stroke="#06080d" stroke-width="2.4"/><circle cx="7.4" cy="7.4" r="4.6" fill="none" stroke="#6fe3a5" stroke-width="1.4"/><path d="M11 11 L16 16" stroke="#6fe3a5" stroke-width="2.4" stroke-linecap="round"/></svg><b style="background:#6fe3a5">a11y-bot</b></span>
+                                    <span class="mini-cur mini-cur-e"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 1 Q9.8 7.4 17 9 Q9.8 10.6 9 17 Q8.2 10.6 1 9 Q8.2 7.4 9 1 Z" fill="#b79bff" stroke="#06080d" stroke-width="1" stroke-linejoin="round"/></svg><b style="background:#b79bff">motion-bot</b></span>
                                 </div>
                             </div>
                         </div>
@@ -225,7 +229,7 @@
                         <p class="when" data-type>11.2024 – today</p>
                         <div class="what">
                             <h3 data-type>Game Designer &amp; Co-founder</h3>
-                            <p class="where" data-type>Moonflux Interactive, Zürich</p>
+                            <p class="where" data-type data-a11y>Moonflux Interactive, Zürich</p>
                             <p data-type>Co-design, concept and strategic planning of the whole player experience. Structured documentation of technical and game design as the interface to development.</p>
                         </div>
                     </li>
@@ -280,7 +284,7 @@
                     <li class="skill" data-box="fast">
                         <p class="layer" data-type>Layer 1</p>
                         <h3 data-type>Business &amp; operations</h3>
-                        <p data-type>Kaufmann EFZ · e-commerce · live operation · documentation · MS Office</p>
+                        <p data-type data-a11y>Kaufmann EFZ · e-commerce · live operation · documentation · MS Office</p>
                     </li>
                     <li class="skill" data-box="fast">
                         <p class="layer" data-type>Layer 2</p>
@@ -323,7 +327,7 @@
                         <li><button class="layer-btn" type="button" data-layer="0" aria-pressed="false"><span class="layer-dot" style="--c:#7b95ff"></span><span><span class="layer-n">Layer 1</span>Business &amp; operations</span></button></li>
                     </ol>
                     <div class="swarm-bar">
-                        <button id="swarm-more" class="btn btn-solid" type="button">More agents</button>
+                        <button id="swarm-more" class="btn btn-solid" type="button" data-a11y>More agents</button>
                         <button id="swarm-stack" class="btn btn-ghost" type="button" aria-pressed="false" data-outline><span class="stack-label">Stack them up</span></button>
                         <p id="swarm-count" class="swarm-count" role="status">16 agents · 5 layers</p>
                     </div>
@@ -337,7 +341,7 @@
                     <h2 id="contact-title" class="title" data-type>Let's build something <em class="accent" data-underline>together.</em></h2>
                     <p class="lede" data-type>Questions, ideas or a project? Write me. My CV is a PDF in German and English, made on the spot from this site.</p>
                     <div class="actions">
-                        <a class="btn btn-solid" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>micael@gomes-fernandes.ch</span></a>
+                        <a class="btn btn-solid" href="mailto:micael@gomes-fernandes.ch" data-box data-a11y><span data-type>micael@gomes-fernandes.ch</span></a>
                         <a class="btn btn-ghost" href="cv.html" data-box data-outline><span data-type>Download CV</span></a>
                     </div>
                 </div>
