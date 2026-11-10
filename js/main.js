@@ -1,38 +1,31 @@
 import { CursorSwarm } from './cursors.js';
 import { SiteBuilder } from './build.js';
 import { AgentField } from './agents.js';
+import { Dock } from './dock.js';
 
 const box = document.getElementById('box');
-const next = document.getElementById('next');
 const swarm = new CursorSwarm(document.getElementById('cursor-layer'), { max: 40 });
+
+// The box is the start button, then the bots' home in the corner (js/dock.js).
+const dock = new Dock({ wrap: document.getElementById('box-wrap'), button: box, swarm });
 
 const builder = new SiteBuilder({
     swarm,
-    box,
+    dock,
     site: document.getElementById('site'),
     glow: document.getElementById('glow'),
-    next,
     status: document.getElementById('status'),
 });
 
-/** Where the bots burst out on the first run: the click, or the button centre for keyboard users. */
-function originOf(event, button) {
-    const rect = button.getBoundingClientRect();
-    const hasPointer = event.detail > 0 && (event.clientX || event.clientY);
-    return {
-        x: hasPointer ? event.clientX : rect.left + rect.width / 2,
-        y: hasPointer ? event.clientY : rect.top + rect.height / 2,
-    };
-}
-
-box.addEventListener('click', (event) => {
+// First click: the bots burst out of the box and build the page while it travels to the corner.
+// Later clicks on the docked box call every bot out and build everything again (not while a build runs).
+box.addEventListener('click', () => {
+    if (dock.disabled) return;
     // Little press animation (also for keyboard / touch users).
     box.classList.add('is-pressed');
     setTimeout(() => box.classList.remove('is-pressed'), 120);
-    builder.run(originOf(event, box));
+    builder.run();
 });
-
-next.addEventListener('click', (event) => builder.run(originOf(event, next)));
 
 // The swarm finale: hundreds of agents on a canvas, drawn from the same animation loop as the bots.
 const swarmStage = document.querySelector('.swarm');

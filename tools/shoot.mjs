@@ -1,6 +1,6 @@
 // Screenshots of the homepage for design review.
 //   node tools/shoot.mjs [--out <dir>] [--fast]
-// Per viewport (desktop 1440, mobile 390): the empty start, the hero after the bots built it, and the
+// Per viewport (desktop 1440, mobile 390): the start (box), the name over the box, the box in flight, the hero after the bots built it, and the
 // finished page (full height, built instantly with prefers-reduced-motion). --fast skips the animated hero.
 // Default output: <tmpdir>/portfolio-shots
 
@@ -32,6 +32,12 @@ try {
             await page.evaluate(() => document.fonts.ready);
             await save(page, `${label}-1-start.png`);
             await startBuild(page);
+            // The name is typed in front of the box (it flips light over it), then the box flies to its corner.
+            await page.waitForFunction(() => [...document.querySelectorAll('#headline .ch')].every((c) => c.classList.contains('on')), null, { timeout: 60000 });
+            await page.waitForTimeout(200);
+            await save(page, `${label}-1b-name-over-box.png`);
+            await page.waitForTimeout(900);
+            await save(page, `${label}-1c-flight.png`);
             await page.waitForFunction(HERO_BUILT, null, { timeout: 60000 });
             await page.waitForTimeout(800);
             await save(page, `${label}-2-hero.png`);

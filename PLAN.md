@@ -105,7 +105,7 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über eine serverseitige Funktion (Vercel Function oder Cloudflare Worker), der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
 | E1 | **Redesign "Editorial", Schritt 1: Look und Hero** | gebaut (siehe Status): hell (Papier/Tinte/Blau), Space Grotesk, flache Nav, Riesen-Name als Hero, Tiefen-Effekt vorbereitet, eckige Buttons. |
-| E2 | Redesign, Schritt 2: wandernde Box als Zuhause der Bots | offen: isometrische Box, FLIP nach unten rechts, Zähler, Bots gehen heim, Klick ruft sie (ersetzt "Build again"). |
+| E2 | **Redesign, Schritt 2: wandernde Box als Zuhause der Bots** | gebaut (siehe Status): isometrische Box im Hero, FLIP nach unten rechts, Zähler und Tooltip, Bots gehen heim und kommen beim Bauen wieder heraus, Klick auf die Box ruft alle (ersetzt "Build again"). |
 | E3 | Redesign, Schritt 3: Abschnitte im Editorial-Stil | offen: Projects-Raster mit 1 px Rahmen, About bis Footer im selben Stil, Schwarm hell hinterlegt. |
 | 11 | Feinschliff | Performance-Messung, Mobil, Reduced-Motion, Lighthouse, Cross-Browser, Sound optional (standardmäßig aus). |
 
@@ -223,6 +223,23 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Eingabeleiste** ("Ask the bots to build something") bewusst weggelassen (totes Bedienelement bis Roadmap-Schritt 9).
   - **Fehlende Dateien:** `DESIGN.md` gibt es im Repo nicht (weder hier noch auf `main`), der Bau-Vertrag ist in `index.html` (Kommentar vor `#site`), im Kopf von `js/build.js` und oben in diesem Plan beschrieben. `tools/check.mjs` und `tools/shoot.mjs` gab es ebenfalls nicht, sie sind in diesem Schritt neu (siehe Arbeitsweise).
   - **Mobil:** Der Name bleibt einzeilig und riesig (55 px bei 390), also rechts abgeschnitten ("Micael Gomes Fe"). Der volle Name steht im Eyebrow darüber.
+- **Redesign "Editorial", Schritt 2 gebaut** (gleicher Branch, kein PR): Die Box wandert und wird das Zuhause der Bots.
+  - **Ablauf:** Die Box (`#box-wrap` mit `<button id="box">`, Label "Open the box") steht im Hero rechts, hinter dem Namen, als isometrisches SVG (`aria-hidden`), graphit, Deckel einen Spalt offen mit Akzent-Lichtkante, Logo auf der Seite, Hinweis "Click to open" (mobil "Tap to open").
+    Klick: Der Deckel hebt sich, die drei Bots platzen aus der Öffnung und bauen den Hero wie bisher. **Sobald der Name getippt ist** (`data-dock-after` an der H1), fliegt die Box nach unten rechts. So kippen die Buchstaben beim Tippen über der Box auf Hell und beim Abflug wieder zurück.
+    Das Mockup zeigt den Namen schon vor dem Klick, der Bau bleibt aber "wie bisher" (Seite leer bis zum Klick). Will man den Effekt schon vor dem Klick, müsste der Name statisch sichtbar sein statt getippt (dann braucht der Hero ein deckendes Pseudo-Element, weil die Seite bis zum Klick `visibility: hidden` ist).
+  - **Flug = EINE Transform-Animation** (`js/dock.js`, `Dock.fly()`, WAAPI): Zielrechteck messen (kurz die Klasse `is-home` setzen, messen, zurücknehmen), `translate` und `scale` von der Startgrösse **herunter** animieren (so bleibt der Vektor scharf), im Hero hinter dem Namen. Im selben Frame, in dem die Animation endet, zieht die Box nach `<body>` und bekommt `position: fixed; right/bottom` mit `env(safe-area-inset-*)`, am selben Ort, also ohne Sprung.
+    (Direkt zu `position: fixed` im Hero ging nicht: Der Hero ist ein Stacking-Kontext, spätere Abschnitte würden über der angedockten Box liegen.) Angedockt: 120 px Breite auf Desktop, 72 px bis 760 px Breite, 24 bzw. 16 px Abstand. Sie bleibt dort für immer.
+  - **Layout:** Zwischen Eyebrow und Name liegt `.box-slot` (nimmt den freien Platz des Hero). Desktop ab 1000 px: die Box ragt aus dem Slot hinter den Namen (`--bw`, Mitte leicht über der Namensmitte). Darunter sitzt sie ganz im Slot (Mindesthöhe), damit der dort nicht überblendete schwarze Name nie über der dunklen Box liegt.
+    Der Hero-Strip lässt rechts Platz für die angedockte Box, der Footer unten ebenfalls.
+  - **Zuhause** (`js/cursors.js`): `idle({ at })` lässt einen Bot ruhig an seinem Rastpunkt warten (`SiteBuilder.rest`), nach `homeDelay()` (ca. 6 s, scheue Bots früher: `6 s * (1.4 - 0.8 * shyness)`) und nur wenn gerade nichts gebaut wird (`Dock.canReceive`), ruft er `goHome(dock)`:
+    zur Öffnung laufen (18 px darüber), dort schrumpfen und ausblenden (`.is-entering`, nur `scale` und `opacity` auf den inneren Teilen, nicht auf dem positionierten Element), Zähler plus 1, die Box "federt" kurz. `callBack(dock)` bricht einen Heimweg ab, wartet auf einen, der gerade hineinsinkt, oder holt einen Bot heraus (`emerge`, mit kleinem Schwung nach links oben, versetzt um 130 ms).
+    Zustände pro Bot: `work`, `walking`, `entering`, `home` (`swarm.counts()`). Persönlichkeit steckt jetzt in `JOBS` (`js/build.js`): layout-bot scheu (geht zuerst heim), copy-bot neugierig, design-bot gesellig. Das Herumwandern aus Schritt 3 (`idle()` ohne `at`) ist weiter ungenutzt.
+  - **Bauen mit Zuhause** (`SiteBuilder.callBots`): Ein Abschnitt ruft nur die Bots, die er braucht (layout bei Formen, copy bei Texten, design bei Unterstreichung/Rahmen/Hero). Der Rest bleibt zu Hause (Experience braucht z. B. keinen design-bot). Wartende Bots stehen nach dem Bau links neben der Box.
+  - **Klick auf die gedockte Box** ruft alle Bots heraus und baut die Seite neu auf, `#next` ("Build again") gibt es nicht mehr. Während ein Bau läuft, ist die Box `aria-disabled` (bleibt fokussierbar, ignoriert Klicks). Label für Screenreader: "Call the bots".
+  - **Anzeige:** Badge in Akzent mit der Zahl der Bots zu Hause (nur ab 1), Tooltip beim Hover/Fokus "1 home · 2 on their way" (dazu "· n at work", wenn Bots arbeiten). Zähler als `role="status"`, der Satz fürs Vorlesen ("2 bots are at home.") wird höchstens alle 0,9 s aktualisiert (leise).
+  - **Reduced Motion:** Die Box dockt sofort an, alle drei Bots sind zu Hause (Zähler 3), keine Animation, die Box ist gesperrt (`aria-disabled`, Label "The bots are at home"). Ohne JS gibt es keine Box (der Slot ist `display: none`).
+  - **Offene Entscheidungen, Standards genommen:** (1) Klick auf die Box = Neu-Aufbau (Alternative: Bots zur Eingabeleiste, Roadmap-Schritt 9). (2) Keine Eingabeleiste. (3) Akzent Blau `#3355ff`.
+  - **Bekannt:** Die Box deckt unten rechts 120 x 145 px Inhalt ab (fix, wie im Mockup); die Bots warten links daneben. Während des Flugs scrollen springt die Box am Ende an die Ecke (Flug dauert 1,5 s).
 
 ## Offene Fragen an Micael
 
@@ -243,7 +260,7 @@ Entschieden: Alle acht Renders werden gezeigt, Aphonia und Dolphin Rush bleiben 
 - Branch: der Chat bekommt einen Branch vorgegeben. Pro Schritt ein PR gegen `main`. Ist der PR gemerged, den Branch neu von `main` starten.
 - Commit-Messages und Chat auf Deutsch, Code und Kommentare auf Englisch.
 - Lokal testen: `python3 -m http.server` im Repo-Root, dann `http://localhost:8000` öffnen.
-  Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Das Element `#box` schwebt dauerhaft, deshalb in Tests mit `{ force: true }` klicken (die Pill `#next` schwebt nicht).
+  Browser-Test mit Playwright (ist in der Umgebung vorinstalliert). Die Box `#box` schwebt (Float-Animation) und ist während eines Baus `aria-disabled`, deshalb in Tests mit `{ force: true }` klicken.
   Der Hero baut sich in ca. 15 Sekunden, jeder weitere Abschnitt in 3 bis 9 Sekunden. In Tests auf Zustände warten (z. B. alle `.ch` eines Abschnitts mit Klasse `on` und alle `[data-box]` mit `is-shown`, oder `#next` mit Klasse `is-ready`), keine festen Pausen.
   Weitere Abschnitte bauen sich erst, wenn man hinscrollt: im Test mit `window.scrollTo({ top, behavior: 'instant' })` springen (das Standard-Scrollen ist weich).
   Bei Zeitmessungen keine Screenshots mitlaufen lassen, sie verfälschen die Dauer.

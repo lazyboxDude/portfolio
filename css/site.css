@@ -117,60 +117,187 @@ html:not(.js) .glow { opacity: 1; }
     background: radial-gradient(closest-side, rgba(255, 199, 102, 0.22), rgba(255, 199, 102, 0));
 }
 
-/* ---- The start box ------------------------------------------------------- */
+/* ---- The box: start button in the hero, later the bots' home (js/dock.js) ----------------------- */
+
+/* A free slot between the label and the name. On desktop the box stands in it and reaches down behind the name;
+   on small screens it sits entirely in the slot, so the (unblended, black) name never runs over it. */
+.box-slot {
+    --bw: min(34vw, 150px); /* box width at the start */
+    position: relative;
+    flex: 1 0 calc(var(--bw) * 1.21 + 12px);
+    margin: 12px var(--gutter) 0;
+}
+
+.box-wrap {
+    position: absolute;
+    z-index: -1; /* behind the name: it blends with whatever stands behind it */
+    top: 0;
+    right: 0;
+    width: var(--bw);
+    transform-origin: 0 0; /* the flight to the corner scales from the top-left corner */
+    visibility: visible;   /* the page is hidden before the first click, the box is not */
+}
+
+@media (min-width: 1000px) {
+    .box-slot {
+        --bw: clamp(260px, 25vw, 380px);
+        flex-basis: calc(var(--bw) * 0.605 - 6.38vw + 16px);
+        margin: 0;
+    }
+
+    /* Centred (a bit high) on the name, whose height is 12.75vw. */
+    .box-wrap {
+        top: auto;
+        right: 5vw;
+        bottom: calc(-5.6vw - var(--bw) * 0.605);
+    }
+}
+
+/* Docked: fixed in the bottom-right corner, outside the hero (js/dock.js moves it to <body>). */
+.box-wrap.is-home {
+    position: fixed;
+    z-index: 6;
+    top: auto;
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    width: 120px;
+}
+
+@media (max-width: 760px) {
+    .box-wrap.is-home {
+        right: calc(16px + env(safe-area-inset-right, 0px));
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        width: 72px;
+    }
+}
 
 .box {
-    --box-size: clamp(140px, 22vmin, 200px);
-    position: fixed;
-    z-index: 5;
-    left: calc(50% - var(--box-size) / 2);
-    top: calc(50% - var(--box-size) / 2);
-    width: var(--box-size);
-    aspect-ratio: 1;
+    display: block;
+    width: 100%;
+    padding: 0;
     border: 0;
     border-radius: 0;
-    background: #1d1f28; /* graphite */
-    box-shadow: inset 0 3px 0 var(--accent), 0 28px 48px -24px rgba(11, 12, 16, 0.55);
-    color: var(--bg);
-    font: 700 17px/1 var(--font-sans);
-    letter-spacing: 0.01em;
+    background: none;
+    color: inherit;
     cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
-    animation: float 5s ease-in-out infinite;
+    transition: scale 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
 }
 
-.box:hover {
-    transform: scale(1.06);
-    box-shadow: inset 0 3px 0 var(--accent), 0 36px 60px -24px rgba(11, 12, 16, 0.65);
-}
+.box:hover { scale: 1.04; }
 
 .box:active,
 .box.is-pressed {
-    transform: scale(0.94);
+    scale: 0.96;
     transition-duration: 0.08s;
 }
 
 .box:focus-visible { outline-offset: 6px; }
 
-.box-label { pointer-events: none; }
+/* Not clickable while the bots build (still focusable). */
+.box[aria-disabled="true"] { cursor: default; }
+.box[aria-disabled="true"]:hover { scale: 1; }
 
-/* The start box dissolves on the first click (js/build.js hides it for good afterwards). */
-.box.is-gone {
-    transform: scale(0.15);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.5, 0, 0.8, 0.4), opacity 0.35s ease;
+.box-art {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 22px 26px rgba(11, 12, 16, 0.22));
 }
+
+.box-wrap.is-start .box-art { animation: float 5s ease-in-out infinite; }
+.box-wrap.is-home .box-art { filter: drop-shadow(0 6px 8px rgba(11, 12, 16, 0.25)); }
 
 @keyframes float {
-    0%, 100% { translate: 0 -6px; }
-    50%      { translate: 0 6px; }
+    0%, 100% { translate: 0 -4px; }
+    50%      { translate: 0 4px; }
 }
 
-/* Without JS the buttons do nothing, so hide them. */
-html:not(.js) .box,
-html:not(.js) .next { display: none; }
+.box-floor { fill: rgba(11, 12, 16, 0.1); }
+.box-glow { fill: url(#box-light); }
+.box-lines { fill: none; stroke: rgba(251, 250, 246, 0.5); stroke-width: 1.2; stroke-linejoin: round; stroke-linecap: round; }
+.box-rim-accent,
+.box-lid-accent { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.box-gap { fill: var(--accent); }
+.box-logo { fill: var(--bg); font: 700 19px/1 var(--font-sans); }
+
+/* The lid stands a gap open (light falls out). After the click it lifts off and fades: the opening is free for the bots. */
+.box-lid { transform: translate(0, -8px); transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease; }
+.box-gap { transition: opacity 0.4s ease; }
+.box-wrap:not(.is-start) .box-lid { transform: translate(0, -46px); opacity: 0; }
+.box-wrap:not(.is-start) .box-gap { opacity: 0; }
+
+/* "Click to open": an affordance on the start box only. */
+.box-hint {
+    position: absolute;
+    left: 58%;
+    top: 22%;
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.box-hint span {
+    margin-top: 16px;
+    padding: 4px 10px;
+    background: var(--fg);
+    color: var(--bg);
+    font: 700 11px/1.4 var(--font-sans);
+    white-space: nowrap;
+}
+
+/* Narrow screens: the box hugs the right edge, so the hint goes to its left. */
+@media (max-width: 999px) {
+    .box-hint { left: auto; right: 64%; top: 18%; }
+}
+
+.hint-tap { display: none; }
+@media (hover: none) { .hint-click { display: none; } .hint-tap { display: inline; } }
+.box-wrap:not(.is-start) .box-hint { display: none; }
+
+/* Badge with the number of bots at home, and a tooltip with where they all are. Only when docked. */
+.box-count {
+    position: absolute;
+    top: 6%;
+    right: -4%;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font: 700 13px/24px var(--font-sans);
+    text-align: center;
+    opacity: 0;
+    scale: 0.6;
+    transition: opacity 0.2s ease, scale 0.2s cubic-bezier(0.2, 1.4, 0.4, 1);
+    pointer-events: none;
+}
+
+.box-wrap.is-home.has-home .box-count { opacity: 1; scale: 1; }
+
+.box-tip {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    padding: 6px 12px;
+    background: var(--fg);
+    color: var(--bg);
+    font: 500 12px/1.4 var(--font-mono);
+    white-space: nowrap;
+    opacity: 0;
+    translate: 0 4px;
+    transition: opacity 0.15s ease, translate 0.15s ease;
+    pointer-events: none;
+}
+
+.box-wrap.is-home:hover .box-tip,
+.box-wrap.is-home:focus-within .box-tip { opacity: 1; translate: 0 0; }
+
+/* Without JS the box does nothing, so hide it. */
+html:not(.js) .box-slot { display: none; }
 
 /* ---- The page ------------------------------------------------------------ */
 
@@ -300,7 +427,7 @@ html:not(.js) .next { display: none; }
    "Micael" stays readable (the mockup cuts about -17vw); the right side runs out of the hero. */
 h1 {
     width: max-content;
-    margin: auto 0 0 -1vw;
+    margin: 0 0 0 -1vw;
     font: 700 clamp(52px, 14.17vw, 280px)/0.9 var(--font-sans);
     letter-spacing: -0.045em;
     white-space: nowrap;
@@ -365,6 +492,8 @@ h1 {
 
 /* Bottom line of the hero: "Scroll" on the left, the five skill layers on the right. */
 .hero-strip {
+    position: relative;
+    z-index: -2; /* below the box, which passes over it on its way to the corner */
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -399,8 +528,12 @@ h1 {
 
 .scroll-cue:hover { color: var(--accent); }
 
+/* The docked box (bottom right) must not cover the skill layers. */
+.js .hero-strip { padding-right: calc(var(--gutter) + 112px); }
+
 @media (max-width: 760px) {
     .hero-strip { padding-block: 8px; }
+    .js .hero-strip { padding-right: calc(var(--gutter) + 64px); }
 }
 
 /* ---- Buttons: square, always (the Shape engine reads --piece-r for the drawn outline) ---- */
@@ -925,7 +1058,7 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
 .cta .btn-ghost:hover { background: rgba(251, 250, 246, 0.12); }
 
 /* Footer */
-.footer { padding: 24px var(--gutter) 104px; }
+.footer { padding: 24px var(--gutter) 200px; } /* room for the docked box */
 
 .footer-inner {
     display: flex;
@@ -1022,32 +1155,6 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
 .edge-right  { top: calc(var(--piece-r) - 1px); bottom: calc(var(--piece-r) - 1px); right: -1px; width: 1.5px;  transform-origin: 50% 0;    scale: 1 0; }
 .edge-left   { top: calc(var(--piece-r) - 1px); bottom: calc(var(--piece-r) - 1px); left: -1px;  width: 1.5px;  transform-origin: 50% 100%; scale: 1 0; }
 
-/* ---- The pill that builds everything again (at the very end of the page) --- */
-
-.next {
-    position: absolute;
-    z-index: 3;
-    left: 50%;
-    bottom: 24px;
-    translate: -50% 0;
-    padding: 16px 28px;
-    border: 0;
-    border-radius: 0;
-    background: var(--fg);
-    color: var(--bg);
-    font: 700 15px/1 var(--font-sans);
-    cursor: pointer;
-    box-shadow: inset 0 3px 0 var(--accent), 0 14px 40px -16px rgba(11, 12, 16, 0.5);
-    transition: scale 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    -webkit-tap-highlight-color: transparent;
-}
-
-.next:hover { scale: 1.06; }
-.next:active { scale: 0.96; transition-duration: 0.08s; }
-
-/* Only offered while no build is running. */
-.js .next:not(.is-ready) { visibility: hidden; }
-
 /* ---- Fake cursors ------------------------------------------------------- */
 
 .cursor-layer {
@@ -1122,6 +1229,20 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
     animation: ripple 0.55s ease-out forwards;
 }
 
+/* A bot going home shrinks at the opening of the box and fades; coming out it grows back. Scale and opacity only. */
+.fake-cursor.is-entering .fake-cursor-body,
+.fake-cursor.is-entering .fake-cursor-tag {
+    scale: 0.15;
+    opacity: 0;
+    transition: scale 0.42s cubic-bezier(0.5, 0, 0.8, 0.4), opacity 0.36s ease 0.06s;
+}
+
+.fake-cursor.is-entering .fake-cursor-tag { transform-origin: -14px -16px; } /* shrinks towards the pointer tip */
+.fake-cursor.is-home { visibility: hidden; }
+
+.fake-cursor.is-emerging .fake-cursor-body,
+.fake-cursor.is-emerging .fake-cursor-tag { transition: scale 0.42s cubic-bezier(0.2, 1.2, 0.4, 1), opacity 0.3s ease; }
+
 @keyframes ripple {
     from { opacity: 0.9; scale: 0.2; }
     to   { opacity: 0;   scale: 1.8; }
@@ -1137,8 +1258,9 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .tilt, .tile img, .layer-btn { transition: none; }
-    .box { animation: none; transition: none; }
-    .next, .btn, .nav-links a, .nav-cta, .glow, .sel-frame, .inspector-tag { transition: none; }
+    .box, .box-lid, .box-gap, .box-count, .box-tip { transition: none; }
+    .box-wrap.is-start .box-art { animation: none; }
+    .btn, .nav-links a, .nav-cta, .glow, .sel-frame, .inspector-tag { transition: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
 }

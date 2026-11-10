@@ -10,7 +10,8 @@ Pro PR genau ein Roadmap-Schritt, danach `PLAN.md` (Status/Roadmap) aktualisiere
 Statisches HTML, CSS und Vanilla-JS (ES-Module), kein Build-Schritt, kein Framework. Deploy über Vercel (statisch, Konfiguration in `vercel.json`). Domain bei GoDaddy, DNS und Proxy über Cloudflare.
 
 ## Struktur
-- `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`: die neue interaktive Startseite.
+- `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/dock.js`, `js/agents.js`: die neue interaktive Startseite (`dock.js` = die Box: Startknopf, dann Zuhause der Bots).
+- `tools/check.mjs`, `tools/shoot.mjs`: Prüfung (`node tools/check.mjs`) und Screenshots (`node tools/shoot.mjs --out <Ordner>`), siehe `PLAN.md`, Arbeitsweise.
 - `dienstplan.html`: eigenständige Web-App im Betrieb, nicht kaputtmachen.
 - `datenschutz.html`, `nutzungsbedingungen.html`: Rechtsseiten für die Google-Kalender-Integration des Dienstplans. Nutzen `css/hub.css` und `js/socials.js`.
 - `archive/v1-2026-11/`: eingefrorene alte Website, nicht ändern.

@@ -13,7 +13,7 @@ const check = (name, ok, detail = '') => {
     console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? `: ${detail}` : ''}`);
 };
 
-const IDS = ['box', 'next', 'cursor-layer', 'site', 'glow', 'status', 'swarm-canvas', 'swarm-count', 'swarm-more', 'swarm-stack', 'headline', 'hello', 'nav', 'nav-cta'];
+const IDS = ['box', 'box-wrap', 'box-count', 'cursor-layer', 'site', 'glow', 'status', 'swarm-canvas', 'swarm-count', 'swarm-more', 'swarm-stack', 'headline', 'hello', 'nav', 'nav-cta'];
 
 /** Runs in the page: contrast of every visible text node against the first opaque ancestor background. */
 const CONTRAST = () => {
@@ -28,7 +28,7 @@ const CONTRAST = () => {
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
         if (!n.data.trim()) continue;
         const el = n.parentElement;
-        if (el.closest('.sr-only, [hidden], .cursor-layer, canvas, [aria-hidden="true"] .poster, .poster, .mini, .box, .next')) continue;
+        if (el.closest('.sr-only, [hidden], .cursor-layer, canvas, [aria-hidden="true"] .poster, .poster, .mini, .box')) continue;
         const cs = getComputedStyle(el);
         if (cs.visibility === 'hidden' || cs.display === 'none') continue;
         if ([...(function* () { for (let a = el; a; a = a.parentElement) yield a; })()].some((a) => getComputedStyle(a).mixBlendMode !== 'normal')) continue; // blended text (h1) is checked by eye
@@ -55,7 +55,7 @@ const CONTRAST = () => {
 /** Runs in the page: interactive things in the hero, nav, buttons and footer that are smaller than 40px. */
 const TOUCH = () => {
     const small = [];
-    for (const el of document.querySelectorAll('.s-hero a, .btn, .nav-cta, .footer a, .layer-btn, #box, #next')) {
+    for (const el of document.querySelectorAll('.s-hero a, .btn, .nav-cta, .footer a, .layer-btn, #box')) {
         const r = el.getBoundingClientRect();
         const cs = getComputedStyle(el);
         if (!r.width || cs.visibility === 'hidden' || cs.display === 'none') continue;
@@ -132,8 +132,24 @@ try {
         check(`[${label}] h1 is the name, one line, 700, hero isolated`, hero.lines === 1 && hero.weight === '700' && hero.iso === 'isolate' && hero.text.includes('Micael Gomes Fernandes'), JSON.stringify(hero));
         check(`[${label}] blend only on desktop`, label === 'desktop' ? hero.blend === 'difference' : hero.blend === 'normal', hero.blend);
         if (label === 'desktop') check('[desktop] nav is 72px high', Math.abs(hero.navH - 73) <= 1.5, `${hero.navH}px incl. line`);
-        const radius = await page.evaluate(() => [...document.querySelectorAll('.btn, .nav-cta, .layer-btn, .next, .box')].filter((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) !== 0).map((e) => e.className));
+        const radius = await page.evaluate(() => [...document.querySelectorAll('.btn, .nav-cta, .layer-btn, .box')].filter((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) !== 0).map((e) => e.className));
         check(`[${label}] buttons are square`, !radius.length, radius.join(', '));
+
+        // Reduced motion: the box is docked at once, every bot is at home, nothing to call.
+        const dock = await page.evaluate(() => {
+            const w = document.getElementById('box-wrap'), r = w.getBoundingClientRect(), cs = getComputedStyle(w);
+            return {
+                parent: w.parentElement.tagName, position: cs.position, w: Math.round(r.width),
+                right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom),
+                home: document.querySelectorAll('.fake-cursor.is-home').length, badge: document.querySelector('.box-count-n').textContent,
+                role: document.getElementById('box-count').getAttribute('role'), disabled: document.getElementById('box').getAttribute('aria-disabled'),
+                label: document.getElementById('box').getAttribute('aria-label'), art: document.querySelector('.box-art').getAttribute('aria-hidden'),
+                next: !!document.getElementById('next'),
+            };
+        });
+        const m = label === 'desktop' ? { w: 120, edge: 24 } : { w: 72, edge: 16 };
+        check(`[${label}] box docked bottom right (${m.w}px, ${m.edge}px margin), no replay pill`, dock.parent === 'BODY' && dock.position === 'fixed' && dock.w === m.w && dock.right === m.edge && dock.bottom === m.edge && !dock.next, JSON.stringify(dock));
+        check(`[${label}] reduced motion: 3 bots home, box locked, status role, graphic hidden`, dock.home === 3 && dock.badge === '3' && dock.role === 'status' && dock.disabled === 'true' && dock.art === 'true', `${dock.home} home, label "${dock.label}"`);
         await ctx.close();
     }
 
@@ -154,6 +170,47 @@ try {
         check('hero builds itself (chars typed, shapes dragged, underline drawn)', built);
         const nan = await page.evaluate(() => [...document.querySelectorAll('.fake-cursor, .inspector-tag')].filter((e) => /NaN/.test(e.style.transform + e.style.cssText)).length);
         check('no NaN positions on the bots (square outlines)', nan === 0, String(nan));
+
+        // The box: the lid opens at the click, it flies to the corner once the name is typed, it is not clickable while building.
+        const early = await page.evaluate(() => ({ cls: document.getElementById('box-wrap').className, disabled: document.getElementById('box').getAttribute('aria-disabled') }));
+        check('the box is not clickable while the bots build', early.disabled === 'true', early.cls);
+        let flew = true;
+        try { await page.waitForFunction(() => document.getElementById('box-wrap').classList.contains('is-home'), null, { timeout: 20000 }); } catch { flew = false; }
+        const landed = await page.evaluate(() => { const r = document.getElementById('box-wrap').getBoundingClientRect(); return { right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom), w: Math.round(r.width), parent: document.getElementById('box-wrap').parentElement.tagName }; });
+        check('the box flew to the bottom-right corner and stays there', flew && landed.right === 24 && landed.bottom === 24 && landed.w === 120 && landed.parent === 'BODY', JSON.stringify(landed));
+
+        // Idle bots walk home one by one; the badge, the tooltip and the (calm) live region follow.
+        let home = true;
+        try { await page.waitForFunction(() => document.querySelectorAll('.fake-cursor.is-home').length === 3 && document.getElementById('box').getAttribute('aria-disabled') === 'false', null, { timeout: 90000 }); } catch { home = false; }
+        check('idle bots walk home into the box (3 at home, box clickable again)', home);
+        await page.hover('#box');
+        await page.waitForTimeout(300); // the tooltip fades in
+        const shown = await page.evaluate(() => ({ badge: document.querySelector('.box-count-n').textContent, tip: document.querySelector('.box-tip').textContent, tipOpacity: getComputedStyle(document.querySelector('.box-tip')).opacity }));
+        check('badge says 3, tooltip says "3 home", it shows on hover', shown.badge === '3' && shown.tip === '3 home' && shown.tipOpacity === '1', JSON.stringify(shown));
+        await page.waitForTimeout(1200);
+        const said = await page.evaluate(() => document.querySelector('#box-count .sr-only').textContent);
+        check('live region says it once, calmly', said === '3 bots are at home.', said);
+
+        // A section that comes into reach calls only the bots it needs out of the box.
+        await page.evaluate(() => window.scrollTo({ top: document.getElementById('experience').offsetTop - 100, behavior: 'instant' }));
+        let out = true;
+        try { await page.waitForFunction(() => document.querySelectorAll('.fake-cursor.is-home').length < 3, null, { timeout: 8000 }); } catch { out = false; }
+        const homeNow = await page.evaluate(() => document.querySelectorAll('.fake-cursor.is-home').length);
+        check('a section being built calls bots out of the box (not all of them)', out && homeNow >= 1, `${homeNow} still home`);
+        let calm = true;
+        try { await page.waitForFunction(() => document.querySelectorAll('.fake-cursor.is-home').length === 3, null, { timeout: 90000 }); } catch { calm = false; }
+        check('after the work they all go home again', calm);
+
+        // Click on the docked box: all bots out, everything is built again; the box ignores clicks meanwhile.
+        await page.locator('#box').click();
+        await page.waitForTimeout(300);
+        const replay = await page.evaluate(() => ({ disabled: document.getElementById('box').getAttribute('aria-disabled'), y: scrollY, built: [...document.querySelectorAll('.s-hero .ch.on')].length }));
+        await page.locator('#box').click({ force: true }); // ignored while building (aria-disabled)
+        await page.waitForTimeout(300);
+        check('click on the docked box builds everything again, then it is disabled while building', replay.disabled === 'true' && replay.y === 0, JSON.stringify(replay));
+        let again = true;
+        try { await page.waitForFunction(HERO_BUILT, null, { timeout: 60000 }); } catch { again = false; }
+        check('the replay builds the hero again', again);
         check('no console or script errors during the build', !errors.length, errors.join(' | '));
         await ctx.close();
     }
@@ -166,7 +223,7 @@ try {
         await page.waitForTimeout(300);
         const state = await page.evaluate(() => ({
             hidden: [...document.querySelectorAll('[data-type], [data-box]')].filter((e) => { const s = getComputedStyle(e); return s.visibility === 'hidden' || s.opacity === '0'; }).length,
-            box: getComputedStyle(document.getElementById('box')).display,
+            box: getComputedStyle(document.querySelector('.box-slot')).display,
             h1: getComputedStyle(document.querySelector('h1')).color,
         }));
         check('without JS everything is visible, no start box', state.hidden === 0 && state.box === 'none', JSON.stringify(state));
