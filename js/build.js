@@ -79,6 +79,9 @@ const part = (className) => {
     return el;
 };
 
+/** "rgb(51, 85, 255)" -> "#3355ff" (what an inspector would show). */
+const toHex = (rgb) => '#' + (rgb.match(/\d+/g) ?? []).slice(0, 3).map((n) => Number(n).toString(16).padStart(2, '0')).join('');
+
 /** Wait for the web fonts (the layout must be final before the bots measure it), but never for long. */
 const fontsReady = () => Promise.race([document.fonts?.ready ?? Promise.resolve(), sleep(FONT_WAIT_MS)]);
 
@@ -687,11 +690,12 @@ export class SiteBuilder {
     async drawUnderline({ el, line }) {
         const { designer, swarm } = this;
         const a = anchor(el);
-        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
         const y = () => a().bottom - 2;
 
         await designer.chase(() => ({ x: a().left, y: y() }), ARRIVE);
-        designer.inspect(`underline 2px ${accent}`, () => { const r = a(); return { x: r.left, y: r.bottom + 10 }; });
+        // The tag shows the real numbers of this line: thickness and colour.
+        const lineStyle = getComputedStyle(line);
+        designer.inspect(`underline ${Math.round(parseFloat(lineStyle.height) * 10) / 10}px ${toHex(lineStyle.backgroundColor)}`, () => { const r = a(); return { x: r.left, y: r.bottom + 10 }; });
         designer.press();
 
         const t0 = performance.now();

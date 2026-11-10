@@ -106,7 +106,7 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
 | E1 | **Redesign "Editorial", Schritt 1: Look und Hero** | gebaut (siehe Status): hell (Papier/Tinte/Blau), Space Grotesk, flache Nav, Riesen-Name als Hero, Tiefen-Effekt vorbereitet, eckige Buttons. |
 | E2 | **Redesign, Schritt 2: wandernde Box als Zuhause der Bots** | gebaut (siehe Status): isometrische Box im Hero, FLIP nach unten rechts, Zähler und Tooltip, Bots gehen heim und kommen beim Bauen wieder heraus, Klick auf die Box ruft alle (ersetzt "Build again"). |
-| E3 | Redesign, Schritt 3: Abschnitte im Editorial-Stil | offen: Projects-Raster mit 1 px Rahmen, About bis Footer im selben Stil, Schwarm hell hinterlegt. |
+| E3 | **Redesign, Schritt 3: Abschnitte im Editorial-Stil** | gebaut (siehe Status): Projects als Raster mit 1 px Tintenrahmen, About, Experience, Skills, Swarm, Contact und Footer im selben Stil. Damit ist das Redesign "Editorial" komplett (Schritt E1 bis E3). |
 | 11 | Feinschliff | Performance-Messung, Mobil, Reduced-Motion, Lighthouse, Cross-Browser, Sound optional (standardmäßig aus). |
 
 Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Schritt Status und Roadmap hier aktualisieren.
@@ -240,6 +240,18 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Reduced Motion:** Die Box dockt sofort an, alle drei Bots sind zu Hause (Zähler 3), keine Animation, die Box ist gesperrt (`aria-disabled`, Label "The bots are at home"). Ohne JS gibt es keine Box (der Slot ist `display: none`).
   - **Offene Entscheidungen, Standards genommen:** (1) Klick auf die Box = Neu-Aufbau (Alternative: Bots zur Eingabeleiste, Roadmap-Schritt 9). (2) Keine Eingabeleiste. (3) Akzent Blau `#3355ff`.
   - **Bekannt:** Die Box deckt unten rechts 120 x 145 px Inhalt ab (fix, wie im Mockup); die Bots warten links daneben. Während des Flugs scrollen springt die Box am Ende an die Ecke (Flug dauert 1,5 s).
+- **Redesign "Editorial", Schritt 3 gebaut** (gleicher Branch, kein PR): Alle Abschnitte im Editorial-Stil.
+  - **Gemeinsame Regeln** (`css/site.css`, Bereich "Sections below the hero"): Eyebrow als Grossbuchstaben-Label mit Laufweite, Titel 700 / -0.045em mit Serifen-Kursiv-Akzentwort, Raster aus 1 px Tintenlinien, kein Radius, keine Füllung (Papier), Hairline (`--line`) zwischen den Abschnitten. `.wrap` ist 1344 px breit (Gutter wie die Nav).
+    Titelgrössen: `.title-xl` 112 px bei 1440 (Projects, Experience, Skills), `.title` 80 px (About, Swarm), Contact 96 px. Neues Muster für Zellen, die sich eine Linie teilen: eigener Rahmen pro Zelle mit `margin: 0 -1px -1px 0` (Skills, About-Liste), damit jede Zelle für sich vom `layout-bot` aufgezogen werden kann.
+  - **Projects:** Titel 112 px, darunter ein Rahmen (`.cells`, `data-box`) mit drei Zellen (01 Dienstplan, 02 Aphonia, 03 This website): Mono-Nummer, Label, Titel 44 px, Text, Links unten. Dann im selben Rahmenstil "Selected renders" (04, mit der Galerie der acht Renders, quadratische Bilder ohne Radius, Linien statt Karten) und Dolphin Rush (05).
+    Die Links sind Textlinks in Grossbuchstaben mit 1 px Unterstreichung, die der `design-bot` zeichnet (`data-underline`, ohne JS ein Rahmen unten). Der Inspector-Tag des `design-bot` zeigt dafür jetzt die echten Werte der Linie (Dicke und Farbe) statt fest "2px Akzent".
+  - **Entfallen:** Die Geräte-Mockups (gekipptes Telefon mit Dienstplan-Screenshot, Aphonia-Poster, Mini-Bild dieser Seite) und ihr CSS (`.tilt`, `.phone`, `.poster`, `.mini*`), weil das Mockup die Zellen ohne Bild zeigt. `images/projects/dienstplan.webp` liegt noch im Repo, wird aber nicht mehr benutzt (kann gelöscht werden).
+  - **Neue Texte** (bitte prüfen): Link "See the source" in Zelle 03 (auf `https://github.com/lazyboxDude/portfolio`, das Mockup hat dort einen toten Link "See how"), Label "Contact" über dem Kontakt-Titel, Nummern 01 bis 05 (`aria-hidden`).
+    Alle übrigen Texte sind wortgleich. Die Aphonia-Zelle hat zwei Links (Steam und Moonflux), das Mockup nur einen.
+  - **About:** Text links, die vier Schwerpunkte als Liste mit Linien rechts. **Experience:** ein Rahmen, Zeilen mit Linien, Datum in Mono. **Skills:** fünf Zellen (zwei oben, drei unten), Layer-Label in Mono und Akzent. **Swarm:** weisse Bühne mit Tintenrahmen, die Ebenenfarben bleiben.
+    **Contact:** ein Tinten-Block (links ausgerichtet) mit hellem Akzentwort, Mail-Button hell, "Download CV" mit hellem Rahmen. **Footer:** Tintenlinie, Grossbuchstaben-Links (40 px Touch-Höhe).
+  - **Achtung, Stand von `main`:** Seit dem Start dieses Redesigns ist auf `main` ein grosser Umbau gelandet ([PR #24](https://github.com/lazyboxDude/portfolio/pull/24) bis [#26](https://github.com/lazyboxDude/portfolio/pull/26): echter `layout-bot`, `a11y-bot`, `motion-bot`, neue Dateien `js/layout.js`, `js/geometry.js`, `js/a11y.js`).
+    Er berührt `js/build.js`, `js/cursors.js`, `css/site.css`, `index.html` und `PLAN.md`, also genau die Dateien dieses Branches. Beim Zusammenführen sind Konflikte zu erwarten (vor allem `build.js`: meine `callBots`/`rest`/Dock-Anbindung für drei Bots gegen fünf Bots). Das ist noch nicht gemacht, es war nicht beauftragt.
 
 ## Offene Fragen an Micael
 
