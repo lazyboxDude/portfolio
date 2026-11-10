@@ -196,13 +196,13 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Bau-Engine:** Ein `data-outline`-Element ohne Text und ohne eigene Form wartet auf die Form um es.
   - **Nächster Schritt: 9 (AI-Element).** Das ist ein eigener Schritt mit eigener Absprache (siehe offene Frage 6).
 - **Nachbesserung Cursor-Logik (nach Schritt 8):** Die Bots schwirrten nach dem Bau im Bild herum, und neue Abschnitte begannen erst, wenn man schon hinscrollte. Jetzt (`js/build.js`):
-  - **Vorausbauen:** Ein Abschnitt wird gebaut, sobald seine Oberkante weniger als `LOOKAHEAD` (0,8) Bildschirmhöhen unter dem unteren Bildrand liegt. Nach dem Hero baut sich also gleich "About", ohne dass man scrollt;
+  - **Vorausbauen:** Ein Abschnitt wird gebaut, sobald seine Oberkante weniger als `LOOKAHEAD` (0,3) Bildschirmhöhen unter dem unteren Bildrand liegt. Nach dem Hero baut sich also gleich "About" (liegt direkt darunter), ohne dass man scrollt; der übernächste Abschnitt beginnt erst nach etwas Scrollen (gemessen bei 1280 × 800: "Projects" nach ca. 385 px);
     wer kontinuierlich scrollt, findet die Seite schon vor oder sieht die Bots mitten im Bau. Die Bots zielen auf Seitenpositionen (`anchor()`), arbeiten also unter dem Bildrand und kommen beim Scrollen ins Bild.
   - **Kein Herumwandern mehr:** `idle()` wird im Bau nicht mehr benutzt. Ein Bot ohne Aufgabe wartet an der "Baufront" am unteren Bildrand (`SiteBuilder.restPoint`, x je Bot versetzt).
     Steht alles, parken die drei Bots gestapelt unten rechts. Sie reagieren nicht mehr auf den Mauszeiger.
   - **Überscrollt:** Scrollt man an einem Abschnitt vorbei, der gerade gebaut wird, wird er sofort fertiggestellt (`skipPast()`), und die Bots machen mit dem nächsten weiter.
   - Die Persönlichkeit (scheu/neugierig/gesellig, Schritt 3 Teil 2) steckt noch in `js/cursors.js` (`idle()`), wird aber vom Bau nicht mehr gerufen. Kann bei Bedarf entfernt werden.
-  - **Bekannte Folge:** Der Abschnitt direkt unter dem Hero baut sich, bevor man ihn sieht, wenn man im Hero liest. Wer das Bauen mehr sehen will, senkt `LOOKAHEAD`.
+  - **Bekannte Folge:** Der Abschnitt direkt unter dem Hero baut sich, bevor man ihn sieht, wenn man im Hero liest. `LOOKAHEAD` war zuerst 0,8 und wurde auf Wunsch von Micael auf 0,3 gesenkt: weniger Bauen außerhalb des Bildes, mehr davon sichtbar.
 
 ## Offene Fragen an Micael
 

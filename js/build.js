@@ -34,7 +34,7 @@ const SCROLL_TYPE_SPEED = 0.5; // sections the visitor scrolls to are typed fast
 const AVG_CHAR_MS = 42;       // average delay per character at speed 1
 // The bots build ahead of the visitor: a section is started once its top is this many screen heights
 // below the bottom edge of the viewport. Visitors tend to keep scrolling, so the page is there before they are.
-const LOOKAHEAD = 0.8;
+const LOOKAHEAD = 0.3;
 const REST_MARGIN = 44;       // parked bots keep this far from the viewport edge (px)
 const REST_STACK = 34;        // vertical gap between parked bots in the corner (px)
 
