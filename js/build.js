@@ -1,4 +1,4 @@
-// The build "job": three bot cursors construct the page live, one section at a time.
+// The build "job": five bot cursors construct the page live, one section at a time.
 // The hero is built after the first click on the start box; every other section (index.html:
 // data-section) is built ahead of the visitor, as soon as it is less than LOOKAHEAD screens below the
 // viewport, so the bots keep working further down while the visitor scrolls. When a bot has nothing
@@ -13,8 +13,13 @@
 //   copy-bot (I-beam)   types every data-type text, character by character, with a tag that shows
 //                       the real typography ("600 · 96px / 1.00 · -0.035em") for data-tag texts.
 //   design-bot (pencil) switches the glow on (hero), draws data-underline words and data-outline shapes.
-// The three bots work in parallel lanes and wait for each other only where they must: a text waits
-// for the box around it, an underline waits for its text, an outline waits for its box.
+//   a11y-bot (magnifier) checks every data-a11y element once it stands: draws a focus ring around it and
+//                       shows the real WCAG contrast (and the click target size) in its tag (see a11y.js).
+//   motion-bot (spark)  starts the drift of the background glow (hero) and tilts every .tilt mockup in
+//                       by dragging it from flat to its 3D angle, with the live angles in its tag.
+// The five bots work in parallel lanes and wait for each other only where they must: a text waits
+// for the box around it, an underline waits for its text, an outline waits for its box, a check waits
+// for the text and the box of the element, a tilt waits for the card it sits on.
 //
 // Everything bots aim at is measured against the page (see anchor), so it still works when the
 // visitor scrolls during a build. Without JS the page is simply visible. With JS every text gets a
@@ -22,6 +27,7 @@
 // are revealed one by one. With prefers-reduced-motion everything is shown at once, bots parked.
 
 import { DRAG_DAMPING, prefersReducedMotion } from './cursors.js';
+import { describe, FocusRing } from './a11y.js';
 import { anchor, clamp, easeInOut, pageRect, part } from './geometry.js';
 import { Grid, Guides, MIN_SIZE, Shell, guidePlan } from './layout.js';
 
@@ -40,11 +46,13 @@ const FONT_WAIT_MS = 1500;
 const DEFAULT_TYPE_MS = 4500; // how long typing a whole section may take (data-type-ms overrides)
 const SCROLL_TYPE_SPEED = 0.5; // sections the visitor scrolls to are typed faster than the hero
 const AVG_CHAR_MS = 42;       // average delay per character at speed 1
+const CHECK_MS = 900;         // how long the a11y-bot keeps its focus ring and tag on an element
+const TILT_MS = 1000;         // how long the motion-bot takes to tilt a mockup in
 // The bots build ahead of the visitor: a section is started once its top is this many screen heights
 // below the bottom edge of the viewport. Visitors tend to keep scrolling, so the page is there before they are.
 const LOOKAHEAD = 0.8;
 const REST_MARGIN = 44;       // parked bots keep this far from the viewport edge (px)
-const REST_STACK = 34;        // vertical gap between parked bots in the corner (px)
+const REST_STACK = 28;        // vertical gap between parked bots in the corner (px)
 
 // How exactly a bot has to arrive before its job goes on. Close and fast enough is enough: the
 // next movement (follow) catches up anyway, and waiting for a full stop made every step crawl.
@@ -59,6 +67,8 @@ const JOBS = {
     layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow' },
     copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text' },
     design: { label: 'design-bot', color: '#ffc766', kind: 'pen' },
+    a11y: { label: 'a11y-bot', color: '#6fe3a5', kind: 'lens' },
+    motion: { label: 'motion-bot', color: '#b79bff', kind: 'spark' },
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -234,6 +244,33 @@ class Shape {
     }
 }
 
+// ---- Mockups the motion-bot tilts in ---------------------------------------------
+
+/**
+ * A .tilt mockup. In CSS its angle is --ry / --rx scaled by --t (1 = tilted, the default). With JS it
+ * starts flat (--t: 0) and the motion-bot turns --t from 0 to 1, so the real angles can be shown live.
+ */
+class Tilt {
+    constructor(el) {
+        this.el = el;
+        this.set(0);
+    }
+
+    set(t) { this.el.style.setProperty('--t', t.toFixed(3)); }
+
+    /** Tilted for good: back to the CSS default (and the hover effect takes over from there). */
+    reveal() {
+        this.el.style.removeProperty('--t');
+        this.el.classList.remove('is-driven');
+    }
+
+    /** The angles at full tilt, read from the CSS custom properties. */
+    angles() {
+        const cs = getComputedStyle(this.el);
+        return { rx: parseFloat(cs.getPropertyValue('--rx')) || 0, ry: parseFloat(cs.getPropertyValue('--ry')) || 0 };
+    }
+}
+
 // ---- One section of the page --------------------------------------------------
 
 /** A [data-section]: its shapes, texts and decorations, and whether it has been built yet. */
@@ -248,6 +285,10 @@ class Section {
         this.shapeOf = new Map(this.shapes.map((s) => [s.el, s]));
         this.texts = [...el.querySelectorAll('[data-type]')].map((e) => new Typable(e));
         this.textOf = new Map(this.texts.map((t) => [t.el, t]));
+
+        // What the motion-bot tilts in, and what the a11y-bot checks.
+        this.tilts = [...el.querySelectorAll('.tilt')].map((e) => new Tilt(e));
+        this.checks = [...el.querySelectorAll('[data-a11y]')];
 
         // [data-grid]: the bot draws the real columns first, then drags the cards (its children) into them.
         this.grids = [...el.querySelectorAll('[data-grid]')]
@@ -287,6 +328,7 @@ class Section {
         for (const g of this.grids) g.cleanup();
         for (const t of this.texts) t.hideAll();
         for (const d of this.decos) if (d.line) d.line.style.scale = '';
+        for (const t of this.tilts) { t.set(0); t.el.classList.remove('is-driven'); }
         this.state = 'idle';
         this.cancelled = false;
     }
@@ -300,6 +342,7 @@ class Section {
             shape.done = true;
         }
         for (const t of this.texts) t.revealAll();
+        for (const t of this.tilts) t.reveal();
         for (const d of this.decos) {
             if (d.kind === 'underline') d.line.style.scale = '1 1';
             else d.shape.setDrawn(1, d.shape.outline());
@@ -325,6 +368,9 @@ export class SiteBuilder {
         this.builder = null;  // layout-bot
         this.typist = null;   // copy-bot
         this.designer = null; // design-bot
+        this.checker = null;  // a11y-bot
+        this.animator = null; // motion-bot
+        this.ring = null;     // the a11y-bot's focus ring
         this.busy = false;    // the hero is being (re)built
         this.pumping = false; // a later section is being built
         this.started = false; // the start box has been clicked
@@ -381,7 +427,7 @@ export class SiteBuilder {
         this.bigCount = 0;
         this.guides.clear();
         for (const s of this.sections) s.reset();
-        this.glow.classList.remove('is-on');
+        this.glow.classList.remove('is-on', 'is-moving');
     }
 
     /** Build every section that has scrolled into view, in order. */
@@ -429,7 +475,7 @@ export class SiteBuilder {
         if (this.sections.every((s) => s.state === 'built')) {
             return { x: Math.max(REST_MARGIN, vw - 120), y: vh - REST_MARGIN - i * REST_STACK };
         }
-        return { x: vw * (0.3 + i * 0.2), y: vh - REST_MARGIN };
+        return { x: vw * (0.2 + i * 0.15), y: vh - REST_MARGIN };
     }
 
     /** Send a bot to wait at its resting point (it follows it, so resizing and the end of the build are covered). */
@@ -442,7 +488,7 @@ export class SiteBuilder {
         for (const bot of this.crew) this.rest(bot);
     }
 
-    get crew() { return [this.builder, this.typist, this.designer]; }
+    get crew() { return [this.builder, this.typist, this.designer, this.checker, this.animator]; }
 
     /** Announce the result and offer to build again, once everything stands. */
     updateUi() {
@@ -457,6 +503,9 @@ export class SiteBuilder {
         this.builder ??= this.swarm.add({ ...origin, ...JOBS.layout, burst });
         this.typist ??= this.swarm.add({ ...origin, ...JOBS.copy, burst });
         this.designer ??= this.swarm.add({ ...origin, ...JOBS.design, burst });
+        this.checker ??= this.swarm.add({ ...origin, ...JOBS.a11y, burst });
+        this.animator ??= this.swarm.add({ ...origin, ...JOBS.motion, burst });
+        this.ring ??= new FocusRing(this.swarm.layer, JOBS.a11y.color);
     }
 
     // ---- Instant builds -----------------------------------------------------
@@ -464,7 +513,7 @@ export class SiteBuilder {
     /** Show a section at once (reduced motion, or it was scrolled past before its turn). */
     showSection(section) {
         section.showAll();
-        if (section.isHero) this.glow.classList.add('is-on');
+        if (section.isHero) this.glow.classList.add('is-on', 'is-moving');
         section.state = 'built';
     }
 
@@ -481,6 +530,9 @@ export class SiteBuilder {
         if (end) this.typist.place(end.right + 8, end.top + end.height / 2);
         const accent = decos.find((d) => d.kind === 'underline')?.el.getBoundingClientRect();
         if (accent) this.designer.place(accent.right, accent.bottom);
+        const checked = this.hero.checks.at(-1)?.getBoundingClientRect();
+        if (checked) this.checker.place(checked.right, checked.bottom);
+        this.animator.place(window.innerWidth * 0.72, window.innerHeight * 0.3);
     }
 
     // ---- Animated builds ----------------------------------------------------
@@ -509,11 +561,12 @@ export class SiteBuilder {
         this.status.textContent = 'Building the website…';
         await fontsReady(); // the layout must be final before anything is measured
         this.ensureBots(origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 }, true);
-        const { builder, typist, designer } = this;
+        const { builder, typist, designer, checker, animator } = this;
 
         const boxReady = new Map(section.shapes.map((s) => [s, defer()]));
         const typed = new Map(section.texts.map((t) => [t, defer()]));
         const speed = section.typingSpeed();
+        const glowOn = defer(); // the design-bot has switched the glow on: the motion-bot may set it drifting
 
         // layout-bot: drags out the shapes, in page order.
         const layout = (async () => {
@@ -544,6 +597,7 @@ export class SiteBuilder {
         // design-bot: switches the glow on (hero), then draws whatever is ready first.
         const design = (async () => {
             if (section.isHero) await this.lightUp();
+            glowOn.resolve();
             const pending = section.decos.map((d) => ({
                 d,
                 ready: d.kind === 'underline'
@@ -562,7 +616,104 @@ export class SiteBuilder {
             this.rest(designer);
         })();
 
-        await Promise.all([layout, copy, design]);
+        // a11y-bot: checks whatever is marked data-a11y, as soon as its text and its box stand.
+        const a11y = (async () => {
+            const pending = section.checks.map((el) => {
+                const around = section.shapeOf.get(el.closest('[data-box]'));
+                const waits = section.texts.filter((t) => el.contains(t.el)).map((t) => typed.get(t).promise);
+                if (around) waits.push(boxReady.get(around).promise);
+                return { el, ready: Promise.all(waits) };
+            });
+            while (pending.length) {
+                const item = await Promise.race(pending.map((p) => p.ready.then(() => p)));
+                pending.splice(pending.indexOf(item), 1);
+                if (section.cancelled) return;
+                await this.checkElement(item.el);
+            }
+            this.rest(checker);
+        })();
+
+        // motion-bot: starts the glow drifting (hero), then tilts every mockup in once its card stands.
+        const motion = (async () => {
+            if (section.isHero) {
+                await glowOn.promise;
+                if (section.cancelled) return;
+                await this.startDrift();
+            }
+            for (const tilt of section.tilts) {
+                if (section.cancelled) return;
+                const around = section.shapeOf.get(tilt.el.closest('[data-box]'));
+                if (around) await boxReady.get(around).promise;
+                await this.tiltIn(tilt);
+            }
+            this.rest(animator);
+        })();
+
+        await Promise.all([layout, copy, design, a11y, motion]);
+    }
+
+    /** a11y-bot walks to an element, holds a focus ring around it and reads out its real contrast. */
+    async checkElement(el) {
+        const { checker: bot, ring, swarm } = this;
+        const a = anchor(el);
+        const centre = () => { const r = a(); return { x: r.left + Math.min(r.width / 2, 160), y: r.top + r.height / 2 }; };
+
+        await bot.chase(centre, ARRIVE);
+        bot.press();
+        ring.show(el, a);
+        bot.inspect(describe(el), () => { const r = a(); return { x: r.left, y: Math.max(4, r.top - TAG_GAP) }; });
+        const stop = swarm.onFrame(() => ring.move());
+
+        await sleep(CHECK_MS);
+        stop();
+        ring.hide();
+        bot.release();
+        swarm.ripple(bot.x, bot.y, bot.color);
+        await sleep(150);
+        bot.hideTag();
+    }
+
+    /** motion-bot clicks into the page: the background glow starts to drift (slowly, forever). */
+    async startDrift() {
+        const { animator: bot } = this;
+        const at = () => ({ x: window.innerWidth * 0.72, y: window.innerHeight * 0.3 });
+        await bot.chase(at, ARRIVE);
+        bot.inspect('drift 26s · ease-in-out', () => { const p = at(); return { x: p.x, y: p.y - TAG_GAP }; });
+        await bot.click();
+        this.glow.classList.add('is-moving');
+        await sleep(700);
+        bot.hideTag();
+    }
+
+    /** motion-bot grabs a flat mockup and drags it into its 3D angle; the tag counts the degrees. */
+    async tiltIn(tilt) {
+        const { animator: bot, swarm } = this;
+        const el = tilt.el;
+        const { rx, ry } = tilt.angles();
+        const a = anchor(el); // measured while the mockup is still flat
+        const grab = () => { const r = a(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+        const tagAt = () => { const r = a(); return { x: r.left, y: Math.max(4, r.top - TAG_GAP) }; };
+
+        await bot.chase(grab, ARRIVE);
+        bot.press();
+        el.classList.add('is-driven'); // no CSS transition while the bot drives --t every frame
+        const t0 = performance.now();
+        const progress = () => easeInOut(clamp((performance.now() - t0) / TILT_MS, 0, 1));
+        const side = ry < 0 ? -1 : 1;
+        bot.follow(() => { const g = grab(); return { x: g.x + side * 40 * progress(), y: g.y }; }, { damping: DRAG_DAMPING });
+        const stop = swarm.onFrame(() => {
+            const p = progress();
+            tilt.set(p);
+            bot.inspect(`rotateY ${Math.round(ry * p)}° · rotateX ${Math.round(rx * p)}°`, tagAt);
+        });
+
+        await sleep(TILT_MS);
+        stop();
+        tilt.reveal();
+        bot.release();
+        swarm.ripple(bot.x, bot.y, bot.color);
+        await sleep(250);
+        bot.hideTag();
     }
 
     /** design-bot walks into the page and clicks: the background glow comes on. */
