@@ -6,9 +6,15 @@
 //
 //   - "More agents" multiplies the swarm (x3 per click) up to a hard cap. At the cap the agents
 //     gather into the five layers on their own. "Stack them up" / "Release" toggles it by hand.
-//   - Every layer is one of the skill layers above it. Hover, focus or tap a layer in the list to
-//     light it up in the picture.
-//   - Real mouse pointer: agents step aside when it comes close.
+//   - Every layer is one of the skill layers above it, and every agent IS one skill: its name tag is
+//     the skill ("3D modeling", "Unity", ...). Click (or tap) an agent and a card opens next to it with
+//     what I can do with that skill. The skills live in the markup (index.html, .layer-skills), this
+//     file only reads them, so without JS they are simply listed.
+//   - Keyboard / screen reader path (the canvas is aria-hidden): the layer buttons open the card for
+//     the first skill of a layer, the chips in the card switch between the skills of that layer.
+//   - Hover, focus or tap a layer in the list to light it up in the picture.
+//   - Real mouse pointer: agents step aside when it comes close, but the one under the pointer stays put
+//     so it can be clicked.
 //   - Frame budget: if drawing gets too slow on this device, the links are dropped and the swarm
 //     stops growing (degrade()).
 //   - prefers-reduced-motion: one still picture of the stacked layers, no controls.
@@ -19,20 +25,46 @@ import { prefersReducedMotion } from './cursors.js';
 
 const COLORS = ['#7b95ff', '#5fd4f0', '#6fe3a5', '#ffc766', '#ff8fb8']; // one per layer, bottom to top
 const WEIGHTS = [0.34, 0.26, 0.2, 0.13, 0.07]; // share of agents per layer (more at the base)
-const KINDS = ['agent', 'layout-agent', 'copy-agent', 'a11y-agent', 'motion-agent', 'type-agent'];
 const START = 16;           // agents at the beginning
 const GROWTH = 3;           // "More agents" multiplies by this
 const CAP_WIDE = 720;       // hard upper limits
 const CAP_NARROW = 360;
 const STILL_COUNT = 240;    // agents in the still picture (reduced motion)
-const LABELLED = 14;        // only the first agents show their name (text is expensive to draw)
 const SPRITE = 14;          // cursor size in px
-const POINTER_RADIUS = 90;
+const POINTER_RADIUS = 48;  // agents step aside this far from the real pointer ...
+const POINTER_PUSH = 260;   // ... with this strength (kept gentle: the agents have to stay clickable)
+const HIT = 16;             // how close a click has to be to an agent's body (px)
+const HIT_TOUCH = 24;       // fingers are bigger
+const BODY_X = 4, BODY_Y = 6; // the middle of the arrow, measured from its tip (the agent's x/y)
+const CARD_W = 300;         // skill card
+const CARD_GAP = 18;        // between agent and card
+const CARD_DOCK_BELOW = 560; // canvas narrower than this: the card docks to the bottom edge instead
 const BUDGET_MS = 10;       // average work per frame that counts as "too slow"
 const SLOW_FRAMES = 45;     // ... for this many frames in a row
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const ARROW = new Path2D('M2 1.5 L2 17 L6.2 13.2 L9 19.6 L11.8 18.4 L9 12.2 L14.8 12.2 Z');
+
+/**
+ * The skills from the markup: one entry per layer, { title, skills: [{ layer, name, text }] }.
+ * Each `.layer-item` holds its layer button and the list of skills (`<li><strong>Name</strong> text</li>`).
+ */
+function readSkills(stage) {
+    const sets = COLORS.map(() => ({ n: '', title: '', skills: [] }));
+    for (const item of stage.querySelectorAll('.layer-item')) {
+        const btn = item.querySelector('.layer-btn');
+        const layer = Number(btn?.dataset.layer);
+        if (!sets[layer]) continue;
+        const n = btn.querySelector('.layer-n')?.textContent ?? '';
+        sets[layer].n = n;
+        sets[layer].title = btn.textContent.replace(n, '').trim();
+        sets[layer].skills = [...item.querySelectorAll('.layer-skills li')].map((li) => {
+            const name = li.querySelector('strong')?.textContent.trim() ?? '';
+            return { layer, name, text: li.textContent.replace(name, '').trim() };
+        }).filter((s) => s.name);
+    }
+    return sets;
+}
 
 export class AgentField {
     /**
@@ -44,8 +76,9 @@ export class AgentField {
      * @param {HTMLButtonElement} o.more
      * @param {HTMLButtonElement} o.stack
      * @param {HTMLButtonElement[]} o.layerButtons  data-layer="0..4" (0 = base)
+     * @param {HTMLElement} o.card       the skill card (hidden until an agent or a layer is picked)
      */
-    constructor({ stage, canvas, swarm, counter, more, stack, layerButtons }) {
+    constructor({ stage, canvas, swarm, counter, more, stack, layerButtons, card }) {
         this.stage = stage;
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
@@ -54,6 +87,24 @@ export class AgentField {
         this.more = more;
         this.stack = stack;
         this.layerButtons = layerButtons;
+        this.card = card;
+
+        // Skills: every agent carries one. The first agents cover every skill once, so the first
+        // "More agents" click shows all of them (layers interleaved, so a small swarm is mixed).
+        this.sets = readSkills(stage);
+        this.queue = [];
+        for (let i = 0, found = true; found; i++) {
+            found = false;
+            for (const set of this.sets) if (set.skills[i]) { this.queue.push(set.skills[i]); found = true; }
+        }
+        this.queued = 0;       // how many of the queue have been handed out
+        this.named = [];       // agents that always show their name (one per skill, at most queue.length)
+        this.selected = null;  // the agent whose card is open
+        this.skill = null;     // the skill of the open card (an agent may not exist, see select())
+        this.hover = null;     // the agent under the real pointer
+        this.opener = null;    // the layer button that opened the card with the keyboard
+        this.cardLayer = -1;   // layer the chips in the card were built for
+        this.cardAt = { x: -99, y: -99 };
 
         this.reduced = prefersReducedMotion();
         this.cap = window.innerWidth < 720 ? CAP_NARROW : CAP_WIDE;
@@ -104,6 +155,7 @@ export class AgentField {
             this.measure();
             this.layout();
             if (this.reduced) { this.snapToTargets(); this.draw(0); }
+            this.placeCard(true);
         }).observe(this.canvas);
 
         this.more.addEventListener('click', () => this.grow());
@@ -116,14 +168,154 @@ export class AgentField {
             btn.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') light(false); });
             btn.addEventListener('focus', () => light(true));
             btn.addEventListener('blur', () => light(false));
-            btn.addEventListener('click', () => {
-                // Tap (or Enter) pins a layer; again unpins it. Works without a hover.
-                this.pinned = this.pinned === layer ? -1 : layer;
-                this.focus = this.pinned;
-                for (const b of this.layerButtons) b.setAttribute('aria-pressed', String(Number(b.dataset.layer) === this.pinned));
-                if (this.reduced) this.draw(0);
+            btn.addEventListener('click', (e) => {
+                // Tap (or Enter) pins a layer and opens its first skill; again closes it. Works without a hover.
+                const first = this.sets[layer].skills[0];
+                if (this.pinned === layer || !first) { this.close(); return; }
+                this.opener = btn;
+                this.select(first, null, { focusCard: e.detail === 0 }); // detail 0 = keyboard
             });
         }
+
+        // The agents themselves: hover shows the name and holds the agent still, a click opens its card.
+        // (Keyboard and screen reader users get the same through the layer buttons and the chips.)
+        this.canvas.addEventListener('pointermove', (e) => {
+            if (e.pointerType !== 'touch') this.setHover(this.hit(e, HIT));
+        });
+        this.canvas.addEventListener('pointerleave', () => this.setHover(null));
+        this.canvas.addEventListener('click', (e) => {
+            const agent = this.hit(e, e.pointerType === 'touch' ? HIT_TOUCH : HIT);
+            this.opener = null;
+            if (agent) this.select(agent.skill, agent); else this.close();
+        });
+        this.card.querySelector('.skill-close').addEventListener('click', () => this.close(true));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.card.hidden) this.close(true);
+        });
+    }
+
+    // ---- Skill card ---------------------------------------------------------
+
+    /** The agent closest to a pointer event (within `radius` px of its body), or null. Only agents with a skill count. */
+    hit(e, radius) {
+        const rect = this.canvas.getBoundingClientRect();
+        if (!rect.width) return null;
+        const px = (e.clientX - rect.left) * (this.w / rect.width);
+        const py = (e.clientY - rect.top) * (this.h / rect.height);
+        let best = null, bestD = radius * radius;
+        for (const a of this.agents) { // later agents sit on top of earlier ones, so "<=" lets them win a tie
+            if (!a.skill) continue;
+            const dx = a.x + BODY_X - px, dy = a.y + BODY_Y - py, d = dx * dx + dy * dy;
+            if (d <= bestD) { best = a; bestD = d; }
+        }
+        return best;
+    }
+
+    setHover(agent) {
+        if (agent === this.hover) return;
+        this.hover = agent;
+        this.canvas.style.cursor = agent ? 'pointer' : '';
+        if (this.reduced) this.draw(0);
+    }
+
+    /** The first agent that carries this skill, or null. */
+    agentFor(skill) {
+        return this.byLayer[skill.layer].find((a) => a.skill === skill) ?? null;
+    }
+
+    /**
+     * Open the card for a skill. Without an agent given the skill's own agent is used; a skill that
+     * has no agent yet (a small swarm) gets one, flung out of the middle, as long as there is room.
+     */
+    select(skill, agent = null, { focusCard = false } = {}) {
+        agent ??= this.agentFor(skill);
+        if (!agent) {
+            const before = this.agents.length;
+            this.spawn(1, true, skill);
+            if (this.agents.length > before) { agent = this.agents[this.agents.length - 1]; this.say(); }
+        }
+        this.selected = agent;
+        this.skill = skill;
+
+        // The picked layer is pinned (lit, the others fade), like a press on its button.
+        this.pinned = this.focus = skill.layer;
+        for (const b of this.layerButtons) b.setAttribute('aria-pressed', String(Number(b.dataset.layer) === skill.layer));
+
+        const card = this.card;
+        card.hidden = false;
+        card.style.setProperty('--c', COLORS[skill.layer]);
+        card.querySelector('.skill-layer').textContent = `agent · ${this.sets[skill.layer].n}`;
+        card.querySelector('.skill-name').textContent = skill.name;
+        card.querySelector('.skill-text').textContent = skill.text;
+        this.fillChips(skill);
+        this.placeCard(true);
+        card.classList.add('is-open');
+        if (focusCard) card.querySelector('.skill-chip[aria-pressed="true"]')?.focus();
+        this.swarm.start();
+        if (this.reduced) this.draw(0);
+    }
+
+    /** One chip per skill of the layer (real buttons: the way into the skills without a mouse). */
+    fillChips(skill) {
+        const list = this.card.querySelector('.skill-peers');
+        if (this.cardLayer !== skill.layer) {
+            this.cardLayer = skill.layer;
+            list.replaceChildren(...this.sets[skill.layer].skills.map((s) => {
+                const li = document.createElement('li');
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'skill-chip';
+                b.textContent = s.name;
+                b.addEventListener('click', () => this.select(s));
+                li.append(b);
+                return li;
+            }));
+        }
+        const skills = this.sets[skill.layer].skills;
+        list.setAttribute('aria-label', `More skills in ${this.sets[skill.layer].title}`);
+        [...list.querySelectorAll('.skill-chip')].forEach((b, i) => b.setAttribute('aria-pressed', String(skills[i] === skill)));
+    }
+
+    close(returnFocus = false) {
+        const opener = this.opener;
+        this.selected = this.skill = null;
+        this.pinned = this.focus = -1;
+        this.cardLayer = -1;
+        for (const b of this.layerButtons) b.setAttribute('aria-pressed', 'false');
+        this.card.classList.remove('is-open');
+        this.card.hidden = true;
+        this.opener = null;
+        if (returnFocus && opener) opener.focus(); // keyboard users land back on the layer button they came from
+        if (this.reduced) this.draw(0);
+    }
+
+    /**
+     * Put the card next to its agent (wide canvas) or dock it to the bottom of the canvas (narrow one).
+     * `force` places it even if the agent has hardly moved. Positions are CSS variables for `translate`,
+     * so nothing but the card's compositing layer is touched.
+     */
+    placeCard(force = false) {
+        const card = this.card;
+        if (card.hidden) return;
+        const a = this.selected;
+        if (!force && a && Math.abs(a.x - this.cardAt.x) < 3 && Math.abs(a.y - this.cardAt.y) < 3) return;
+        const ox = this.canvas.offsetLeft, oy = this.canvas.offsetTop;
+        const w = Math.min(CARD_W, this.w - 16);
+        const h = card.offsetHeight;
+        let x, y;
+        if (this.w < CARD_DOCK_BELOW || !a) {
+            x = (this.w - w) / 2;
+            y = a && a.y > this.h / 2 ? 8 : this.h - h - 8; // dock on the side the agent is not on
+        } else {
+            x = a.x + CARD_GAP + w > this.w - 8 ? a.x - CARD_GAP - w : a.x + CARD_GAP;
+            y = a.y - h / 2;
+        }
+        x = Math.max(8, Math.min(x, this.w - w - 8));
+        y = Math.max(8, Math.min(y, this.h - h - 8));
+        this.cardAt = { x: a ? a.x : -99, y: a ? a.y : -99 };
+        card.style.setProperty('--cw', `${w}px`);
+        card.style.setProperty('--cx', `${Math.round(ox + x)}px`);
+        card.style.setProperty('--cy', `${Math.round(oy + y)}px`);
     }
 
     /** Canvas size follows its CSS box; drawing is in CSS pixels, scaled for the screen. */
@@ -189,14 +381,22 @@ export class AgentField {
 
     // ---- Agents -----------------------------------------------------------
 
-    /** Add `n` agents (up to the cap), flung out of the middle of the stage. */
-    spawn(n, burst = true) {
+    /**
+     * Add `n` agents (up to the cap), flung out of the middle of the stage. Every agent gets a skill:
+     * first the queue (each skill once), then a random skill of a layer picked by weight. `forced` makes
+     * one agent for exactly that skill (it does not use up the queue).
+     */
+    spawn(n, burst = true, forced = null) {
         if (!this.layers.length) this.layout();
         const room = Math.max(0, this.cap - this.agents.length);
         for (let i = 0; i < Math.min(n, room); i++) {
-            // Pick a layer by weight, then a point inside its diamond.
+            let skill = forced, named = false;
+            if (!skill && this.queued < this.queue.length) { skill = this.queue[this.queued++]; named = true; }
+            // Pick a layer by weight (or take the skill's own), then a point inside its diamond.
             let r = Math.random(), layer = 0;
-            for (; layer < WEIGHTS.length - 1; layer++) { r -= WEIGHTS[layer]; if (r <= 0) break; }
+            if (skill) layer = skill.layer;
+            else for (; layer < WEIGHTS.length - 1; layer++) { r -= WEIGHTS[layer]; if (r <= 0) break; }
+            if (!skill) { const own = this.sets[layer].skills; skill = own.length ? own[Math.floor(Math.random() * own.length)] : null; }
             let u = rand(-1, 1), v = rand(-1, 1);
             if (Math.abs(u) + Math.abs(v) > 1) { u = Math.sign(u) - u; v = Math.sign(v) - v; }
 
@@ -208,13 +408,10 @@ export class AgentField {
                 layer, u, v, tx: 0, ty: 0,
                 link: above?.length && Math.random() < 0.12 ? above[Math.floor(Math.random() * above.length)]
                     : peers.length ? peers[Math.floor(Math.random() * peers.length)] : null,
-                label: null, labelW: 0,
+                skill, labelW: 0,
                 wob: rand(0, Math.PI * 2),
             };
-            if (this.agents.length < LABELLED) {
-                const kind = KINDS[Math.floor(Math.random() * KINDS.length)];
-                a.label = kind === 'agent' ? `agent-${100 + Math.floor(Math.random() * 900)}` : kind;
-            }
+            if (named && skill) this.named.push(a);
             if (burst) {
                 const angle = rand(0, Math.PI * 2), s = rand(120, 320);
                 a.vx = Math.cos(angle) * s; a.vy = Math.sin(angle) * s;
@@ -222,6 +419,7 @@ export class AgentField {
                 a.x = rand(0, this.w); a.y = rand(0, this.h);
             }
             this.target(a);
+            if (this.reduced) { a.x = a.tx; a.y = a.ty; a.vx = a.vy = 0; } // still picture: no loop to carry it there
             this.agents.push(a);
             peers.push(a);
         }
@@ -273,7 +471,12 @@ export class AgentField {
 
         const k = 16, damp = 2 * Math.sqrt(k) * 0.85;
         for (const a of this.agents) {
-            if (this.stacked) {
+            // The agent under the pointer and the one whose card is open stand still (so they can be clicked and read).
+            const held = a === this.selected || a === this.hover;
+            if (held && !this.stacked) {
+                const slow = Math.max(0, 1 - dt * 12);
+                a.vx *= slow; a.vy *= slow;
+            } else if (this.stacked) {
                 // A little bob so the stack stays alive.
                 a.wob += dt * 2;
                 const bx = Math.cos(a.wob) * 1.5, by = Math.sin(a.wob * 1.3) * 1.5;
@@ -288,16 +491,17 @@ export class AgentField {
                 a.vx += (Math.cos(a.h) * a.speed - a.vx) * 2 * dt;
                 a.vy += (Math.sin(a.h) * a.speed - a.vy) * 2 * dt;
             }
-            if (near) {
+            if (near && !held) {
                 const dx = a.x - px, dy = a.y - py, d2 = dx * dx + dy * dy;
                 if (d2 < r2 && d2 > 1) {
-                    const d = Math.sqrt(d2), push = (1 - d / POINTER_RADIUS) * 900 * dt;
+                    const d = Math.sqrt(d2), push = (1 - d / POINTER_RADIUS) * POINTER_PUSH * dt;
                     a.vx += (dx / d) * push; a.vy += (dy / d) * push;
                 }
             }
             a.x += a.vx * dt;
             a.y += a.vy * dt;
         }
+        if (this.selected) this.placeCard(); // follows its agent (only when it has moved a few pixels)
     }
 
     draw() {
@@ -349,18 +553,39 @@ export class AgentField {
         }
         ctx.globalAlpha = 1;
 
-        // Names for the first few.
+        // Names: one agent per skill always shows its skill. In the stack that would be a pile of overlapping
+        // tags, so there only the lit layer shows them (plus the agent under the pointer and the open one).
         ctx.font = '600 10px ui-monospace, SFMono-Regular, Menlo, monospace';
         ctx.textBaseline = 'middle';
-        for (let i = 0; i < Math.min(LABELLED, this.agents.length); i++) {
-            const a = this.agents[i];
-            if (!a.label) continue;
-            if (!a.labelW) a.labelW = ctx.measureText(a.label).width + 10;
-            ctx.fillStyle = COLORS[a.layer];
-            ctx.fillRect(a.x + 9, a.y + 7, a.labelW, 13);
-            ctx.fillStyle = '#06080d';
-            ctx.fillText(a.label, a.x + 14, a.y + 13.5);
+        const crowded = prog > 0.5;
+        for (const a of this.named) {
+            if (a === this.selected || a === this.hover) continue; // drawn last, on top
+            if (crowded && this.focus !== a.layer) continue;
+            this.drawName(a);
         }
+        for (const a of [this.hover, this.selected]) {
+            if (!a) continue;
+            ctx.globalAlpha = a === this.selected ? 1 : 0.7;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(a.x + BODY_X, a.y + BODY_Y, 11, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            this.drawName(a);
+        }
+    }
+
+    /** The name tag of an agent: its skill, in the colour of its layer. */
+    drawName(a) {
+        if (!a.skill) return;
+        const { ctx } = this;
+        if (!a.labelW) a.labelW = ctx.measureText(a.skill.name).width + 10;
+        const x = Math.max(2, Math.min(a.x + 9, this.w - a.labelW - 2));
+        ctx.fillStyle = COLORS[a.layer];
+        ctx.fillRect(x, a.y + 7, a.labelW, 13);
+        ctx.fillStyle = '#06080d';
+        ctx.fillText(a.skill.name, x + 5, a.y + 13.5);
     }
 
     /** Frame budget: if this device cannot keep up, drop the links and stop growing. */

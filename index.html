@@ -317,21 +317,72 @@
             <div class="wrap">
                 <p class="eyebrow" data-type>The stack, alive</p>
                 <h2 id="swarm-title" class="title" data-type>Press the button, <em class="accent">they multiply.</em></h2>
-                <p class="lede" data-type>The same five layers as a swarm. Every cursor is a small agent with a job. Add more of them and watch the layers fill up.</p>
+                <p class="lede" data-type>The same five layers as a swarm. Every cursor is a small agent with one skill. Click one to see what I can do with it, or add more and watch the layers fill up.</p>
                 <div class="swarm" data-box data-frame="none">
-                    <!-- Decorative picture, drawn by js/agents.js. The list on the right says the same in words. -->
+                    <!-- Decorative picture, drawn by js/agents.js: every agent is one skill. The list on the right says the same in words
+                         (without JS the skills are listed open, with JS they open in the card below as the visitor picks an agent or a layer). -->
                     <canvas id="swarm-canvas" class="swarm-canvas" aria-hidden="true"></canvas>
                     <ol class="layer-list" aria-label="The five layers, top to bottom">
-                        <li><button class="layer-btn" type="button" data-layer="4" aria-pressed="false"><span class="layer-dot" style="--c:#ff8fb8"></span><span><span class="layer-n">Layer 5</span>AI tools</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="3" aria-pressed="false"><span class="layer-dot" style="--c:#ffc766"></span><span><span class="layer-n">Layer 4</span>Programming</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="2" aria-pressed="false"><span class="layer-dot" style="--c:#6fe3a5"></span><span><span class="layer-n">Layer 3</span>Game engines</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="1" aria-pressed="false"><span class="layer-dot" style="--c:#5fd4f0"></span><span><span class="layer-n">Layer 2</span>3D &amp; graphics</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="0" aria-pressed="false"><span class="layer-dot" style="--c:#7b95ff"></span><span><span class="layer-n">Layer 1</span>Business &amp; operations</span></button></li>
+                        <li class="layer-item">
+                            <button class="layer-btn" type="button" data-layer="4" aria-pressed="false"><span class="layer-dot" style="--c:#ff8fb8"></span><span><span class="layer-n">Layer 5</span>AI tools</span></button>
+                            <ul class="layer-skills" aria-label="Skills in layer 5">
+                                <li><strong>Claude</strong> Daily helper for planning, writing and code. This whole site is built with Claude Code.</li>
+                                <li><strong>Gemini</strong> Concept references and image prompts for character and 3D design.</li>
+                                <li><strong>Copilot</strong> Microsoft Copilot in Word, PowerPoint and Excel.</li>
+                            </ul>
+                        </li>
+                        <li class="layer-item">
+                            <button class="layer-btn" type="button" data-layer="3" aria-pressed="false"><span class="layer-dot" style="--c:#ffc766"></span><span><span class="layer-n">Layer 4</span>Programming</span></button>
+                            <ul class="layer-skills" aria-label="Skills in layer 4">
+                                <li><strong>Blueprint</strong> Visual scripting in Unreal Engine 5: gameplay logic and prototypes.</li>
+                                <li><strong>C++</strong> Hobby deep dive: my own game prototypes.</li>
+                                <li><strong>Python</strong> Hobby programming for my own projects.</li>
+                                <li><strong>GDScript</strong> Gameplay prototypes in Godot 4.</li>
+                                <li><strong>Web</strong> HTML, CSS and vanilla JavaScript: this site and the Dienstplan web app.</li>
+                            </ul>
+                        </li>
+                        <li class="layer-item">
+                            <button class="layer-btn" type="button" data-layer="2" aria-pressed="false"><span class="layer-dot" style="--c:#6fe3a5"></span><span><span class="layer-n">Layer 3</span>Game engines</span></button>
+                            <ul class="layer-skills" aria-label="Skills in layer 3">
+                                <li><strong>Unreal Engine 5</strong> Blueprint-first prototyping and lighting studies.</li>
+                                <li><strong>Unity</strong> Used on Aphonia and Dolphin Rush (C#).</li>
+                                <li><strong>Godot 4</strong> Prototypes in GDScript.</li>
+                                <li><strong>Game design</strong> Co-founder of Moonflux Interactive: concept, planning and design documentation for the whole player experience.</li>
+                            </ul>
+                        </li>
+                        <li class="layer-item">
+                            <button class="layer-btn" type="button" data-layer="1" aria-pressed="false"><span class="layer-dot" style="--c:#5fd4f0"></span><span><span class="layer-n">Layer 2</span>3D &amp; graphics</span></button>
+                            <ul class="layer-skills" aria-label="Skills in layer 2">
+                                <li><strong>3D modeling</strong> Maya modeling, low- and high-poly workflow. Blender assets for an AR architecture viewer.</li>
+                                <li><strong>Texturing</strong> Substance Painter and Substance Designer, for example on the environment Under The Bridge.</li>
+                                <li><strong>Rendering</strong> Blender Cycles renders and Unreal lighting studies.</li>
+                                <li><strong>Graphic design</strong> Affinity Photo, Publisher and Designer for layouts and 2D work.</li>
+                                <li><strong>Game art</strong> Diploma in Game Art &amp; 3D Animation, SAE Institute Zürich.</li>
+                            </ul>
+                        </li>
+                        <li class="layer-item">
+                            <button class="layer-btn" type="button" data-layer="0" aria-pressed="false"><span class="layer-dot" style="--c:#7b95ff"></span><span><span class="layer-n">Layer 1</span>Business &amp; operations</span></button>
+                            <ul class="layer-skills" aria-label="Skills in layer 1">
+                                <li><strong>E-commerce</strong> Commercial apprenticeship (Kaufmann EFZ): ran an online shop and traded goods on online platforms.</li>
+                                <li><strong>Advertising</strong> Digital and print advertising material, made during the apprenticeship.</li>
+                                <li><strong>Live operation</strong> Cinema 8: fixing system faults and keeping the technology running in live operation.</li>
+                                <li><strong>Documentation</strong> Structured technical and game design documentation as the interface to development.</li>
+                                <li><strong>MS Office</strong> Word, PowerPoint and Excel.</li>
+                            </ul>
+                        </li>
                     </ol>
+                    <div id="skill-card" class="skill-card" role="region" aria-label="Skill details" aria-live="polite" aria-atomic="true" hidden>
+                        <button class="skill-close" type="button" aria-label="Close skill details">&times;</button>
+                        <p class="skill-eyebrow"><span class="layer-dot"></span><span class="skill-layer"></span></p>
+                        <h3 class="skill-name"></h3>
+                        <p class="skill-text"></p>
+                        <ul class="skill-peers" aria-label="More skills in this layer"></ul>
+                    </div>
                     <div class="swarm-bar">
                         <button id="swarm-more" class="btn btn-solid" type="button" data-a11y>More agents</button>
                         <button id="swarm-stack" class="btn btn-ghost" type="button" aria-pressed="false" data-outline><span class="stack-label">Stack them up</span></button>
                         <p id="swarm-count" class="swarm-count" role="status">16 agents · 5 layers</p>
+                        <p class="swarm-hint">Click or tap an agent to see its skill</p>
                     </div>
                 </div>
             </div>

@@ -45,5 +45,6 @@ if (swarmStage) {
         more: document.getElementById('swarm-more'),
         stack: document.getElementById('swarm-stack'),
         layerButtons: [...swarmStage.querySelectorAll('.layer-btn')],
+        card: document.getElementById('skill-card'),
     });
 }
