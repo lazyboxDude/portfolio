@@ -145,6 +145,7 @@ export class Shell {
     /** fp / fg: how far padding / gap have come (0..1). */
     frameStep(fp, fg) {
         const { el, m, band } = this;
+        if (!band) return; // the build was cut short (cleanup) while the bot was still working
         const pad = m.pad.map((v) => `${(v * fp).toFixed(2)}px`).join(' ');
         el.style.padding = pad;
         el.style.gap = `${(m.gap[0] * fg).toFixed(2)}px ${(m.gap[1] * fg).toFixed(2)}px`;

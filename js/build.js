@@ -1,6 +1,9 @@
 // The build "job": three bot cursors construct the page live, one section at a time.
 // The hero is built after the first click on the start box; every other section (index.html:
-// data-section) is built when it scrolls into view. Afterwards a small pill builds everything again.
+// data-section) is built ahead of the visitor, as soon as it is less than LOOKAHEAD screens below the
+// viewport, so the bots keep working further down while the visitor scrolls. When a bot has nothing
+// to do it waits at the bottom edge of the screen (the build front), or tucks into the corner once
+// everything stands. Afterwards a small pill builds everything again.
 //
 // Who does what (the markup says what to build, see index.html):
 //   layout-bot (arrow)  builds every data-box for real (js/layout.js): it drags out a box with a real
@@ -37,6 +40,11 @@ const FONT_WAIT_MS = 1500;
 const DEFAULT_TYPE_MS = 4500; // how long typing a whole section may take (data-type-ms overrides)
 const SCROLL_TYPE_SPEED = 0.5; // sections the visitor scrolls to are typed faster than the hero
 const AVG_CHAR_MS = 42;       // average delay per character at speed 1
+// The bots build ahead of the visitor: a section is started once its top is this many screen heights
+// below the bottom edge of the viewport. Visitors tend to keep scrolling, so the page is there before they are.
+const LOOKAHEAD = 0.8;
+const REST_MARGIN = 44;       // parked bots keep this far from the viewport edge (px)
+const REST_STACK = 34;        // vertical gap between parked bots in the corner (px)
 
 // How exactly a bot has to arrive before its job goes on. Close and fast enough is enough: the
 // next movement (follow) catches up anyway, and waiting for a full stop made every step crawl.
@@ -45,12 +53,12 @@ const ARRIVE_FAST = { tolerance: 80, settleSpeed: 1000, timeout: 700 };
 // Typing starts while the copy-bot is still a few steps away: it follows the caret and catches up.
 const TYPE_ARRIVE = { tolerance: 90, settleSpeed: 4000, timeout: 900 };
 
-// One job per bot: name pill, colour, pointer shape (see cursors.js) and off-duty personality:
-// one shy, one curious, one sociable. Colours stay readable under the dark pill text.
+// One job per bot: name pill, colour and pointer shape (see cursors.js). Colours stay readable under
+// the dark pill text. Off duty the bots do not roam (see SiteBuilder.rest): they wait where the next work is.
 const JOBS = {
-    layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow', personality: { shyness: 1, curiosity: 0.1, sociability: 0.3 } },
-    copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text', personality: { shyness: 0.1, curiosity: 1, sociability: 0.6 } },
-    design: { label: 'design-bot', color: '#ffc766', kind: 'pen', personality: { shyness: 0.3, curiosity: 0.3, sociability: 0.9 } },
+    layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow' },
+    copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text' },
+    design: { label: 'design-bot', color: '#ffc766', kind: 'pen' },
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -329,7 +337,7 @@ export class SiteBuilder {
 
         const onScroll = () => {
             if (this.frame) return;
-            this.frame = requestAnimationFrame(() => { this.frame = 0; this.pump(); });
+            this.frame = requestAnimationFrame(() => { this.frame = 0; this.skipPast(); this.pump(); });
         };
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onScroll, { passive: true });
@@ -389,15 +397,52 @@ export class SiteBuilder {
         } finally {
             this.pumping = false;
         }
+        this.restAll();
         this.updateUi();
     }
 
-    /** A section is wanted once it has come into the viewport (or lies above it). */
+    /** A section is wanted once it is close to the viewport: in it, above it, or less than LOOKAHEAD screens below. */
     wanted(section) {
         const r = section.el.getBoundingClientRect();
-        const vh = window.innerHeight;
-        return r.top < Math.max(vh * 0.8, vh - 120);
+        return r.top < window.innerHeight * (1 + LOOKAHEAD);
     }
+
+    /** The visitor scrolled past the section being built: finish it at once so the bots move on to the next one. */
+    skipPast() {
+        const s = this.current;
+        if (!s || s.isHero || s.cancelled) return;
+        if (s.el.getBoundingClientRect().bottom >= 0) return;
+        s.cancelled = true;
+        s.showAll();
+    }
+
+    // ---- Off duty -------------------------------------------------------------
+
+    /**
+     * Where a bot waits while it has nothing to build. Not a roaming target: the bots stand at the bottom
+     * edge of the screen, where the next section will come from. Once everything stands they tuck into
+     * the bottom-right corner (stacked, so the name pills stay readable and nothing sits on the content).
+     */
+    restPoint(bot) {
+        const i = Math.max(0, this.crew.indexOf(bot));
+        const vw = window.innerWidth, vh = window.innerHeight;
+        if (this.sections.every((s) => s.state === 'built')) {
+            return { x: Math.max(REST_MARGIN, vw - 120), y: vh - REST_MARGIN - i * REST_STACK };
+        }
+        return { x: vw * (0.3 + i * 0.2), y: vh - REST_MARGIN };
+    }
+
+    /** Send a bot to wait at its resting point (it follows it, so resizing and the end of the build are covered). */
+    rest(bot) {
+        if (!bot || prefersReducedMotion()) return;
+        bot.follow(() => this.restPoint(bot));
+    }
+
+    restAll() {
+        for (const bot of this.crew) this.rest(bot);
+    }
+
+    get crew() { return [this.builder, this.typist, this.designer]; }
 
     /** Announce the result and offer to build again, once everything stands. */
     updateUi() {
@@ -480,7 +525,7 @@ export class SiteBuilder {
                 if (grid && --grid.pending === 0) grid.close();
                 boxReady.get(shape).resolve();
             }
-            builder.idle();
+            this.rest(builder);
         })();
 
         // copy-bot: types the texts, in page order. A text waits for the shape around it.
@@ -493,7 +538,7 @@ export class SiteBuilder {
                 await this.typeText(t, { speed: Number.isFinite(override) ? override : speed, tag: t.el.hasAttribute('data-tag') });
                 typed.get(t).resolve();
             }
-            typist.idle();
+            this.rest(typist);
         })();
 
         // design-bot: switches the glow on (hero), then draws whatever is ready first.
@@ -514,7 +559,7 @@ export class SiteBuilder {
                 if (item.d.kind === 'underline') await this.drawUnderline(item.d);
                 else await this.drawOutline(item.d.shape);
             }
-            designer.idle();
+            this.rest(designer);
         })();
 
         await Promise.all([layout, copy, design]);
@@ -730,7 +775,10 @@ export class SiteBuilder {
         const step = speed < 0.15 ? 3 : speed < 0.3 ? 2 : 1;
         const n = t.chars.length;
         for (let i = 0; i < n; i += step) {
-            if (this.current?.cancelled) return;
+            if (this.current?.cancelled) {
+                if (tag) typist.hideTag();
+                return;
+            }
             const end = Math.min(i + step, n);
             t.reveal(end);
             await sleep(typingDelay(t.text[end - 1], speed));
