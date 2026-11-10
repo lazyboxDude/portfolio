@@ -47,3 +47,22 @@ if (swarmStage) {
         layerButtons: [...swarmStage.querySelectorAll('.layer-btn')],
     });
 }
+
+// Nav: mark the link of the section in view (aria-current). Home is the default at the top.
+const navLinks = [...document.querySelectorAll('.nav-links a')];
+const navTargets = navLinks.map((a) => ({ a, el: a.hash.length > 1 ? document.querySelector(a.hash) : null }));
+
+function markNav() {
+    const line = window.innerHeight * 0.4; // a section counts once its top has passed this line
+    let current = navLinks[0];
+    for (const { a, el } of navTargets) {
+        if (el && el.getBoundingClientRect().top <= line) current = a;
+    }
+    for (const a of navLinks) {
+        if (a === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+    }
+}
+
+window.addEventListener('scroll', markNav, { passive: true });
+window.addEventListener('resize', markNav, { passive: true });

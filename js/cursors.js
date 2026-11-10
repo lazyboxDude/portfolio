@@ -27,14 +27,14 @@ const KINDS = {
         svg: `
 <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
   <path d="M2 1.5 L2 17 L6.2 13.2 L9 19.6 L11.8 18.4 L9 12.2 L14.8 12.2 Z"
-        fill="var(--cursor-color)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+        fill="var(--cursor-color)" stroke="var(--fg)" stroke-width="1.4" stroke-linejoin="round"/>
 </svg>`,
     },
     text: {
         hot: [11, 11],
         svg: `
 <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" fill="none" stroke-linecap="round">
-  <path d="M7.5 3.5 H14.5 M11 3.5 V18.5 M7.5 18.5 H14.5" stroke="#fff" stroke-width="4.2"/>
+  <path d="M7.5 3.5 H14.5 M11 3.5 V18.5 M7.5 18.5 H14.5" stroke="var(--fg)" stroke-width="4.2"/>
   <path d="M7.5 3.5 H14.5 M11 3.5 V18.5 M7.5 18.5 H14.5" stroke="var(--cursor-color)" stroke-width="2"/>
 </svg>`,
     },
@@ -43,8 +43,8 @@ const KINDS = {
         svg: `
 <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
   <path d="M3 19.5 L4.2 14.6 L15 3.8 Q16.2 2.6 17.6 3.8 L18.2 4.4 Q19.4 5.8 18.2 7 L7.4 17.8 Z"
-        fill="var(--cursor-color)" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
-  <path d="M4.2 14.6 L7.4 17.8" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>
+        fill="var(--cursor-color)" stroke="var(--fg)" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M4.2 14.6 L7.4 17.8" stroke="var(--fg)" stroke-width="1.2" stroke-linecap="round"/>
 </svg>`,
     },
 };

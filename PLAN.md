@@ -104,6 +104,9 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 | 8 | **Schwarm-Finale** (Bakelayer) | gebaut (siehe Status): neuer Abschnitt `#swarm`. "More agents" vervielfacht den Schwarm (16, 48, 144, 432 bis 720 Agents auf `<canvas>`), auf dem Höchststand sammelt er sich zu den fünf Skill-Ebenen. Mit Zähler, Verbindungslinien, Frame-Budget und Standbild bei Reduced Motion. |
 | 9 | AI-Element | Etwas, das zur Zielgruppe passt: z. B. die Cursors als kleine Agenten, die eine echte Aufgabe lösen. Falls ein Live-Modell nötig ist: Aufruf über eine serverseitige Funktion (Vercel Function oder Cloudflare Worker), der Schlüssel liegt nur serverseitig, mit Rate-Limit. Das ist ein eigener Schritt mit eigener Absprache. |
 | 10 | Bewerbungs-Essentials | Meta-/OG-Tags (mit Vorschaubild), Favicon prüfen, Seitentitel, Ohne-JS-Fallback prüfen. Der CV-Download (mehrsprachige Seite, kein PDF) ist schon in Schritt 6 gebaut, hier bleiben eventuell weitere Sprachen und Feinschliff am Druck. |
+| E1 | **Redesign "Editorial", Schritt 1: Look und Hero** | gebaut (siehe Status): hell (Papier/Tinte/Blau), Space Grotesk, flache Nav, Riesen-Name als Hero, Tiefen-Effekt vorbereitet, eckige Buttons. |
+| E2 | Redesign, Schritt 2: wandernde Box als Zuhause der Bots | offen: isometrische Box, FLIP nach unten rechts, Zähler, Bots gehen heim, Klick ruft sie (ersetzt "Build again"). |
+| E3 | Redesign, Schritt 3: Abschnitte im Editorial-Stil | offen: Projects-Raster mit 1 px Rahmen, About bis Footer im selben Stil, Schwarm hell hinterlegt. |
 | 11 | Feinschliff | Performance-Messung, Mobil, Reduced-Motion, Lighthouse, Cross-Browser, Sound optional (standardmäßig aus). |
 
 Die Reihenfolge darf sich ändern, sobald etwas ausprobiert wurde. Nach jedem Schritt Status und Roadmap hier aktualisieren.
@@ -203,6 +206,23 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **Überscrollt:** Scrollt man an einem Abschnitt vorbei, der gerade gebaut wird, wird er sofort fertiggestellt (`skipPast()`), und die Bots machen mit dem nächsten weiter.
   - Die Persönlichkeit (scheu/neugierig/gesellig, Schritt 3 Teil 2) steckt noch in `js/cursors.js` (`idle()`), wird aber vom Bau nicht mehr gerufen. Kann bei Bedarf entfernt werden.
   - **Bekannte Folge:** Der Abschnitt direkt unter dem Hero baut sich, bevor man ihn sieht, wenn man im Hero liest. Wer das Bauen mehr sehen will, senkt `LOOKAHEAD`.
+- **Redesign "Editorial", Schritt 1 gebaut** (Branch `claude/bold-lamport-n9w5kv`, kein PR): Referenz ist ein privates Mockup (https://claude.ai/artifact/4t7DPkX3g1pkpZbvjc3S63, Boards "E · Editorial, state 1" und "state 3").
+  Das Redesign hat drei Schritte (E1 bis E3 in der Roadmap), jeder ein eigener Commit-Block, nach jedem Schritt Stopp und Bericht.
+  - **Tokens** (`:root` in `css/site.css`, die alten Dunkel-Tokens sind weg): Papier `--bg #fbfaf6`, Fläche `--surface #fff`, Tinte `--fg #0b0c10`, `--muted #3d4050`, `--subtle #5a5d6a`, Linie `--line #e7e4da`, `--line-strong #cfcbbf`, Akzent `--accent #3355ff`.
+    Kontrast gemessen: Akzent auf Papier 5,2 : 1, Weiss auf Akzent 5,4 : 1, `--subtle` 6,3 : 1. `--accent-soft` und `--accent-2` entfallen. Der Gutter ist `--gutter` (20 bis 48 px).
+  - **Schriften:** Space Grotesk (variabel, latin, `fonts/space-grotesk-latin-var.woff2`, OFL, Eintrag in `fonts/README.md`) für alles, Instrument Serif kursiv für Akzentwörter und Tagline, Mono bleibt die System-Mono. Die Datei hat die Achse 300 bis 700, genutzt werden 400 (Fliesstext), 500 und 700.
+    Kein Google-Request zur Laufzeit (wird in `tools/check.mjs` geprüft). Inter bleibt im Repo, weil `cv.html` es noch nutzt.
+  - **Nav:** flache Leiste, 72 px, Linie unten, Logo, Home/About/Projects/Experience/Skills in Grossbuchstaben (12 px, 0.14em), eckiger Button "Contact". Der aktive Link (Akzent, 1 px Unterstrich, `aria-current`) folgt dem Scrollen (`markNav()` in `js/main.js`). Mobil zwei Zeilen.
+  - **Hero:** Der Name ist die H1 (`#headline`, 700, -0.045em, einzeilig, `14.17vw` = 204 px bei 1440), rechts abgeschnitten. Links wird er nur minimal angeschnitten (`margin-left: -1vw`), damit "Micael" lesbar bleibt. Das Mockup schneidet links viel stärker (ca. -17vw), das ist ein einziger Wert in `h1` (`css/site.css`).
+    Die Tagline darunter (Instrument Serif kursiv) ist "Game designer, 3D artist and tool builder. I build interfaces that *build themselves.*". Buttons "Say hello" (gefüllt) und "See my work" (Rahmen, Anker `#projects`, `#work-link` ersetzt `#about-link`). Unten Linie mit "Scroll" und den fünf Skill-Ebenen.
+    Eyebrow und Lede ("This page builds itself ...") sind unverändert geblieben (Wortlaut), das Mockup zeigt sie nicht.
+  - **Tiefe:** `.hero` ist ein eigener Stacking-Kontext (`isolation: isolate`, Papier als Hintergrund), die H1 ist ab 1000 px Papierfarbe mit `mix-blend-mode: difference` (schwarz auf Papier, hell über Dunklem), darunter schwarzer Text. Mit einer eingeschobenen dunklen Fläche getestet, es wirkt. Die Box kommt in Schritt E2 darunter.
+    Der Hintergrund-Glow (`#glow`) liegt jetzt im Hero (`z-index: -1`), weil der Hero deckend ist. Er ist ein dezenter blauer und ocker Schimmer.
+  - **Eckig:** `.btn`, `.nav-cta`, `.layer-btn`, `.next` und `.box` haben Radius 0. Karten und Chips bleiben vorerst rund (Schritt E3). **Bau-Engine:** Bei Radius 0 teilte `Shape.setDrawn`/`drawPoint` durch 0 (NaN, Bots hätten ein NaN-Ziel bekommen), jetzt abgefangen (`js/build.js`).
+  - **Übrige Abschnitte:** nur neue Tokens (weisse Flächen mit Linie, Kontakt als Tinten-Block, Footer), kein Umbau. Cursor-Umrisse sind jetzt Tinte statt weiss (`js/cursors.js`, `js/agents.js`), Schwarm-Linien blau, Ebenen-Rauten kräftiger auf Hell. Namens-Pills behalten dunklen Text.
+  - **Eingabeleiste** ("Ask the bots to build something") bewusst weggelassen (totes Bedienelement bis Roadmap-Schritt 9).
+  - **Fehlende Dateien:** `DESIGN.md` gibt es im Repo nicht (weder hier noch auf `main`), der Bau-Vertrag ist in `index.html` (Kommentar vor `#site`), im Kopf von `js/build.js` und oben in diesem Plan beschrieben. `tools/check.mjs` und `tools/shoot.mjs` gab es ebenfalls nicht, sie sind in diesem Schritt neu (siehe Arbeitsweise).
+  - **Mobil:** Der Name bleibt einzeilig und riesig (55 px bei 390), also rechts abgeschnitten ("Micael Gomes Fe"). Der volle Name steht im Eyebrow darüber.
 
 ## Offene Fragen an Micael
 
@@ -227,4 +247,6 @@ Entschieden: Alle acht Renders werden gezeigt, Aphonia und Dolphin Rush bleiben 
   Der Hero baut sich in ca. 15 Sekunden, jeder weitere Abschnitt in 3 bis 9 Sekunden. In Tests auf Zustände warten (z. B. alle `.ch` eines Abschnitts mit Klasse `on` und alle `[data-box]` mit `is-shown`, oder `#next` mit Klasse `is-ready`), keine festen Pausen.
   Weitere Abschnitte bauen sich erst, wenn man hinscrollt: im Test mit `window.scrollTo({ top, behavior: 'instant' })` springen (das Standard-Scrollen ist weich).
   Bei Zeitmessungen keine Screenshots mitlaufen lassen, sie verfälschen die Dauer.
+- **Werkzeuge** (`tools/`, ohne Abhängigkeiten ausser dem vorinstallierten Playwright): `node tools/check.mjs` (`--quick` überspringt den animierten Hero-Bau) prüft Bau-Vertrag, Kontrast, Touch-Ziele 40 px, Überlauf, Reduced Motion, ohne JS, keine externen Requests und dass die anderen Seiten laden.
+  `node tools/shoot.mjs --out <dir>` macht Screenshots (Desktop 1440 und Mobil 390: Start, Hero nach dem Bau, fertige Seite).
 - Vor jedem PR kurz prüfen, dass `dienstplan.html`, `datenschutz.html` und `nutzungsbedingungen.html` ohne Fehler laden.

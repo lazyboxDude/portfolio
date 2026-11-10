@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="light">
     <title>Micael G. Fernandes</title>
     <meta name="description" content="Micael Gomes Fernandes (._lazybox_): game designer, 3D artist and tool builder. A personal website that builds itself.">
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/space-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Marks that JS runs: without it the whole page is shown right away and the buttons below are hidden. -->
     <script>document.documentElement.classList.add('js');</script>
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <!-- Background glow: the design-bot switches it on (js/build.js). -->
-    <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
-
     <!-- Start box: vanishes after the first click and never comes back. -->
     <button id="box" class="box" type="button">
         <span class="box-label">Build Website</span>
@@ -38,22 +35,35 @@
                 <nav id="nav" class="nav" data-box aria-label="Main">
                     <a class="nav-logo" href="./" data-type>._lazybox_</a>
                     <ul class="nav-links">
+                        <li><a href="#" aria-current="location" data-type>Home</a></li>
                         <li><a href="#about" data-type>About</a></li>
                         <li><a href="#projects" data-type>Projects</a></li>
                         <li><a href="#experience" data-type>Experience</a></li>
                         <li><a href="#skills" data-type>Skills</a></li>
                     </ul>
-                    <a id="nav-cta" class="btn btn-solid btn-small" href="#contact" data-box><span data-type>Contact</span></a>
+                    <a id="nav-cta" class="nav-cta" href="#contact" data-box><span data-type>Contact</span></a>
                 </nav>
             </header>
 
+            <!-- The hero is its own stacking context (isolation) on a paper background: the giant name is paper-coloured
+                 with mix-blend-mode: difference, so it turns light wherever something dark stands behind it (the box, step 2). -->
             <main class="hero">
+                <!-- Background glow: the design-bot switches it on (js/build.js). -->
+                <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
+
                 <p class="eyebrow" data-type>Micael Gomes Fernandes · ._lazybox_</p>
-                <h1 id="headline" data-type data-tag data-speed="0.7">I build interfaces that <em class="accent" data-underline>build themselves.</em></h1>
-                <p class="lede" data-type data-tag>This page builds itself: a small team of cursor bots lays it out, writes it and draws it, live. Everything is plain HTML, CSS and JavaScript.</p>
-                <div class="actions">
-                    <a id="about-link" class="btn btn-solid" href="#about" data-box><span data-type>About me</span></a>
-                    <a id="hello" class="btn btn-ghost" href="mailto:micael@gomes-fernandes.ch" data-box data-outline><span data-type>Say hello</span></a>
+                <h1 id="headline" data-type data-tag data-speed="0.7">Micael Gomes Fernandes</h1>
+                <div class="hero-copy">
+                    <p class="tagline" data-type data-tag>Game designer, 3D artist and tool builder. I build interfaces that <em class="accent" data-underline>build themselves.</em></p>
+                    <p class="lede" data-type>This page builds itself: a small team of cursor bots lays it out, writes it and draws it, live. Everything is plain HTML, CSS and JavaScript.</p>
+                    <div class="actions">
+                        <a id="hello" class="btn btn-solid btn-lg" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>Say hello</span></a>
+                        <a id="work-link" class="btn btn-ghost btn-lg" href="#projects" data-box data-outline><span data-type>See my work</span></a>
+                    </div>
+                </div>
+                <div class="hero-strip">
+                    <a class="scroll-cue" href="#about"><span data-type>Scroll</span></a>
+                    <p class="strip-layers" data-type>Business &amp; operations · 3D &amp; graphics · Game engines · Programming · AI tools</p>
                 </div>
             </main>
         </div>

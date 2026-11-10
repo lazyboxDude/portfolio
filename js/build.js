@@ -235,7 +235,7 @@ class Shape {
     setDrawn(p, path) {
         let dist = p * path.total;
         path.lens.forEach((len, i) => {
-            const t = clamp(dist / len, 0, 1);
+            const t = len > 0 ? clamp(dist / len, 0, 1) : 1; // square corners have length 0
             dist -= len;
             const piece = this.pieces[i];
             if (i % 2 === 0) piece.style.opacity = t.toFixed(3);
@@ -248,7 +248,7 @@ class Shape {
         let dist = p * path.total;
         let i = 0;
         while (i < path.lens.length - 1 && dist > path.lens[i]) dist -= path.lens[i++];
-        const t = clamp(dist / path.lens[i], 0, 1);
+        const t = path.lens[i] > 0 ? clamp(dist / path.lens[i], 0, 1) : 0;
         const [x0, y0] = path.pts[i];
         const [x1, y1] = path.pts[i + 1];
         return { x: r.left + x0 + (x1 - x0) * t, y: r.top + y0 + (y1 - y0) * t };
