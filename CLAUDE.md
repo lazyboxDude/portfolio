@@ -19,7 +19,7 @@ Statisches HTML, CSS und Vanilla-JS (ES-Module), kein Build-Schritt, kein Framew
 - `vercel.json`: Weiterleitungen. Die alten CV-Dateien unter `archive/v1-2026-11/docs/` (enthalten private Daten) werden auf `cv.html` umgeleitet.
 - `cv.html`, `css/cv.css`, `js/cv.js`: der Lebenslauf als Seite (Deutsch/Englisch), kein PDF im Deploy. Keine privaten Daten auf der Website, siehe `PLAN.md`.
 - `fonts/`, `images/projects/`: selbst gehostete Schriften und kleine Projektbilder.
-- `history.html`, `images/history/`: Zeitleiste "How this site changed" mit Screenshots aller Versionen (WebP, zusammen ca. 1,2 MB). Neue Version dazu = Ordner unter `images/history/` und ein `<li class="stage">` in `history.html`.
+- `history.html`, `images/history/`: Zeitleiste "How this site changed" mit Screenshots der fertigen Versionen (WebP, zusammen ca. 0,8 MB), keine Zwischenschritte. Neue Version dazu = Ordner unter `images/history/` und ein `<li class="stage">` in `history.html`.
 - `CNAME`: Domain, bleibt im Root.
 
 ## Konventionen
