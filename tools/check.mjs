@@ -94,6 +94,13 @@ try {
         check('no script errors on load', !errors.length, errors.join(' | '));
         check('Space Grotesk and Instrument Serif are loaded', await page.evaluate(() => document.fonts.check('700 20px "Space Grotesk"') && document.fonts.check('italic 20px "Instrument Serif"')));
 
+        // The swarm's agents are named after the skills (tools of each skill, see agents.js toolNames).
+        const names = await page.evaluate(async () => {
+            const { toolNames } = await import('/js/agents.js');
+            return [toolNames('Blender · Autodesk Maya · Affinity Photo, Publisher, Designer'), toolNames('C++ · Blueprint · Python · GDScript, for my own prototypes'), toolNames('Unreal Engine 5 · Unity · Godot 4')];
+        });
+        check('swarm agents are named after the tools of the skills', names[0].join() === 'blender-agent,autodesk-maya-agent,affinity-photo-agent' && names[1].join() === 'cpp-agent,blueprint-agent,python-agent,gdscript-agent' && names[2].join() === 'unreal-engine-5-agent,unity-agent,godot-4-agent', JSON.stringify(names));
+
         // Tokens: contrast pairs from the :root custom properties.
         const tokens = await page.evaluate(() => {
             const cs = getComputedStyle(document.documentElement);

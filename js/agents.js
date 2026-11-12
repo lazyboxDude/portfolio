@@ -6,8 +6,9 @@
 //
 //   - "More agents" multiplies the swarm (x3 per click) up to a hard cap. At the cap the agents
 //     gather into the five layers on their own. "Stack them up" / "Release" toggles it by hand.
-//   - Every layer is one of the skill layers above it. Hover, focus or tap a layer in the list to
-//     light it up in the picture.
+//   - Every layer is one of the skill layers above it, and its agents are named after the tools of that
+//     skill ("blender-agent" on the 3D layer, "python-agent" on the programming layer, see toolNames).
+//     Hover, focus or tap a layer in the list to light it up in the picture.
 //   - Real mouse pointer: agents step aside when it comes close.
 //   - Frame budget: if drawing gets too slow on this device, the links are dropped and the swarm
 //     stops growing (degrade()).
@@ -19,7 +20,7 @@ import { prefersReducedMotion } from './cursors.js';
 
 const COLORS = ['#7b95ff', '#5fd4f0', '#6fe3a5', '#ffc766', '#ff8fb8']; // one per layer, bottom to top
 const WEIGHTS = [0.34, 0.26, 0.2, 0.13, 0.07]; // share of agents per layer (more at the base)
-const KINDS = ['agent', 'layout-agent', 'copy-agent', 'a11y-agent', 'motion-agent', 'type-agent'];
+const KINDS = ['agent', 'layout-agent', 'copy-agent', 'a11y-agent', 'motion-agent', 'type-agent']; // only if a layer has no tools
 const START = 16;           // agents at the beginning
 const GROWTH = 3;           // "More agents" multiplies by this
 const CAP_WIDE = 720;       // hard upper limits
@@ -32,6 +33,18 @@ const BUDGET_MS = 10;       // average work per frame that counts as "too slow"
 const SLOW_FRAMES = 45;     // ... for this many frames in a row
 
 const rand = (a, b) => a + Math.random() * (b - a);
+
+/**
+ * The tools named in a skill's description ("Blender · Autodesk Maya · Affinity Photo, Publisher, Designer"),
+ * as agent names: "blender-agent", "autodesk-maya-agent", "affinity-photo-agent". Items are separated by
+ * " · "; what follows a comma inside an item is a remark or a list continuation and is dropped.
+ */
+export function toolNames(text) {
+    return text.split('·')
+        .map((item) => item.split(',')[0].trim().toLowerCase().replace(/[^a-z0-9+#]+/g, '-').replace(/^-+|-+$/g, ''))
+        .filter(Boolean)
+        .map((slug) => `${slug.replace(/\+\+/g, 'pp')}-agent`);
+}
 const ARROW = new Path2D('M2 1.5 L2 17 L6.2 13.2 L9 19.6 L11.8 18.4 L9 12.2 L14.8 12.2 Z');
 
 export class AgentField {
@@ -44,8 +57,9 @@ export class AgentField {
      * @param {HTMLButtonElement} o.more
      * @param {HTMLButtonElement} o.stack
      * @param {HTMLButtonElement[]} o.layerButtons  data-layer="0..4" (0 = base)
+     * @param {string[][]} [o.names]     agent names per layer (0 = base), from the skills: see toolNames
      */
-    constructor({ stage, canvas, swarm, counter, more, stack, layerButtons }) {
+    constructor({ stage, canvas, swarm, counter, more, stack, layerButtons, names = [] }) {
         this.stage = stage;
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
@@ -54,6 +68,7 @@ export class AgentField {
         this.more = more;
         this.stack = stack;
         this.layerButtons = layerButtons;
+        this.names = names;
 
         this.reduced = prefersReducedMotion();
         this.cap = window.innerWidth < 720 ? CAP_NARROW : CAP_WIDE;
@@ -161,6 +176,15 @@ export class AgentField {
         });
     }
 
+    /** A tool name of the layer's skill: every name once before one repeats (the first agents are the labelled ones). */
+    nameFor(layer) {
+        const all = this.names[layer];
+        this.unused ??= [];
+        if (!this.unused[layer]?.length) this.unused[layer] = [...all];
+        const pool = this.unused[layer];
+        return pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+    }
+
     /** Geometry of the five layers: flat diamonds stacked upwards, the base the widest. */
     layout() {
         const { w, h } = this;
@@ -212,8 +236,13 @@ export class AgentField {
                 wob: rand(0, Math.PI * 2),
             };
             if (this.agents.length < LABELLED) {
-                const kind = KINDS[Math.floor(Math.random() * KINDS.length)];
-                a.label = kind === 'agent' ? `agent-${100 + Math.floor(Math.random() * 900)}` : kind;
+                const own = this.names[layer];
+                if (own?.length) {
+                    a.label = this.nameFor(layer);
+                } else {
+                    const kind = KINDS[Math.floor(Math.random() * KINDS.length)];
+                    a.label = kind === 'agent' ? `agent-${100 + Math.floor(Math.random() * 900)}` : kind;
+                }
             }
             if (burst) {
                 const angle = rand(0, Math.PI * 2), s = rand(120, 320);

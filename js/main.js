@@ -1,7 +1,12 @@
 import { CursorSwarm } from './cursors.js';
 import { SiteBuilder } from './build.js';
-import { AgentField } from './agents.js';
+import { AgentField, toolNames } from './agents.js';
 import { Dock } from './dock.js';
+
+// The swarm's agents are named after the skills: read the tools from the Skills section now, before the
+// builder wraps its text into single characters (layer 1 = the first skill = the base of the stack).
+const skillNames = [...document.querySelectorAll('.skills .skill')]
+    .map((skill) => toolNames(skill.querySelector('h3 + p')?.textContent ?? ''));
 
 const box = document.getElementById('box');
 const swarm = new CursorSwarm(document.getElementById('cursor-layer'), { max: 40 });
@@ -38,6 +43,7 @@ if (swarmStage) {
         more: document.getElementById('swarm-more'),
         stack: document.getElementById('swarm-stack'),
         layerButtons: [...swarmStage.querySelectorAll('.layer-btn')],
+        names: skillNames,
     });
 }
 
