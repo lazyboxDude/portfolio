@@ -152,7 +152,7 @@ export class AgentField {
             g.translate(2, 2);
             g.scale(s, s);
             g.fillStyle = color;
-            g.strokeStyle = '#ffffff';
+            g.strokeStyle = '#0b0c10'; // ink outline: the stage is light
             g.lineWidth = 1.4;
             g.lineJoin = 'round';
             g.fill(ARROW);
@@ -317,10 +317,10 @@ export class AgentField {
                 ctx.lineTo(L.cx, L.cy + L.ry);
                 ctx.lineTo(L.cx - L.rx, L.cy);
                 ctx.closePath();
-                ctx.globalAlpha = prog * (lit ? 0.5 : 0.14);
+                ctx.globalAlpha = prog * (lit ? 0.5 : 0.18);
                 ctx.fillStyle = L.color;
                 ctx.fill();
-                ctx.globalAlpha = prog * (lit ? 1 : 0.55);
+                ctx.globalAlpha = prog * (lit ? 1 : 0.85);
                 ctx.strokeStyle = L.color;
                 ctx.lineWidth = lit ? 2 : 1;
                 ctx.stroke();
@@ -329,8 +329,8 @@ export class AgentField {
 
         // Links between agents of a layer (and a few to the layer above): one path, one stroke.
         if (this.linesOn && prog > 0.05) {
-            ctx.globalAlpha = 0.22 * prog;
-            ctx.strokeStyle = '#9fb4ff';
+            ctx.globalAlpha = 0.2 * prog;
+            ctx.strokeStyle = '#3355ff';
             ctx.lineWidth = 0.7;
             ctx.beginPath();
             for (const a of this.agents) {

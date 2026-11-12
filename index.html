@@ -3,25 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="light">
     <title>Micael G. Fernandes</title>
     <meta name="description" content="Micael Gomes Fernandes (._lazybox_): game designer, 3D artist and tool builder. A personal website that builds itself.">
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/space-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Marks that JS runs: without it the whole page is shown right away and the buttons below are hidden. -->
     <script>document.documentElement.classList.add('js');</script>
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <!-- Background glow: the design-bot switches it on (js/build.js). -->
-    <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
-
-    <!-- Start box: vanishes after the first click and never comes back. -->
-    <button id="box" class="box" type="button">
-        <span class="box-label">Build Website</span>
-    </button>
-
     <!-- The page itself. With JS it is built live by the bot cursors (js/build.js), one data-section at a
          time: the hero after the first click, every other section when it scrolls into view.
          data-box    = a shape the layout-bot builds: a real drag (width/height), then padding and gap (hidden until then;
@@ -31,10 +23,12 @@
          data-underline / data-outline = something the design-bot draws (data-outline works with or without data-box)
          data-tag    = the copy-bot shows the real typography while typing it
          data-a11y   = the a11y-bot checks it (focus ring + real contrast); only on elements with a solid background
-         .tilt       = a mockup the motion-bot tilts in from flat (see --t in css/site.css)
+         .tilt       = a mockup the motion-bot tilts in from flat (see --t in css/site.css); none in the Editorial look
          data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
+         data-dock-after = once this text is typed, the motion-bot carries the box (below) to its corner
          data-instant = the section simply appears when it scrolls into view, no bots
-         Without JS everything is simply visible. Screen readers get all text at once. -->
+         The box (#box-wrap, in the hero) is the start button and later the bots' home in the bottom-right corner (js/dock.js).
+         Without JS everything is simply visible (no box). Screen readers get all text at once. -->
     <div id="site" class="site" tabindex="-1">
 
         <div class="s-hero" data-section="hero" data-type-ms="4200">
@@ -42,22 +36,69 @@
                 <nav id="nav" class="nav" data-box aria-label="Main">
                     <a class="nav-logo" href="./" data-type>._lazybox_</a>
                     <ul class="nav-links">
+                        <li><a href="#" aria-current="location" data-type>Home</a></li>
                         <li><a href="#about" data-type>About</a></li>
                         <li><a href="#projects" data-type>Projects</a></li>
                         <li><a href="#experience" data-type>Experience</a></li>
                         <li><a href="#skills" data-type>Skills</a></li>
                     </ul>
-                    <a id="nav-cta" class="btn btn-solid btn-small" href="#contact" data-box data-a11y><span data-type>Contact</span></a>
+                    <a id="nav-cta" class="nav-cta" href="#contact" data-box data-a11y><span data-type>Contact</span></a>
                 </nav>
             </header>
 
+            <!-- The hero is its own stacking context (isolation) on a paper background: the giant name is paper-coloured
+                 with mix-blend-mode: difference, so it turns light wherever something dark stands behind it (the box, step 2). -->
             <main class="hero">
+                <!-- Background glow: the design-bot switches it on (js/build.js). -->
+                <div id="glow" class="glow" aria-hidden="true"><span class="glow-a"></span><span class="glow-b"></span></div>
+
                 <p class="eyebrow" data-type>Micael Gomes Fernandes · ._lazybox_</p>
-                <h1 id="headline" data-type data-tag data-a11y data-speed="0.7">I build interfaces that <em class="accent" data-underline>build themselves.</em></h1>
-                <p class="lede" data-type data-tag data-a11y>This page builds itself: a small team of cursor bots lays it out, writes it, draws it, checks it and sets it in motion, live. Everything is plain HTML, CSS and JavaScript.</p>
-                <div class="actions">
-                    <a id="about-link" class="btn btn-solid" href="#about" data-box><span data-type>About me</span></a>
-                    <a id="hello" class="btn btn-ghost" href="mailto:micael@gomes-fernandes.ch" data-box data-outline><span data-type>Say hello</span></a>
+                <!-- Free space between the label and the name. The box stands here, behind the name (it is the start button
+                     and later docks bottom right, see js/dock.js). Hidden without JS. -->
+                <div class="box-slot">
+                    <div id="box-wrap" class="box-wrap is-start">
+                        <button id="box" class="box" type="button" aria-label="Open the box">
+                            <!-- Isometric box, graphite like a black-and-white photo; the lid is not quite shut and light falls out of the gap. -->
+                            <svg class="box-art" viewBox="0 0 226 274" aria-hidden="true" focusable="false">
+                                <ellipse class="box-floor" cx="113" cy="262" rx="118" ry="14"/>
+                                <polygon class="box-face-left" points="0,78 113,143 113,273 0,208"/>
+                                <polygon class="box-face-right" points="113,143 226,78 226,208 113,273"/>
+                                <polygon class="box-face-open" points="113,13 226,78 113,143 0,78"/>
+                                <defs><radialGradient id="box-light"><stop class="box-light-stop" offset="0" stop-opacity="0.95"/><stop class="box-light-stop" offset="1" stop-opacity="0"/></radialGradient></defs>
+                                <ellipse class="box-glow" cx="113" cy="78" rx="74" ry="36"/>
+                                <path class="box-rim-accent" d="M113 13 L226 78"/>
+                                <g class="box-lines"><path d="M0 78V208M113 143V273M226 78V208M0 208L113 273L226 208M0 78L113 143L226 78"/></g>
+                                <g transform="translate(0 78) matrix(0.866 0.5 0 1 0 0)"><text class="box-logo" x="12" y="86">._lazybox_</text></g>
+                                <polygon class="box-gap" points="0,70 113,135 226,70 226,78 113,143 0,78"/>
+                                <g class="box-lid">
+                                    <polygon class="box-face-lid" points="113,13 226,78 113,143 0,78"/>
+                                    <polygon class="box-lines" points="113,13 226,78 113,143 0,78"/>
+                                    <path class="box-lid-accent" d="M113 13 L226 78"/>
+                                </g>
+                            </svg>
+                        </button>
+                        <span class="box-hint" aria-hidden="true">
+                            <svg width="16" height="20" viewBox="0 0 18 22"><path class="hint-arrow" d="M2 2v16l4.4-4 3 7 3-1.3-3-6.8H15z"/></svg>
+                            <span class="hint-click">Click to open</span><span class="hint-tap">Tap to open</span>
+                        </span>
+                        <!-- How many bots are home; the sentence for screen assistants is updated calmly (see Dock.render). -->
+                        <span id="box-count" class="box-count" role="status"><span class="box-count-n" aria-hidden="true"></span><span class="sr-only"></span></span>
+                        <span class="box-tip" aria-hidden="true"></span>
+                    </div>
+                </div>
+
+                <h1 id="headline" data-type data-tag data-speed="0.7" data-dock-after>Micael Gomes Fernandes</h1>
+                <div class="hero-copy">
+                    <p class="tagline" data-type data-tag data-a11y>Game designer, 3D artist and tool builder. I build interfaces that <em class="accent" data-underline>build themselves.</em></p>
+                    <p class="lede" data-type data-a11y>This page builds itself: a small team of cursor bots lays it out, writes it, draws it, checks it and sets it in motion, live. Everything is plain HTML, CSS and JavaScript.</p>
+                    <div class="actions">
+                        <a id="hello" class="btn btn-solid btn-lg" href="mailto:micael@gomes-fernandes.ch" data-box><span data-type>Say hello</span></a>
+                        <a id="work-link" class="btn btn-ghost btn-lg" href="#projects" data-box data-outline><span data-type>See my work</span></a>
+                    </div>
+                </div>
+                <div class="hero-strip">
+                    <a class="scroll-cue" href="#about"><span data-type>Scroll</span></a>
+                    <p class="strip-layers" data-type>Business &amp; operations · 3D &amp; graphics · Game engines · Programming · AI tools</p>
                 </div>
             </main>
         </div>
@@ -84,81 +125,38 @@
         <section id="projects" class="section" data-section aria-labelledby="projects-title">
             <div class="wrap">
                 <p class="eyebrow" data-type>Projects</p>
-                <h2 id="projects-title" class="title" data-type>Things I made, <em class="accent">and use.</em></h2>
-                <div class="projects" data-grid>
-
-                    <article class="project project-wide" data-box aria-labelledby="p-dienstplan">
-                        <div class="project-text">
-                            <p class="eyebrow" data-type>Web app · in use</p>
-                            <h3 id="p-dienstplan" data-type>Dienstplan</h3>
-                            <p data-type>Drop in the monthly roster as a PDF, pick your name and get your shifts, your target hours and an export for your calendar or Notion. The file stays on your device.</p>
-                            <div class="project-links">
-                                <a class="btn btn-ghost btn-small" href="dienstplan.html" data-outline data-a11y><span data-type>Open the app</span></a>
-                            </div>
-                        </div>
-                        <div class="device" data-box="fast">
-                            <div class="tilt tilt-r">
-                                <div class="phone"><img src="images/projects/dienstplan.webp" width="390" height="844" alt="The Dienstplan app: drop a roster PDF to get your shifts and hours." loading="lazy" decoding="async"></div>
-                            </div>
-                        </div>
+                <h2 id="projects-title" class="title title-xl" data-type>Things I made, <em class="accent">and use.</em></h2>
+                <div class="cells" data-grid>
+                    <article class="cell" data-box aria-labelledby="p-dienstplan">
+                        <p class="cell-top"><span class="num" aria-hidden="true" data-type>01</span><span class="eyebrow" data-type>Web app · in use</span></p>
+                        <h3 id="p-dienstplan" data-type>Dienstplan</h3>
+                        <p class="cell-text" data-type>Drop in the monthly roster as a PDF, pick your name and get your shifts, your target hours and an export for your calendar or Notion. The file stays on your device.</p>
+                        <p class="cell-links"><a class="link" href="dienstplan.html" data-type data-underline data-a11y>Open the app</a></p>
                     </article>
-
-                    <article class="project" data-box="fast" aria-labelledby="p-aphonia">
-                        <div class="project-text">
-                            <p class="eyebrow" data-type>Game · Moonflux Interactive · 2025</p>
-                            <h3 id="p-aphonia" data-type>Aphonia</h3>
-                            <p data-type>A narrative puzzle game about the erosion of sound and the act of listening. You accompany Leelo, a mute being who notices what others no longer do. In development, built with Unity.</p>
-                            <div class="project-links">
-                                <a class="btn btn-ghost btn-small" href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" data-outline><span data-type>Wishlist on Steam</span></a>
-                                <a class="btn btn-ghost btn-small" href="https://moonflux-interactive.com" data-outline><span data-type>Moonflux Interactive</span></a>
-                            </div>
-                        </div>
-                        <div class="device" aria-hidden="true">
-                            <div class="tilt tilt-l">
-                                <div class="poster"><span class="poster-title">Aphonia</span><span class="poster-sub">Leelo's Journey to Harmony</span></div>
-                            </div>
-                        </div>
+                    <article class="cell" data-box aria-labelledby="p-aphonia">
+                        <p class="cell-top"><span class="num" aria-hidden="true" data-type>02</span><span class="eyebrow" data-type>Game · Moonflux Interactive · 2025</span></p>
+                        <h3 id="p-aphonia" data-type>Aphonia</h3>
+                        <p class="cell-text" data-type>A narrative puzzle game about the erosion of sound and the act of listening. You accompany Leelo, a mute being who notices what others no longer do. In development, built with Unity.</p>
+                        <p class="cell-links">
+                            <a class="link" href="https://store.steampowered.com/app/4025110/Aphonia__Leelos_Journey_to_Harmony/" data-type data-underline>Wishlist on Steam</a>
+                            <a class="link" href="https://moonflux-interactive.com" data-type data-underline>Moonflux Interactive</a>
+                        </p>
                     </article>
-
-
-
-                    <article class="project" data-box="fast" aria-labelledby="p-site">
-                        <div class="project-text">
-                            <p class="eyebrow" data-type>Experiment · this page</p>
-                            <h3 id="p-site" data-type>This website</h3>
-                            <p data-type>Five cursor bots with jobs lay it out, write it, draw it, check it and animate it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
-                        </div>
-                        <div class="device" aria-hidden="true">
-                            <div class="tilt tilt-l">
-                                <div class="mini">
-                                    <div class="mini-bar"><i></i><i></i><i></i></div>
-                                    <div class="mini-body">
-                                        <span class="mini-nav"></span>
-                                        <span class="mini-h mini-h1"></span>
-                                        <span class="mini-h mini-h2"></span>
-                                        <span class="mini-p"></span>
-                                        <span class="mini-p mini-p2"></span>
-                                        <span class="mini-btn"></span>
-                                    </div>
-                                    <span class="mini-cur mini-cur-a"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#7b95ff" stroke="#06080d" stroke-width="1"/></svg><b style="background:#7b95ff">layout-bot</b></span>
-                                    <span class="mini-cur mini-cur-b"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#ff8fb8" stroke="#06080d" stroke-width="1"/></svg><b style="background:#ff8fb8">copy-bot</b></span>
-                                    <span class="mini-cur mini-cur-c"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 1.5 L2 14 L5.6 10.8 L8 16 L10.2 15 L7.8 9.8 L12.6 9.6 Z" fill="#ffc766" stroke="#06080d" stroke-width="1"/></svg><b style="background:#ffc766">design-bot</b></span>
-                                    <span class="mini-cur mini-cur-d"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.4" cy="7.4" r="4.6" fill="#6fe3a5" fill-opacity="0.35" stroke="#06080d" stroke-width="2.4"/><circle cx="7.4" cy="7.4" r="4.6" fill="none" stroke="#6fe3a5" stroke-width="1.4"/><path d="M11 11 L16 16" stroke="#6fe3a5" stroke-width="2.4" stroke-linecap="round"/></svg><b style="background:#6fe3a5">a11y-bot</b></span>
-                                    <span class="mini-cur mini-cur-e"><svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 1 Q9.8 7.4 17 9 Q9.8 10.6 9 17 Q8.2 10.6 1 9 Q8.2 7.4 9 1 Z" fill="#b79bff" stroke="#06080d" stroke-width="1" stroke-linejoin="round"/></svg><b style="background:#b79bff">motion-bot</b></span>
-                                </div>
-                            </div>
-                        </div>
+                    <article class="cell" data-box aria-labelledby="p-site">
+                        <p class="cell-top"><span class="num" aria-hidden="true" data-type>03</span><span class="eyebrow" data-type>Experiment · this page</span></p>
+                        <h3 id="p-site" data-type>This website</h3>
+                        <p class="cell-text" data-type>Five cursor bots with jobs lay it out, write it, draw it, check it and animate it, live, while you scroll. One shared animation loop, no framework, no build step.</p>
+                        <p class="cell-links"><a class="link" href="https://github.com/lazyboxDude/portfolio" data-type data-underline>See the source</a></p>
                     </article>
+                </div>
 
-                    <article class="project project-wide" data-box="fast" aria-labelledby="p-art">
-                        <div class="project-text">
-                            <p class="eyebrow" data-type>3D &amp; digital art · 2023–2024</p>
-                            <h3 id="p-art" data-type>Selected renders</h3>
-                            <p data-type>A selection from my earlier portfolio: 3D renders, environment art and digital compositions.</p>
-                            <div class="project-links">
-                                <a class="btn btn-ghost btn-small" href="archive/v1-2026-11/portfolio.html" data-outline><span data-type>Browse the archive</span></a>
-                            </div>
-                        </div>
+                <article class="renders" data-box aria-labelledby="p-art">
+                    <div class="renders-head">
+                        <p class="cell-top"><span class="num" aria-hidden="true" data-type>04</span><span class="eyebrow" data-type>3D &amp; digital art · 2023–2024</span></p>
+                        <h3 id="p-art" data-type>Selected renders</h3>
+                        <p class="cell-text" data-type>A selection from my earlier portfolio: 3D renders, environment art and digital compositions.</p>
+                        <p class="cell-links"><a class="link" href="archive/v1-2026-11/portfolio.html" data-type data-underline>Browse the archive</a></p>
+                    </div>
                         <ul class="gallery" aria-label="Selected renders">
                                 <li>
                                     <figure class="tile">
@@ -209,23 +207,20 @@
                                     </figure>
                                 </li>
                         </ul>
-                    </article>
+                </article>
 
-                    <article class="project project-slim" data-box="fast" aria-labelledby="p-dolphin">
-                        <div class="project-text">
-                            <p class="eyebrow" data-type>Educational game · 2023</p>
-                            <h3 id="p-dolphin" data-type>Dolphin Rush</h3>
-                            <p data-type>Made for Whale and Dolphin Conservation: an interactive experience that raises awareness for marine life. Built with Unity.</p>
-                        </div>
-                    </article>
-                </div>
+                <article class="cell cell-slim" data-box="fast" aria-labelledby="p-dolphin">
+                    <p class="cell-top"><span class="num" aria-hidden="true" data-type>05</span><span class="eyebrow" data-type>Educational game · 2023</span></p>
+                    <h3 id="p-dolphin" data-type>Dolphin Rush</h3>
+                    <p class="cell-text" data-type>Made for Whale and Dolphin Conservation: an interactive experience that raises awareness for marine life. Built with Unity.</p>
+                </article>
             </div>
         </section>
 
         <section id="experience" class="section" data-section aria-labelledby="experience-title">
             <div class="wrap">
                 <p class="eyebrow" data-type>Experience</p>
-                <h2 id="experience-title" class="title" data-type>The path <em class="accent">so far.</em></h2>
+                <h2 id="experience-title" class="title title-xl" data-type>The path <em class="accent">so far.</em></h2>
                 <ol class="timeline" data-box>
                     <li class="row">
                         <p class="when" data-type>11.2024 – today</p>
@@ -281,7 +276,7 @@
         <section id="skills" class="section" data-section aria-labelledby="skills-title">
             <div class="wrap">
                 <p class="eyebrow" data-type>Skills</p>
-                <h2 id="skills-title" class="title" data-type>Five layers, <em class="accent">one stack.</em></h2>
+                <h2 id="skills-title" class="title title-xl" data-type>Five layers, <em class="accent">one stack.</em></h2>
                 <ul class="skills" data-grid>
                     <li class="skill" data-box="fast">
                         <p class="layer" data-type>Layer 1</p>
@@ -340,6 +335,7 @@
         <section id="contact" class="section" data-section data-type-ms="3000" aria-labelledby="contact-title">
             <div class="wrap">
                 <div class="cta" data-box>
+                    <p class="eyebrow" data-type>Contact</p>
                     <h2 id="contact-title" class="title" data-type>Let's build something <em class="accent" data-underline>together.</em></h2>
                     <p class="lede" data-type>Questions, ideas or a project? Write me. My CV is a PDF in German and English, made on the spot from this site.</p>
                     <div class="actions">
@@ -364,9 +360,6 @@
             </div>
         </footer>
     </div>
-
-    <!-- Builds everything again once the whole page is built; label is set by js/build.js -->
-    <button id="next" class="next" type="button"><span class="next-label"></span></button>
 
     <!-- Announces build progress to screen readers -->
     <p id="status" class="sr-only" role="status"></p>

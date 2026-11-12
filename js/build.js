@@ -1,9 +1,10 @@
 // The build "job": five bot cursors construct the page live, one section at a time.
-// The hero is built after the first click on the start box; every other section (index.html:
+// The hero is built after the first click on the box; every other section (index.html:
 // data-section) is built ahead of the visitor, as soon as it is less than LOOKAHEAD screens below the
 // viewport, so the bots keep working further down while the visitor scrolls. When a bot has nothing
-// to do it waits at the bottom edge of the screen (the build front), or tucks into the corner once
-// everything stands. Afterwards a small pill builds everything again.
+// to do it waits at the bottom edge of the screen (the build front), or next to the box in the corner once
+// everything stands, and after a few seconds it walks home into the box (Cursor.goHome). A section that
+// scrolls into reach calls the bots it needs back out of the box. A click on the docked box builds everything again.
 //
 // Who does what (the markup says what to build, see index.html):
 //   layout-bot (arrow)  builds every data-box for real (js/layout.js): it drags out a box with a real
@@ -40,8 +41,6 @@ const GRID_MS = 420;       // drawing the columns of a grid
 const BIG_AREA = 20000;    // shapes bigger than this (px²) may overshoot; every third one does
 const DRAW_MS = 900;
 const TAG_GAP = 28;      // inspector tags sit this far above an element (or 8px below it)
-const REPLAY_LABEL = 'Build again';
-const BOX_EXIT_MS = 400; // keep in sync with .box.is-gone in site.css
 const FONT_WAIT_MS = 1500;
 const DEFAULT_TYPE_MS = 4500; // how long typing a whole section may take (data-type-ms overrides)
 const SCROLL_TYPE_SPEED = 0.5; // sections the visitor scrolls to are typed faster than the hero
@@ -51,8 +50,9 @@ const TILT_MS = 1000;         // how long the motion-bot takes to tilt a mockup 
 // The bots build ahead of the visitor: a section is started once its top is this many screen heights
 // below the bottom edge of the viewport. Visitors tend to keep scrolling, so the page is there before they are.
 const LOOKAHEAD = 0.8;
-const REST_MARGIN = 44;       // parked bots keep this far from the viewport edge (px)
-const REST_STACK = 28;        // vertical gap between parked bots in the corner (px)
+const REST_MARGIN = 44;       // waiting bots keep this far from the viewport edge (px)
+const REST_STACK = 28;        // vertical gap between waiting bots next to the box (px)
+const EMERGE_STAGGER_MS = 130; // bots come out of the box one after the other
 
 // How exactly a bot has to arrive before its job goes on. Close and fast enough is enough: the
 // next movement (follow) catches up anyway, and waiting for a full stop made every step crawl.
@@ -63,12 +63,13 @@ const TYPE_ARRIVE = { tolerance: 90, settleSpeed: 4000, timeout: 900 };
 
 // One job per bot: name pill, colour and pointer shape (see cursors.js). Colours stay readable under
 // the dark pill text. Off duty the bots do not roam (see SiteBuilder.rest): they wait where the next work is.
+// Personality: the layout-bot is shy (goes home first), the copy-bot curious, the design-bot sociable.
 const JOBS = {
-    layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow' },
-    copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text' },
-    design: { label: 'design-bot', color: '#ffc766', kind: 'pen' },
-    a11y: { label: 'a11y-bot', color: '#6fe3a5', kind: 'lens' },
-    motion: { label: 'motion-bot', color: '#b79bff', kind: 'spark' },
+    layout: { label: 'layout-bot', color: '#7b95ff', kind: 'arrow', personality: { shyness: 0.9, curiosity: 0.2, sociability: 0.3 } },
+    copy: { label: 'copy-bot', color: '#ff8fb8', kind: 'text', personality: { shyness: 0.2, curiosity: 0.9, sociability: 0.4 } },
+    design: { label: 'design-bot', color: '#ffc766', kind: 'pen', personality: { shyness: 0.4, curiosity: 0.3, sociability: 0.9 } },
+    a11y: { label: 'a11y-bot', color: '#6fe3a5', kind: 'lens', personality: { shyness: 0.6, curiosity: 0.6, sociability: 0.2 } },
+    motion: { label: 'motion-bot', color: '#b79bff', kind: 'spark', personality: { shyness: 0.1, curiosity: 0.5, sociability: 0.8 } },
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -86,6 +87,9 @@ function typingDelay(ch, speed) {
     if (ch === ',') return 180 * speed;
     return (28 + Math.random() * 28) * speed;
 }
+
+/** "rgb(51, 85, 255)" -> "#3355ff" (what an inspector would show). */
+const toHex = (rgb) => '#' + (rgb.match(/\d+/g) ?? []).slice(0, 3).map((n) => Number(n).toString(16).padStart(2, '0')).join('');
 
 /** Wait for the web fonts (the layout must be final before the bots measure it), but never for long. */
 const fontsReady = () => Promise.race([document.fonts?.ready ?? Promise.resolve(), sleep(FONT_WAIT_MS)]);
@@ -224,7 +228,7 @@ class Shape {
     setDrawn(p, path) {
         let dist = p * path.total;
         path.lens.forEach((len, i) => {
-            const t = clamp(dist / len, 0, 1);
+            const t = len > 0 ? clamp(dist / len, 0, 1) : 1; // square corners have length 0
             dist -= len;
             const piece = this.pieces[i];
             if (i % 2 === 0) piece.style.opacity = t.toFixed(3);
@@ -237,7 +241,7 @@ class Shape {
         let dist = p * path.total;
         let i = 0;
         while (i < path.lens.length - 1 && dist > path.lens[i]) dist -= path.lens[i++];
-        const t = clamp(dist / path.lens[i], 0, 1);
+        const t = path.lens[i] > 0 ? clamp(dist / path.lens[i], 0, 1) : 0;
         const [x0, y0] = path.pts[i];
         const [x1, y1] = path.pts[i + 1];
         return { x: r.left + x0 + (x1 - x0) * t, y: r.top + y0 + (y1 - y0) * t };
@@ -353,18 +357,17 @@ class Section {
 // ---- The builder -------------------------------------------------------------
 
 export class SiteBuilder {
-    constructor({ swarm, box, site, glow, next, status }) {
+    constructor({ swarm, dock, site, glow, status }) {
         this.swarm = swarm;
-        this.box = box;   // start box: gone after the first click
+        this.dock = dock; // the box: start button, then the bots' home and the button that builds everything again
         this.site = site; // the page
         this.glow = glow;
-        this.next = next; // pill that builds everything again
-        this.nextLabel = next.querySelector('.next-label');
         this.status = status;
 
         this.sections = [...site.querySelectorAll('[data-section]')].map((el) => new Section(el));
         this.hero = this.sections.find((s) => s.isHero) ?? this.sections[0];
 
+        dock.canReceive = () => !this.busy && !this.pumping && !this.current; // bots only go home between builds
         this.builder = null;  // layout-bot
         this.typist = null;   // copy-bot
         this.designer = null; // design-bot
@@ -389,36 +392,39 @@ export class SiteBuilder {
         window.addEventListener('resize', onScroll, { passive: true });
     }
 
-    /** Start (or restart) the build. `origin` is where the bots burst out (first run only). */
-    async run(origin) {
+    /** Start (or restart) the build: the bots come out of the box. The first run also sends the box to its corner. */
+    async run() {
         if (this.busy || this.pumping || this.parked) return;
         this.busy = true;
-        this.next.classList.remove('is-ready');
-        this.hideBox();
+        this.syncDock();
         if (this.started) this.reset();
         this.started = true;
         document.documentElement.classList.add('is-live');
         this.site.classList.add('is-live');
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         this.site.focus({ preventScroll: true }); // keep keyboard focus somewhere sensible while building
+        const origin = this.dock.entry(); // the opening of the box
+        const reduced = prefersReducedMotion();
+        this.dock.open(); // the lid lifts, the bots come out; the box travels to its corner once the name is typed (data-dock-after)
         try {
-            if (prefersReducedMotion()) this.buildStatic(origin);
-            else await this.buildSection(this.hero, origin);
+            if (reduced) {
+                this.dock.fly({ instant: true });
+                this.buildStatic(origin);
+            } else {
+                await this.buildSection(this.hero, origin);
+            }
         } finally {
+            this.dock.fly(); // in case the name was never typed (error): the box gets to its corner anyway
             this.busy = false;
             this.live = true;
-            this.parked = prefersReducedMotion();
+            this.parked = reduced;
         }
         this.pump();
     }
 
-    /** The start box dissolves on the first click and never comes back. */
-    hideBox() {
-        const { box } = this;
-        if (box.hidden || box.classList.contains('is-gone')) return;
-        box.classList.add('is-gone');
-        if (prefersReducedMotion()) box.hidden = true;
-        else setTimeout(() => { box.hidden = true; }, BOX_EXIT_MS);
+    /** The box can only be clicked while no build is running. */
+    syncDock() {
+        this.dock.setBusy(this.busy || this.pumping);
     }
 
     /** Back to the empty page (the glow fades out on its own). */
@@ -434,6 +440,7 @@ export class SiteBuilder {
     async pump() {
         if (this.pumping || this.busy || !this.live) return;
         this.pumping = true;
+        this.syncDock();
         try {
             for (;;) {
                 const next = this.sections.find((s) => s.state === 'idle');
@@ -445,6 +452,7 @@ export class SiteBuilder {
         }
         this.restAll();
         this.updateUi();
+        this.syncDock();
     }
 
     /** A section is wanted once it is close to the viewport: in it, above it, or less than LOOKAHEAD screens below. */
@@ -460,28 +468,31 @@ export class SiteBuilder {
         if (s.el.getBoundingClientRect().bottom >= 0) return;
         s.cancelled = true;
         s.showAll();
+        s.release?.();
     }
 
     // ---- Off duty -------------------------------------------------------------
 
     /**
      * Where a bot waits while it has nothing to build. Not a roaming target: the bots stand at the bottom
-     * edge of the screen, where the next section will come from. Once everything stands they tuck into
-     * the bottom-right corner (stacked, so the name pills stay readable and nothing sits on the content).
+     * edge of the screen, where the next section will come from. Once everything stands they wait next to
+     * the box in the corner (stacked, so the name pills stay readable and nothing sits on the content).
      */
     restPoint(bot) {
         const i = Math.max(0, this.crew.indexOf(bot));
         const vw = window.innerWidth, vh = window.innerHeight;
         if (this.sections.every((s) => s.state === 'built')) {
+            const box = this.dock.corner();
+            if (box) return { x: Math.max(REST_MARGIN, box.left - 120), y: box.bottom - 24 - i * REST_STACK };
             return { x: Math.max(REST_MARGIN, vw - 120), y: vh - REST_MARGIN - i * REST_STACK };
         }
         return { x: vw * (0.2 + i * 0.15), y: vh - REST_MARGIN };
     }
 
-    /** Send a bot to wait at its resting point (it follows it, so resizing and the end of the build are covered). */
+    /** Off duty: wait at the resting point (it follows it, so resizing and the end of the build are covered), then go home. */
     rest(bot) {
         if (!bot || prefersReducedMotion()) return;
-        bot.follow(() => this.restPoint(bot));
+        bot.idle({ at: () => this.restPoint(bot) });
     }
 
     restAll() {
@@ -490,22 +501,38 @@ export class SiteBuilder {
 
     get crew() { return [this.builder, this.typist, this.designer, this.checker, this.animator]; }
 
-    /** Announce the result and offer to build again, once everything stands. */
+    /** Announce the result once everything stands (the box then calls the bots to build it all again). */
     updateUi() {
         if (this.sections.some((s) => s.state !== 'built')) return;
         this.status.textContent = 'Website built.';
-        if (this.parked) return;
-        this.nextLabel.textContent = REPLAY_LABEL;
-        this.next.classList.add('is-ready');
     }
 
-    ensureBots(origin, burst) {
-        this.builder ??= this.swarm.add({ ...origin, ...JOBS.layout, burst });
-        this.typist ??= this.swarm.add({ ...origin, ...JOBS.copy, burst });
-        this.designer ??= this.swarm.add({ ...origin, ...JOBS.design, burst });
-        this.checker ??= this.swarm.add({ ...origin, ...JOBS.a11y, burst });
-        this.animator ??= this.swarm.add({ ...origin, ...JOBS.motion, burst });
-        this.ring ??= new FocusRing(this.swarm.layer, JOBS.a11y.color);
+    /**
+     * The bots a section needs, out of the box: created at the opening the first time, called back (walk
+     * cancelled or brought out of the box) afterwards. The others stay where they are, at home.
+     */
+    async callBots(section, origin) {
+        const needs = {
+            builder: section.shapes.length > 0 || section.grids.length > 0,
+            typist: section.texts.length > 0,
+            designer: section.isHero || section.decos.length > 0,
+            checker: section.checks.length > 0,
+            animator: section.isHero || section.tilts.length > 0, // the glow starts to drift in the hero
+        };
+        const jobs = { builder: JOBS.layout, typist: JOBS.copy, designer: JOBS.design, checker: JOBS.a11y, animator: JOBS.motion };
+        const calls = [];
+        let n = 0;
+        for (const key of Object.keys(needs)) {
+            if (!needs[key]) continue;
+            if (!this[key]) {
+                this[key] = this.swarm.add({ ...origin, ...jobs[key], burst: true });
+            } else {
+                const bot = this[key], delay = n++ * EMERGE_STAGGER_MS;
+                calls.push(sleep(delay).then(() => bot.callBack(this.dock)));
+            }
+        }
+        if (this.checker) this.ring ??= new FocusRing(this.swarm.layer, JOBS.a11y.color);
+        await Promise.all(calls);
     }
 
     // ---- Instant builds -----------------------------------------------------
@@ -517,22 +544,17 @@ export class SiteBuilder {
         section.state = 'built';
     }
 
-    /** Reduced motion: the whole page at once, the bots parked next to the hero. */
+    /** Reduced motion: the whole page at once, the box docked at once, every bot at home (nothing moves). */
     buildStatic(origin) {
-        this.ensureBots(origin, false);
+        this.builder ??= this.swarm.add({ ...origin, ...JOBS.layout });
+        this.typist ??= this.swarm.add({ ...origin, ...JOBS.copy });
+        this.designer ??= this.swarm.add({ ...origin, ...JOBS.design });
+        this.checker ??= this.swarm.add({ ...origin, ...JOBS.a11y });
+        this.animator ??= this.swarm.add({ ...origin, ...JOBS.motion });
         for (const s of this.sections) this.showSection(s);
         this.status.textContent = 'Website built.';
-
-        const { shapes, texts, decos } = this.hero;
-        const last = shapes.at(-1).el.getBoundingClientRect();
-        this.builder.place(last.right, last.bottom);
-        const end = texts.find((t) => t.el.classList.contains('lede'))?.chars.at(-1).getBoundingClientRect();
-        if (end) this.typist.place(end.right + 8, end.top + end.height / 2);
-        const accent = decos.find((d) => d.kind === 'underline')?.el.getBoundingClientRect();
-        if (accent) this.designer.place(accent.right, accent.bottom);
-        const checked = this.hero.checks.at(-1)?.getBoundingClientRect();
-        if (checked) this.checker.place(checked.right, checked.bottom);
-        this.animator.place(window.innerWidth * 0.72, window.innerHeight * 0.3);
+        for (const bot of this.crew) bot.setHome();
+        this.dock.lock();
     }
 
     // ---- Animated builds ----------------------------------------------------
@@ -550,6 +572,7 @@ export class SiteBuilder {
             // Whatever went wrong: the visitor must never be left with a half-built page.
             console.error(error);
             section.cancelled = true;
+            section.release?.();
             this.showSection(section);
         }
         section.state = 'built';
@@ -560,13 +583,18 @@ export class SiteBuilder {
     async animate(section, origin) {
         this.status.textContent = 'Building the website…';
         await fontsReady(); // the layout must be final before anything is measured
-        this.ensureBots(origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 }, true);
+        await this.callBots(section, origin ?? this.dock.entry());
         const { builder, typist, designer, checker, animator } = this;
 
         const boxReady = new Map(section.shapes.map((s) => [s, defer()]));
         const typed = new Map(section.texts.map((t) => [t, defer()]));
         const speed = section.typingSpeed();
         const glowOn = defer(); // the design-bot has switched the glow on: the motion-bot may set it drifting
+        const nameTyped = defer(); // the copy-bot has typed the name: the motion-bot may carry the box to its corner
+        // Cancelled (the visitor scrolled past): a lane that stopped early never reports its box or text as done,
+        // and the lanes waiting for it would hang forever. Releasing everything lets all of them wind down.
+        section.release = () => { for (const d of [...boxReady.values(), ...typed.values(), glowOn, nameTyped]) d.resolve(); };
+        if (section.cancelled) section.release(); // cancelled while the bots were still on their way out of the box
 
         // layout-bot: drags out the shapes, in page order.
         const layout = (async () => {
@@ -574,6 +602,7 @@ export class SiteBuilder {
                 if (section.cancelled) return;
                 const grid = section.gridOf.get(shape);
                 if (grid && !grid.opened) await this.openGrid(grid);
+                if (section.cancelled) return;
                 await this.dragOut(shape, section);
                 if (grid && --grid.pending === 0) grid.close();
                 boxReady.get(shape).resolve();
@@ -587,9 +616,11 @@ export class SiteBuilder {
                 if (section.cancelled) return;
                 const around = section.shapeOf.get(t.el.closest('[data-box]'));
                 if (around) await boxReady.get(around).promise;
+                if (section.cancelled) return; // released while waiting: this section is already finished
                 const override = parseFloat(t.el.dataset.speed);
-                await this.typeText(t, { speed: Number.isFinite(override) ? override : speed, tag: t.el.hasAttribute('data-tag') });
+                await this.typeText(t, { speed: Number.isFinite(override) ? override : speed, tag: t.el.hasAttribute('data-tag'), section });
                 typed.get(t).resolve();
+                if (t.el.hasAttribute('data-dock-after')) nameTyped.resolve(); // e.g. the name: now the box may leave
             }
             this.rest(typist);
         })();
@@ -633,23 +664,29 @@ export class SiteBuilder {
             this.rest(checker);
         })();
 
-        // motion-bot: starts the glow drifting (hero), then tilts every mockup in once its card stands.
+        // motion-bot: starts the glow drifting (hero), carries the box to its corner once the name is typed (hero),
+        // then tilts every mockup in once its card stands.
         const motion = (async () => {
             if (section.isHero) {
                 await glowOn.promise;
                 if (section.cancelled) return;
                 await this.startDrift();
+                await nameTyped.promise;
+                if (section.cancelled) return;
+                await this.carryBox();
             }
             for (const tilt of section.tilts) {
                 if (section.cancelled) return;
                 const around = section.shapeOf.get(tilt.el.closest('[data-box]'));
                 if (around) await boxReady.get(around).promise;
+                if (section.cancelled) return;
                 await this.tiltIn(tilt);
             }
             this.rest(animator);
         })();
 
         await Promise.all([layout, copy, design, a11y, motion]);
+        section.release = null;
     }
 
     /** a11y-bot walks to an element, holds a focus ring around it and reads out its real contrast. */
@@ -682,6 +719,34 @@ export class SiteBuilder {
         await bot.click();
         this.glow.classList.add('is-moving');
         await sleep(700);
+        bot.hideTag();
+    }
+
+    /**
+     * motion-bot grabs the box and carries it to its corner: it walks to the lid, presses, and follows the box
+     * while it flies (one transform animation, see Dock.fly). The tag shows the live translate and scale.
+     * Not on a replay: the box already stands in its corner.
+     */
+    async carryBox() {
+        const { animator: bot, swarm, dock } = this;
+        if (dock.state !== 'start' && dock.state !== 'open') return;
+        const first = dock.bounds();
+        const grab = () => { const r = dock.bounds(); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.4 }; };
+        const tagAt = () => { const r = dock.bounds(); return { x: r.left, y: Math.max(4, r.top - TAG_GAP) }; };
+
+        await bot.chase(grab, ARRIVE);
+        bot.press();
+        const flight = dock.fly(); // starts at once; resolves when the box has landed
+        bot.follow(grab, { damping: DRAG_DAMPING });
+        const stop = swarm.onFrame(() => {
+            const r = dock.bounds();
+            bot.inspect(`translate ${Math.round(r.left - first.left)}px ${Math.round(r.top - first.top)}px · scale ${(r.width / first.width).toFixed(2)}`, tagAt);
+        });
+        await flight;
+        stop();
+        bot.release();
+        swarm.ripple(bot.x, bot.y, bot.color);
+        await sleep(250);
         bot.hideTag();
     }
 
@@ -908,7 +973,7 @@ export class SiteBuilder {
     }
 
     /** copy-bot walks to the start of a text, then types it while following the last character. */
-    async typeText(t, { speed = 1, tag = false } = {}) {
+    async typeText(t, { speed = 1, tag = false, section = null } = {}) {
         const { typist } = this;
         const slow = speed > 0.3; // fast typing does not wait for the bot to arrive
 
@@ -926,7 +991,7 @@ export class SiteBuilder {
         const step = speed < 0.15 ? 3 : speed < 0.3 ? 2 : 1;
         const n = t.chars.length;
         for (let i = 0; i < n; i += step) {
-            if (this.current?.cancelled) {
+            if ((section ?? this.current)?.cancelled) {
                 if (tag) typist.hideTag();
                 return;
             }
@@ -943,11 +1008,12 @@ export class SiteBuilder {
     async drawUnderline({ el, line }) {
         const { designer, swarm } = this;
         const a = anchor(el);
-        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
         const y = () => a().bottom - 2;
 
         await designer.chase(() => ({ x: a().left, y: y() }), ARRIVE);
-        designer.inspect(`underline 2px ${accent}`, () => { const r = a(); return { x: r.left, y: r.bottom + 10 }; });
+        // The tag shows the real numbers of this line: thickness and colour.
+        const lineStyle = getComputedStyle(line);
+        designer.inspect(`underline ${Math.round(parseFloat(lineStyle.height) * 10) / 10}px ${toHex(lineStyle.backgroundColor)}`, () => { const r = a(); return { x: r.left, y: r.bottom + 10 }; });
         designer.press();
 
         const t0 = performance.now();
