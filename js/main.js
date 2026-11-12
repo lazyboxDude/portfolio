@@ -1,5 +1,5 @@
 import { CursorSwarm } from './cursors.js';
-import { SiteBuilder } from './build.js';
+import { SiteBuilder, showSeen } from './build.js';
 import { AgentField, toolNames } from './agents.js';
 import { Dock } from './dock.js';
 
@@ -21,6 +21,18 @@ const builder = new SiteBuilder({
     glow: document.getElementById('glow'),
     status: document.getElementById('status'),
 });
+
+// Reload, back button, a link back from another page: show the finished page at once if this tab has seen the show
+// (the browser's own scroll restoration then puts the visitor back where they were). Otherwise always start on top:
+// a restored scroll position on the still empty page would show nothing at all.
+if (showSeen()) {
+    // "manual" (set on the first visit) sticks to the history entry and would block the restoration of the scroll position.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'auto';
+    builder.restore();
+} else {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+}
 
 // First click: the bots burst out of the box and build the page while it travels to the corner.
 // Later clicks on the docked box call every bot out and build everything again (not while a build runs).

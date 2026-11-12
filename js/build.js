@@ -72,6 +72,11 @@ const JOBS = {
     motion: { label: 'motion-bot', color: '#b79bff', kind: 'spark', personality: { shyness: 0.1, curiosity: 0.5, sociability: 0.8 } },
 };
 
+// "This tab has seen the show": a reload or the back button then shows the finished page (SiteBuilder.restore).
+const SEEN_KEY = 'lazybox-show-seen';
+export const showSeen = () => { try { return sessionStorage.getItem(SEEN_KEY) === '1'; } catch { return false; } };
+const rememberShow = () => { try { sessionStorage.setItem(SEEN_KEY, '1'); } catch { /* private mode: the show just plays again */ } };
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** A promise that is resolved from outside (the bots wait for each other with these). */
@@ -399,6 +404,7 @@ export class SiteBuilder {
         this.syncDock();
         if (this.started) this.reset();
         this.started = true;
+        rememberShow();
         document.documentElement.classList.add('is-live');
         this.site.classList.add('is-live');
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -420,6 +426,23 @@ export class SiteBuilder {
             this.parked = reduced;
         }
         this.pump();
+    }
+
+    /**
+     * The visitor has already seen the show in this tab (reload, back button, a link back from another page):
+     * the page stands at once, the box sits in its corner, every bot is at home. A click on the box plays it again.
+     * Without this a reload shows an empty page, scrolled to wherever the browser remembered.
+     */
+    restore() {
+        const reduced = prefersReducedMotion();
+        this.started = true;
+        document.documentElement.classList.add('is-live');
+        this.site.classList.add('is-live');
+        this.dock.fly({ instant: true });
+        this.buildStatic(this.dock.entry(), { lock: reduced });
+        this.live = true;
+        this.parked = reduced;
+        this.syncDock();
     }
 
     /** The box can only be clicked while no build is running. */
@@ -545,7 +568,7 @@ export class SiteBuilder {
     }
 
     /** Reduced motion: the whole page at once, the box docked at once, every bot at home (nothing moves). */
-    buildStatic(origin) {
+    buildStatic(origin, { lock = true } = {}) {
         this.builder ??= this.swarm.add({ ...origin, ...JOBS.layout });
         this.typist ??= this.swarm.add({ ...origin, ...JOBS.copy });
         this.designer ??= this.swarm.add({ ...origin, ...JOBS.design });
@@ -554,7 +577,7 @@ export class SiteBuilder {
         for (const s of this.sections) this.showSection(s);
         this.status.textContent = 'Website built.';
         for (const bot of this.crew) bot.setHome();
-        this.dock.lock();
+        if (lock) this.dock.lock();
     }
 
     // ---- Animated builds ----------------------------------------------------

@@ -223,6 +223,53 @@ try {
         await ctx.close();
     }
 
+    // ---- Reload and back button: the page must stand (it was empty and scrolled away before) ------
+    {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        await startBuild(page);
+        await page.waitForTimeout(1000);
+        const state = () => page.evaluate(() => ({
+            y: Math.round(scrollY),
+            visible: getComputedStyle(document.getElementById('site')).visibility === 'visible',
+            docked: document.getElementById('box-wrap').classList.contains('is-home') && document.getElementById('box-wrap').parentElement.tagName === 'BODY',
+            home: document.querySelectorAll('.fake-cursor.is-home').length,
+            missing: document.querySelectorAll('#site .ch:not(.on)').length,
+            enabled: document.getElementById('box').getAttribute('aria-disabled') === 'false',
+        }));
+        await page.reload();
+        await page.evaluate(() => document.fonts.ready);
+        let st = await state();
+        check('reload after the start shows the finished page, box docked, all bots home', st.visible && st.docked && st.home === BOTS && st.missing === 0 && st.enabled, JSON.stringify(st));
+        await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'instant' }));
+        await page.waitForTimeout(300);
+        await page.reload();
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(500);
+        st = await state();
+        check('reload keeps the scroll position', st.visible && Math.abs(st.y - 1200) <= 5, JSON.stringify(st));
+        await page.goto(server.url + '/cv.html');
+        await page.goBack();
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(500);
+        st = await state();
+        check('back button shows the finished page at the old scroll position', st.visible && st.docked && Math.abs(st.y - 1200) <= 5, JSON.stringify(st));
+        await page.locator('#box').click();
+        await page.waitForTimeout(500);
+        check('after a reload the box still plays the show again', await page.evaluate(() => document.getElementById('box').getAttribute('aria-disabled') === 'true' && scrollY === 0));
+        await ctx.close();
+
+        // A tab that never started the show always starts on top (a remembered scroll position would show an empty page).
+        const fresh = await (await browser.newContext({ viewport: VIEWPORTS.desktop })).newPage();
+        await fresh.goto(server.url + '/index.html');
+        await fresh.evaluate(() => window.scrollTo(0, 0));
+        await fresh.reload();
+        check('a tab that has not started the show starts on top with the box', await fresh.evaluate(() => scrollY === 0 && document.getElementById('box-wrap').classList.contains('is-start')));
+        await fresh.context().close();
+    }
+
     // ---- Scrolling while the box flies: it still lands exactly in the corner --------------------
     if (!quick) {
         const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
