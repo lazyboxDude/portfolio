@@ -1,0 +1,192 @@
+/* ==========================================================================
+   Secondary pages (renders, legal, CV, Dienstplan chrome): the same look as the homepage.
+   They load css/site.css first (tokens, Space Grotesk, nav, footer, .title, .eyebrow, .link, .btn)
+   and add only what the homepage does not need. No JavaScript, no Google fonts, no icon fonts.
+   ========================================================================== */
+
+.page-main {
+    max-width: calc(1344px + 2 * var(--gutter)); /* content lines up with the nav and the footer */
+    margin: 0 auto;
+    padding: clamp(48px, 6vw, 88px) var(--gutter) clamp(56px, 7vw, 96px);
+}
+
+/* No docked box on these pages: the footer needs no room for it. */
+.page .footer { padding-bottom: 48px; }
+
+.page-head .lede { max-width: 640px; margin-top: 24px; }
+
+.back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    margin-bottom: 32px;
+    font: 700 12px/1 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid var(--fg);
+}
+
+.back:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ---- Long text: legal pages --------------------------------------------- */
+
+.prose {
+    max-width: 760px;
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--fg);
+}
+
+.prose .updated {
+    margin: 0;
+    color: var(--muted);
+    font: 500 12px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.prose h2 {
+    margin: 40px 0 12px;
+    font: 700 clamp(22px, 2vw, 28px)/1.15 var(--font-sans);
+    letter-spacing: -0.03em;
+}
+
+.prose .updated + h2 { margin-top: 28px; }
+
+.prose p,
+.prose li {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.prose ul { margin: 8px 0; padding-left: 20px; }
+.prose li { margin-bottom: 6px; }
+.prose a { color: var(--accent); text-underline-offset: 3px; }
+.prose a:hover { color: var(--fg); }
+
+.prose code {
+    padding: 1px 6px;
+    background: var(--hover);
+    font: 500 0.88em var(--font-mono);
+}
+
+/* ---- Renders page --------------------------------------------------------- */
+
+.work {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 56px 1px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Every item has its own frame, neighbours share a line (same trick as the skills on the homepage). */
+.work-item {
+    display: flex;
+    flex-direction: column;
+    margin: 0 -1px -1px 0;
+    border: 1px solid var(--fg);
+}
+
+.work-item img {
+    display: block;
+    width: 100%;
+    height: auto; /* the height attribute only reserves space */
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--line);
+    border-bottom: 1px solid var(--fg);
+}
+
+.work-body { padding: 28px; }
+.work-body h2 {
+    margin: 28px 0 0;
+    font: 700 clamp(28px, 2.8vw, 40px)/1 var(--font-sans);
+    letter-spacing: -0.035em;
+}
+
+.work-body p { max-width: 520px; margin: 16px 0 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
+
+.work-tools {
+    margin-top: 20px;
+    color: var(--subtle);
+    font: 500 12px/1.5 var(--font-mono);
+}
+
+@media (max-width: 720px) {
+    .work { grid-template-columns: 1fr; }
+    .work-body { padding: 24px 20px; }
+}
+
+.page-head .lede a { color: var(--accent); text-underline-offset: 3px; }
+
+/* ---- History page: one framed block per version, screenshots inside ------ */
+
+.stages { margin: 56px 0 0; padding: 0; list-style: none; }
+
+.stage {
+    margin-top: -1px;
+    border: 1px solid var(--fg);
+}
+
+.stage-head { padding: 28px; border-bottom: 1px solid var(--fg); }
+
+.stage-head h2 {
+    margin: 28px 0 0;
+    font: 700 clamp(28px, 3vw, 44px)/1 var(--font-sans);
+    letter-spacing: -0.035em;
+}
+
+.stage-head p:not(.cell-top):not(.cell-links) {
+    max-width: 640px;
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.55;
+}
+
+.stage-head .cell-links { padding-top: 16px; }
+
+.shots {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0 1px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Every picture has its own frame in the grid, neighbours share a line. */
+.shot { margin: 0 -1px -1px 0; border: 1px solid var(--line-strong); }
+.shot figure { margin: 0; }
+
+.shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--line);
+}
+
+/* A full page is very tall: show its top, the link opens all of it. */
+.shot-tall img { height: 320px; object-fit: cover; object-position: top; }
+
+/* A phone screenshot stands in the middle of the frame. */
+.shot-mobile img { width: auto; max-width: 100%; height: 320px; margin: 0 auto; object-fit: contain; }
+.shot-mobile a { display: block; background: var(--line); }
+
+.shot figcaption {
+    padding: 10px 14px;
+    border-top: 1px solid var(--line-strong);
+    color: var(--subtle);
+    font: 500 12px/1.4 var(--font-mono);
+}
+
+@media (max-width: 900px) {
+    .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+    .shots { grid-template-columns: 1fr; }
+    .stage-head { padding: 24px 20px; }
+}

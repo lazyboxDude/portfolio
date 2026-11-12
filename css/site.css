@@ -1,6 +1,6 @@
 /* ==========================================================================
    Site — styles for the interactive homepage (index.html).
-   Independent from hub.css, which is only used by the legal pages now.
+   Also the base of every secondary page (css/pages.css adds what they need).
    Look "Editorial": warm paper, ink, one blue accent, square corners, hairlines.
    Space Grotesk for everything, Instrument Serif italic for accent words (see PLAN.md).
    ========================================================================== */
@@ -450,7 +450,7 @@ html:not(.js) .box-slot { display: none; }
 
 /* The name: one line, huge, cut off at the edges. 14.17vw = 204px at 1440. The left edge only nicks the M, so
    "Micael" stays readable (the mockup cuts about -17vw); the right side runs out of the hero. */
-h1 {
+.hero h1 {
     width: max-content;
     margin: 0 0 0 -1vw;
     font: 700 clamp(52px, 14.17vw, 280px)/0.9 var(--font-sans);
@@ -461,7 +461,7 @@ h1 {
 
 /* Desktop depth: paper-coloured with "difference" = black on paper, light where something dark stands behind. */
 @media (min-width: 1000px) {
-    h1 {
+    .hero h1 {
         color: var(--bg);
         mix-blend-mode: difference;
     }

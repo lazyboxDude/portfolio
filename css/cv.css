@@ -1,39 +1,11 @@
 /* ==========================================================================
-   CV page (cv.html). On screen: a white sheet on the dark site look.
-   Printed (or saved as PDF from the print dialog): just the sheet on A4.
+   CV page (cv.html). Loads css/site.css first (tokens, Space Grotesk, nav, footer).
+   On screen: a white sheet with an ink frame on the paper. Printed (or saved as PDF from the
+   print dialog): just the sheet on A4, nothing else.
    ========================================================================== */
 
-@font-face {
-    font-family: 'Inter';
-    src: url('../fonts/inter-latin-var.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-:root {
-    --bg: #07090f;
-    --paper: #ffffff;
-    --ink: #14161d;
-    --ink-soft: #4a5166;
-    --line: #dfe3ee;
-    --accent: #3d5bd9;
-    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    padding: 0 16px 64px;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-}
-
-a { color: var(--accent); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* No docked box on this page. */
+.cv-page .footer { padding-bottom: 48px; }
 
 /* ---- Toolbar (screen only) ------------------------------------------------ */
 
@@ -43,50 +15,67 @@ a { color: var(--accent); }
     align-items: center;
     justify-content: space-between;
     gap: 12px 24px;
-    width: min(820px, 100%);
+    width: min(880px, 100% - 2 * var(--gutter));
     margin: 0 auto;
-    padding: 20px 0;
-    color: #c9d2ea;
-    font-size: 14px;
+    padding: 32px 0 24px;
 }
 
-.cv-toolbar a { color: #c9d2ea; text-underline-offset: 3px; }
-.cv-toolbar a:hover { color: #fff; }
-.cv-toolbar :focus-visible { outline-color: #9fb4ff; }
+.cv-back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    border-bottom: 1px solid var(--fg);
+    font: 700 12px/1 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.cv-back:hover { color: var(--accent); border-color: var(--accent); }
 
 .cv-langs {
     display: flex;
-    gap: 6px;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
+/* Square tabs; neighbours share a line. */
 .cv-langs a {
-    display: block;
-    padding: 8px 14px;
-    border: 1px solid #2a3658;
-    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    margin-right: -1px;
+    padding: 0 18px;
+    border: 1px solid var(--fg);
+    font: 700 12px/1 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     text-decoration: none;
 }
 
+.cv-langs a:hover { color: var(--accent); }
+
 .cv-langs a[aria-current="true"] {
-    border-color: #6c8cff;
-    background: rgba(108, 140, 255, 0.16);
-    color: #fff;
+    background: var(--fg);
+    color: var(--bg);
 }
 
 .cv-print {
-    padding: 10px 18px;
-    border: 0;
-    border-radius: 999px;
-    background: #eaf0ff;
-    color: #07090f;
-    font: 600 14px/1 var(--font-sans);
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid var(--fg);
+    border-radius: 0;
+    background: var(--fg);
+    color: var(--bg);
+    font: 700 12px/1 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.cv-print:hover { background: #fff; }
+.cv-print:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* ---- Language switching: no JS needed (:target), JS adds .is-active ------- */
 
@@ -97,41 +86,45 @@ main:not(:has(.cv:target)):not(:has(.cv.is-active)) .cv:first-of-type { display:
 
 /* ---- The sheet ------------------------------------------------------------ */
 
+.cv-page main { padding: 0 var(--gutter) clamp(48px, 6vw, 88px); }
+
 .cv {
-    width: min(820px, 100%);
+    --ink: var(--fg);
+    --ink-soft: var(--muted);
+    width: min(880px, 100%);
     margin: 0 auto;
     padding: clamp(24px, 6vw, 56px);
-    border-radius: 6px;
-    background: var(--paper);
+    border: 1px solid var(--fg);
+    background: var(--surface);
+    color: var(--fg);
     font-size: 14px;
     line-height: 1.55;
 }
 
-.cv-head { padding-bottom: 20px; border-bottom: 2px solid var(--ink); }
+.cv-head { padding-bottom: 24px; border-bottom: 1px solid var(--fg); }
 
 .cv h1 {
     margin: 0;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font: 700 clamp(32px, 5vw, 48px)/1 var(--font-sans);
+    letter-spacing: -0.045em;
 }
 
 .cv-role {
-    margin: 4px 0 12px;
-    color: var(--ink-soft);
-    font-size: 16px;
+    margin: 10px 0 14px;
+    color: var(--fg);
+    font: italic 400 22px/1.2 var(--font-serif);
 }
 
 .cv-contact { margin: 0; color: var(--ink-soft); font-size: 13px; }
+.cv-contact a { color: var(--accent); text-underline-offset: 3px; }
 
-.cv section { margin-top: 28px; break-inside: avoid-page; }
+.cv section { margin-top: 32px; break-inside: avoid-page; }
 
 .cv h2 {
-    margin: 0 0 12px;
+    margin: 0 0 14px;
     color: var(--accent);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font: 700 12px/1.4 var(--font-sans);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
 }
 
@@ -139,9 +132,9 @@ main:not(:has(.cv:target)):not(:has(.cv.is-active)) .cv:first-of-type { display:
 
 .cv-item {
     display: grid;
-    grid-template-columns: 140px 1fr;
+    grid-template-columns: 150px 1fr;
     gap: 4px 24px;
-    padding: 10px 0;
+    padding: 12px 0;
     border-top: 1px solid var(--line);
     break-inside: avoid;
 }
@@ -151,20 +144,20 @@ main:not(:has(.cv:target)):not(:has(.cv.is-active)) .cv:first-of-type { display:
 .cv-when {
     margin: 0;
     color: var(--ink-soft);
-    font-size: 13px;
+    font: 500 13px/1.55 var(--font-mono);
     font-variant-numeric: tabular-nums;
 }
 
 .cv h3 {
     margin: 0 0 2px;
-    font-size: 14px;
-    font-weight: 600;
+    font: 700 15px/1.3 var(--font-sans);
+    letter-spacing: -0.01em;
 }
 
 .cv h3 span {
     display: block;
     color: var(--ink-soft);
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .cv-item p { margin: 0 0 2px; }
@@ -172,13 +165,14 @@ main:not(:has(.cv:target)):not(:has(.cv.is-active)) .cv:first-of-type { display:
 
 .cv-skills {
     display: grid;
-    grid-template-columns: 140px 1fr;
+    grid-template-columns: 150px 1fr;
     gap: 6px 24px;
     margin: 0;
 }
 
-.cv-skills dt { font-weight: 600; }
+.cv-skills dt { font-weight: 700; }
 .cv-skills dd { margin: 0; }
+.cv-skills a { color: var(--accent); text-underline-offset: 3px; }
 
 .cv-foot {
     margin: 32px 0 0;
@@ -198,8 +192,9 @@ main:not(:has(.cv:target)):not(:has(.cv.is-active)) .cv:first-of-type { display:
 
 @media print {
     body { padding: 0; background: #fff; }
-    .cv-toolbar { display: none; }
-    .cv { width: auto; margin: 0; padding: 0; border-radius: 0; font-size: 10.5pt; }
+    .nav, .cv-toolbar, .footer { display: none; }
+    .cv-page main { padding: 0; }
+    .cv { width: auto; margin: 0; padding: 0; border: 0; font-size: 10.5pt; }
     .cv h1 { font-size: 22pt; }
     .cv a { color: inherit; text-decoration: none; }
     .cv section { margin-top: 18pt; }

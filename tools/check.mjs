@@ -94,6 +94,13 @@ try {
         check('no script errors on load', !errors.length, errors.join(' | '));
         check('Space Grotesk and Instrument Serif are loaded', await page.evaluate(() => document.fonts.check('700 20px "Space Grotesk"') && document.fonts.check('italic 20px "Instrument Serif"')));
 
+        // The swarm's agents are named after the skills (tools of each skill, see agents.js toolNames).
+        const names = await page.evaluate(async () => {
+            const { toolNames } = await import('/js/agents.js');
+            return [toolNames('Blender · Autodesk Maya · Affinity Photo, Publisher, Designer'), toolNames('C++ · Blueprint · Python · GDScript, for my own prototypes'), toolNames('Unreal Engine 5 · Unity · Godot 4'), toolNames('Claude for code · Gemini for research · Microsoft Copilot')];
+        });
+        check('swarm agents are named after the tools of the skills', names[0].join() === 'blender-agent,autodesk-maya-agent,affinity-photo-agent' && names[1].join() === 'cpp-agent,blueprint-agent,python-agent,gdscript-agent' && names[2].join() === 'unreal-engine-5-agent,unity-agent,godot-4-agent' && names[3].join() === 'claude-for-code-agent,gemini-for-research-agent,microsoft-copilot-agent', JSON.stringify(names));
+
         // Tokens: contrast pairs from the :root custom properties.
         const tokens = await page.evaluate(() => {
             const cs = getComputedStyle(document.documentElement);
@@ -216,6 +223,53 @@ try {
         await ctx.close();
     }
 
+    // ---- Reload and back button: the page must stand (it was empty and scrolled away before) ------
+    {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        await startBuild(page);
+        await page.waitForTimeout(1000);
+        const state = () => page.evaluate(() => ({
+            y: Math.round(scrollY),
+            visible: getComputedStyle(document.getElementById('site')).visibility === 'visible',
+            docked: document.getElementById('box-wrap').classList.contains('is-home') && document.getElementById('box-wrap').parentElement.tagName === 'BODY',
+            home: document.querySelectorAll('.fake-cursor.is-home').length,
+            missing: document.querySelectorAll('#site .ch:not(.on)').length,
+            enabled: document.getElementById('box').getAttribute('aria-disabled') === 'false',
+        }));
+        await page.reload();
+        await page.evaluate(() => document.fonts.ready);
+        let st = await state();
+        check('reload after the start shows the finished page, box docked, all bots home', st.visible && st.docked && st.home === BOTS && st.missing === 0 && st.enabled, JSON.stringify(st));
+        await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'instant' }));
+        await page.waitForTimeout(300);
+        await page.reload();
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(500);
+        st = await state();
+        check('reload keeps the scroll position', st.visible && Math.abs(st.y - 1200) <= 5, JSON.stringify(st));
+        await page.goto(server.url + '/cv.html');
+        await page.goBack();
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(500);
+        st = await state();
+        check('back button shows the finished page at the old scroll position', st.visible && st.docked && Math.abs(st.y - 1200) <= 5, JSON.stringify(st));
+        await page.locator('#box').click();
+        await page.waitForTimeout(500);
+        check('after a reload the box still plays the show again', await page.evaluate(() => document.getElementById('box').getAttribute('aria-disabled') === 'true' && scrollY === 0));
+        await ctx.close();
+
+        // A tab that never started the show always starts on top (a remembered scroll position would show an empty page).
+        const fresh = await (await browser.newContext({ viewport: VIEWPORTS.desktop })).newPage();
+        await fresh.goto(server.url + '/index.html');
+        await fresh.evaluate(() => window.scrollTo(0, 0));
+        await fresh.reload();
+        check('a tab that has not started the show starts on top with the box', await fresh.evaluate(() => scrollY === 0 && document.getElementById('box-wrap').classList.contains('is-start')));
+        await fresh.context().close();
+    }
+
     // ---- Scrolling while the box flies: it still lands exactly in the corner --------------------
     if (!quick) {
         const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
@@ -286,15 +340,62 @@ try {
     // ---- Homepage makes no third-party requests -------------------------------------------------
     check('homepage requests only same-origin files (no Google)', !requests.length, requests.join(', '));
 
-    // ---- Other pages still load -----------------------------------------------------------------
-    for (const file of ['dienstplan.html', 'datenschutz.html', 'nutzungsbedingungen.html', 'cv.html']) {
+    // ---- Every page has the same design, loads without errors and links only to pages that exist ----
+    const PAGES = ['index.html', 'renders.html', 'history.html', 'cv.html', 'datenschutz.html', 'nutzungsbedingungen.html', 'dienstplan.html'];
+    // Dienstplan needs pdf.js and Google sign-in to work; nothing else may leave the site (no Google fonts, no icon fonts).
+    const ALLOWED_EXTERNAL = { 'dienstplan.html': [/^https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pdf\.js\//, /^https:\/\/accounts\.google\.com\/gsi\//] };
+    const linked = new Set();
+    for (const file of PAGES) {
         const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
         const page = await ctx.newPage();
-        const errors = [];
+        const errors = [], external = [];
         page.on('pageerror', (e) => errors.push(e.message));
-        const resp = await page.goto(`${server.url}/${file}`, { waitUntil: 'domcontentloaded' });
+        page.on('request', (r) => { if (!r.url().startsWith(server.url) && !r.url().startsWith('data:') && !r.url().startsWith('blob:')) external.push(r.url()); });
+        const resp = await page.goto(`${server.url}/${file}`, { waitUntil: 'load' });
+        await page.evaluate(() => document.fonts.ready);
         await page.waitForTimeout(400);
-        check(`${file} loads`, resp.status() === 200 && !errors.length, errors.join(' | '));
+        check(`${file} loads without script errors`, resp.status() === 200 && !errors.length, errors.join(' | '));
+
+        const look = await page.evaluate(() => {
+            const cs = getComputedStyle(document.body);
+            const round = [...document.querySelectorAll('button, input, select, textarea, .btn, .nav-cta, .cv-print, .cv-langs a')]
+                .filter((e) => getComputedStyle(e).display !== 'none' && parseFloat(getComputedStyle(e).borderTopLeftRadius) > 0).map((e) => e.className || e.tagName);
+            return { bg: cs.backgroundColor, font: cs.fontFamily.split(',')[0].replace(/["']/g, ''), loaded: document.fonts.check('700 16px "Space Grotesk"'), round };
+        });
+        check(`${file} uses the design: paper, Space Grotesk, square controls`, look.bg === 'rgb(251, 250, 246)' && look.font === 'Space Grotesk' && look.loaded && !look.round.length, JSON.stringify(look));
+        if (file !== 'index.html') {
+            const low = await page.evaluate(CONTRAST);
+            check(`${file} text contrast`, !low.length, low.slice(0, 6).join(' | '));
+        }
+        const allowed = ALLOWED_EXTERNAL[file] ?? [];
+        const stray = external.filter((u) => !allowed.some((re) => re.test(u)));
+        check(`${file} makes no stray third-party requests`, !stray.length, stray.join(', '));
+
+        // Every internal link resolves (ignoring anchors), and no page links into the old archive.
+        const hrefs = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')));
+        const internal = [...new Set(hrefs.filter((h) => h && !/^(https?:|mailto:|tel:|#)/.test(h)).map((h) => h.split('#')[0] || null).filter(Boolean))];
+        const broken = [];
+        for (const h of internal) {
+            linked.add(h);
+            const r = await ctx.request.get(new URL(h, `${server.url}/${file}`).href);
+            if (r.status() !== 200) broken.push(`${h} ${r.status()}`);
+        }
+        check(`${file}: internal links resolve, none into the archive`, !broken.length && !internal.some((h) => h.includes('archive/')), broken.concat(internal.filter((h) => h.includes('archive/'))).join(', '));
+        if (file === 'cv.html') {
+            await page.emulateMedia({ media: 'print' });
+            const hidden = await page.evaluate(() => ['.nav', '.cv-toolbar', '.footer'].every((sel) => getComputedStyle(document.querySelector(sel)).display === 'none'));
+            check('cv.html prints only the sheet (nav, toolbar and footer are hidden)', hidden);
+        }
+        await ctx.close();
+    }
+    // The pages the homepage links to are exactly the pages that have the design.
+    {
+        const ctx = await browser.newContext();
+        const page = await ctx.newPage();
+        await page.goto(`${server.url}/index.html`);
+        const fromHome = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).filter((h) => h && !/^(https?:|mailto:|tel:|#)/.test(h)).map((h) => h.split('#')[0]).filter((h) => h && h !== './'));
+        const missing = [...new Set(fromHome)].filter((h) => !PAGES.includes(h));
+        check('every page the homepage links to has the design', !missing.length, missing.join(', '));
         await ctx.close();
     }
 } finally {

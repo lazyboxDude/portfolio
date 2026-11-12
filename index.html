@@ -10,7 +10,12 @@
     <link rel="preload" href="fonts/space-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Marks that JS runs: without it the whole page is shown right away and the buttons below are hidden. -->
-    <script>document.documentElement.classList.add('js');</script>
+    <script>
+        document.documentElement.classList.add('js');
+        // A tab that has already seen the show gets the page unlocked from the first layout on, so the browser can
+        // restore the scroll position after a reload or the back button (js/build.js: SiteBuilder.restore).
+        try { if (sessionStorage.getItem('lazybox-show-seen') === '1') document.documentElement.classList.add('is-live'); } catch (e) { /* storage blocked */ }
+    </script>
     <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
@@ -155,7 +160,7 @@
                         <p class="cell-top"><span class="num" aria-hidden="true" data-type>04</span><span class="eyebrow" data-type>3D &amp; digital art · 2023–2024</span></p>
                         <h3 id="p-art" data-type>Selected renders</h3>
                         <p class="cell-text" data-type>A selection from my earlier portfolio: 3D renders, environment art and digital compositions.</p>
-                        <p class="cell-links"><a class="link" href="archive/v1-2026-11/portfolio.html" data-type data-underline>Browse the archive</a></p>
+                        <p class="cell-links"><a class="link" href="renders.html" data-type data-underline>Renders in detail</a></p>
                     </div>
                         <ul class="gallery" aria-label="Selected renders">
                                 <li>
@@ -301,7 +306,7 @@
                     <li class="skill" data-box="fast">
                         <p class="layer" data-type>Layer 5</p>
                         <h3 data-type>AI tools</h3>
-                        <p data-type>Claude · Gemini · Microsoft Copilot</p>
+                        <p data-type>Claude for code · Gemini for research · Microsoft Copilot</p>
                     </li>
                 </ul>
                 <p class="note" data-type>Languages: German (native), English (B2)</p>
@@ -353,7 +358,8 @@
                     <li><a href="https://github.com/lazyboxDude" data-type>GitHub</a></li>
                     <li><a href="https://www.linkedin.com/in/micael-gomes-fernandes" data-type>LinkedIn</a></li>
                     <li><a href="dienstplan.html" data-type>Dienstplan</a></li>
-                    <li><a href="archive/v1-2026-11/index.html" data-type>Archive</a></li>
+                    <li><a href="renders.html" data-type>Renders</a></li>
+                        <li><a href="history.html" data-type>History</a></li>
                     <li><a href="datenschutz.html" data-type>Datenschutz</a></li>
                     <li><a href="nutzungsbedingungen.html" data-type>Nutzungsbedingungen</a></li>
                 </ul>
