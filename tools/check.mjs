@@ -341,7 +341,7 @@ try {
     check('homepage requests only same-origin files (no Google)', !requests.length, requests.join(', '));
 
     // ---- Every page has the same design, loads without errors and links only to pages that exist ----
-    const PAGES = ['index.html', 'renders.html', 'cv.html', 'datenschutz.html', 'nutzungsbedingungen.html', 'dienstplan.html'];
+    const PAGES = ['index.html', 'renders.html', 'history.html', 'cv.html', 'datenschutz.html', 'nutzungsbedingungen.html', 'dienstplan.html'];
     // Dienstplan needs pdf.js and Google sign-in to work; nothing else may leave the site (no Google fonts, no icon fonts).
     const ALLOWED_EXTERNAL = { 'dienstplan.html': [/^https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pdf\.js\//, /^https:\/\/accounts\.google\.com\/gsi\//] };
     const linked = new Set();
