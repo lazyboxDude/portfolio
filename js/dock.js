@@ -53,6 +53,11 @@ export class Dock {
         return { x: r.left + r.width * OPENING.x, y: r.top + r.height * OPENING.y };
     }
 
+    /** The box's rectangle right now (it moves while it flies: the motion-bot follows it). */
+    bounds() {
+        return this.wrap.getBoundingClientRect();
+    }
+
     /** The box's rectangle once it stands in the corner (the bots wait next to it). */
     corner() {
         return this.state === 'home' ? (this.rect ??= this.wrap.getBoundingClientRect()) : null;
@@ -84,11 +89,18 @@ export class Dock {
 
         if (!instant && first.width > 0) {
             const dx = last.left - first.left, dy = last.top - first.top, s = last.width / first.width;
-            const flight = wrap.animate(
-                [{ transform: 'none' }, { transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${s.toFixed(4)})` }],
-                { duration: FLY_MS, easing: 'cubic-bezier(0.65, 0, 0.25, 1)', fill: 'forwards' },
-            );
+            const y0 = window.scrollY;
+            // The box flies inside the page, its corner is fixed to the window: when the visitor scrolls during the
+            // flight, the target moves by the same amount, so it still lands exactly in the corner.
+            const frames = () => [
+                { transform: 'none' },
+                { transform: `translate(${dx.toFixed(1)}px, ${(dy + window.scrollY - y0).toFixed(1)}px) scale(${s.toFixed(4)})` },
+            ];
+            const flight = wrap.animate(frames(), { duration: FLY_MS, easing: 'cubic-bezier(0.65, 0, 0.25, 1)', fill: 'forwards' });
+            const onScroll = () => flight.effect.setKeyframes(frames());
+            window.addEventListener('scroll', onScroll, { passive: true });
             try { await flight.finished; } catch { /* cancelled */ }
+            window.removeEventListener('scroll', onScroll);
             // Dock for real in the same frame as the animation ends: same rectangle, so nothing moves.
             wrap.classList.add('is-home');
             document.body.append(wrap);
@@ -123,7 +135,6 @@ export class Dock {
     applyDisabled() {
         const off = this.busy || this.locked;
         this.button.setAttribute('aria-disabled', String(off));
-        this.wrap.classList.toggle('is-busy', off);
     }
 
     setLabel(text) { this.button.setAttribute('aria-label', text); }

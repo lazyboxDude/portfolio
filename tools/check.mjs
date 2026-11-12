@@ -216,6 +216,37 @@ try {
         await ctx.close();
     }
 
+    // ---- Scrolling while the box flies: it still lands exactly in the corner --------------------
+    if (!quick) {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        await startBuild(page);
+        await page.waitForFunction(() => document.getElementById('box-wrap').getAnimations().length > 0, null, { timeout: 40000 });
+        // Record where the box is on every frame of the flight, then scroll once in the middle of it.
+        await page.evaluate(() => {
+            window.__last = null;
+            const wrap = document.getElementById('box-wrap');
+            (function frame() {
+                if (wrap.classList.contains('is-home')) return;
+                const r = wrap.getBoundingClientRect();
+                window.__last = { right: r.right, bottom: r.bottom };
+                requestAnimationFrame(frame);
+            })();
+        });
+        await page.waitForTimeout(500);
+        await page.evaluate(() => window.scrollTo({ top: 260, behavior: 'instant' }));
+        await page.waitForFunction(() => document.getElementById('box-wrap').classList.contains('is-home'), null, { timeout: 10000 });
+        const at = await page.evaluate(() => {
+            const r = document.getElementById('box-wrap').getBoundingClientRect();
+            return { right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom), w: Math.round(r.width),
+                jump: Math.round(Math.hypot(window.__last.right - r.right, window.__last.bottom - r.bottom)) };
+        });
+        check('scrolling during the flight: it lands in the corner without a jump', at.right === 24 && at.bottom === 24 && at.w === 120 && at.jump <= 3, JSON.stringify(at));
+        await ctx.close();
+    }
+
     // ---- Scrolling through while the bots build must never hang the build ------------------------
     if (!quick) {
         const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });

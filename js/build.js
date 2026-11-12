@@ -590,9 +590,10 @@ export class SiteBuilder {
         const typed = new Map(section.texts.map((t) => [t, defer()]));
         const speed = section.typingSpeed();
         const glowOn = defer(); // the design-bot has switched the glow on: the motion-bot may set it drifting
+        const nameTyped = defer(); // the copy-bot has typed the name: the motion-bot may carry the box to its corner
         // Cancelled (the visitor scrolled past): a lane that stopped early never reports its box or text as done,
         // and the lanes waiting for it would hang forever. Releasing everything lets all of them wind down.
-        section.release = () => { for (const d of [...boxReady.values(), ...typed.values(), glowOn]) d.resolve(); };
+        section.release = () => { for (const d of [...boxReady.values(), ...typed.values(), glowOn, nameTyped]) d.resolve(); };
         if (section.cancelled) section.release(); // cancelled while the bots were still on their way out of the box
 
         // layout-bot: drags out the shapes, in page order.
@@ -619,7 +620,7 @@ export class SiteBuilder {
                 const override = parseFloat(t.el.dataset.speed);
                 await this.typeText(t, { speed: Number.isFinite(override) ? override : speed, tag: t.el.hasAttribute('data-tag'), section });
                 typed.get(t).resolve();
-                if (t.el.hasAttribute('data-dock-after')) this.dock.fly(); // e.g. the name: now the box may leave
+                if (t.el.hasAttribute('data-dock-after')) nameTyped.resolve(); // e.g. the name: now the box may leave
             }
             this.rest(typist);
         })();
@@ -663,12 +664,16 @@ export class SiteBuilder {
             this.rest(checker);
         })();
 
-        // motion-bot: starts the glow drifting (hero), then tilts every mockup in once its card stands.
+        // motion-bot: starts the glow drifting (hero), carries the box to its corner once the name is typed (hero),
+        // then tilts every mockup in once its card stands.
         const motion = (async () => {
             if (section.isHero) {
                 await glowOn.promise;
                 if (section.cancelled) return;
                 await this.startDrift();
+                await nameTyped.promise;
+                if (section.cancelled) return;
+                await this.carryBox();
             }
             for (const tilt of section.tilts) {
                 if (section.cancelled) return;
@@ -714,6 +719,34 @@ export class SiteBuilder {
         await bot.click();
         this.glow.classList.add('is-moving');
         await sleep(700);
+        bot.hideTag();
+    }
+
+    /**
+     * motion-bot grabs the box and carries it to its corner: it walks to the lid, presses, and follows the box
+     * while it flies (one transform animation, see Dock.fly). The tag shows the live translate and scale.
+     * Not on a replay: the box already stands in its corner.
+     */
+    async carryBox() {
+        const { animator: bot, swarm, dock } = this;
+        if (dock.state !== 'start' && dock.state !== 'open') return;
+        const first = dock.bounds();
+        const grab = () => { const r = dock.bounds(); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.4 }; };
+        const tagAt = () => { const r = dock.bounds(); return { x: r.left, y: Math.max(4, r.top - TAG_GAP) }; };
+
+        await bot.chase(grab, ARRIVE);
+        bot.press();
+        const flight = dock.fly(); // starts at once; resolves when the box has landed
+        bot.follow(grab, { damping: DRAG_DAMPING });
+        const stop = swarm.onFrame(() => {
+            const r = dock.bounds();
+            bot.inspect(`translate ${Math.round(r.left - first.left)}px ${Math.round(r.top - first.top)}px · scale ${(r.width / first.width).toFixed(2)}`, tagAt);
+        });
+        await flight;
+        stop();
+        bot.release();
+        swarm.ripple(bot.x, bot.y, bot.color);
+        await sleep(250);
         bot.hideTag();
     }
 

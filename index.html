@@ -25,7 +25,7 @@
          data-a11y   = the a11y-bot checks it (focus ring + real contrast); only on elements with a solid background
          .tilt       = a mockup the motion-bot tilts in from flat (see --t in css/site.css); none in the Editorial look
          data-speed  = typing speed of one text (1 = slow, 0.2 = fast); data-type-ms = how long typing a whole section may take
-         data-dock-after = once this text is typed, the box (below) flies to its corner
+         data-dock-after = once this text is typed, the motion-bot carries the box (below) to its corner
          data-instant = the section simply appears when it scrolls into view, no bots
          The box (#box-wrap, in the hero) is the start button and later the bots' home in the bottom-right corner (js/dock.js).
          Without JS everything is simply visible (no box). Screen readers get all text at once. -->
@@ -61,24 +61,24 @@
                             <!-- Isometric box, graphite like a black-and-white photo; the lid is not quite shut and light falls out of the gap. -->
                             <svg class="box-art" viewBox="0 0 226 274" aria-hidden="true" focusable="false">
                                 <ellipse class="box-floor" cx="113" cy="262" rx="118" ry="14"/>
-                                <polygon points="0,78 113,143 113,273 0,208" fill="#1d1f28"/>
-                                <polygon points="113,143 226,78 226,208 113,273" fill="#0b0c10"/>
-                                <polygon points="113,13 226,78 113,143 0,78" fill="#0b0c10"/>
-                                <defs><radialGradient id="box-light"><stop offset="0" stop-color="#3355ff" stop-opacity="0.95"/><stop offset="1" stop-color="#3355ff" stop-opacity="0"/></radialGradient></defs>
+                                <polygon class="box-face-left" points="0,78 113,143 113,273 0,208"/>
+                                <polygon class="box-face-right" points="113,143 226,78 226,208 113,273"/>
+                                <polygon class="box-face-open" points="113,13 226,78 113,143 0,78"/>
+                                <defs><radialGradient id="box-light"><stop class="box-light-stop" offset="0" stop-opacity="0.95"/><stop class="box-light-stop" offset="1" stop-opacity="0"/></radialGradient></defs>
                                 <ellipse class="box-glow" cx="113" cy="78" rx="74" ry="36"/>
                                 <path class="box-rim-accent" d="M113 13 L226 78"/>
                                 <g class="box-lines"><path d="M0 78V208M113 143V273M226 78V208M0 208L113 273L226 208M0 78L113 143L226 78"/></g>
                                 <g transform="translate(0 78) matrix(0.866 0.5 0 1 0 0)"><text class="box-logo" x="12" y="86">._lazybox_</text></g>
                                 <polygon class="box-gap" points="0,70 113,135 226,70 226,78 113,143 0,78"/>
                                 <g class="box-lid">
-                                    <polygon points="113,13 226,78 113,143 0,78" fill="#2a2d3a"/>
+                                    <polygon class="box-face-lid" points="113,13 226,78 113,143 0,78"/>
                                     <polygon class="box-lines" points="113,13 226,78 113,143 0,78"/>
                                     <path class="box-lid-accent" d="M113 13 L226 78"/>
                                 </g>
                             </svg>
                         </button>
                         <span class="box-hint" aria-hidden="true">
-                            <svg width="16" height="20" viewBox="0 0 18 22"><path d="M2 2v16l4.4-4 3 7 3-1.3-3-6.8H15z" fill="#0b0c10" stroke="#fbfaf6" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                            <svg width="16" height="20" viewBox="0 0 18 22"><path class="hint-arrow" d="M2 2v16l4.4-4 3 7 3-1.3-3-6.8H15z"/></svg>
                             <span class="hint-click">Click to open</span><span class="hint-tap">Tap to open</span>
                         </span>
                         <!-- How many bots are home; the sentence for screen assistants is updated calmly (see Dock.render). -->
