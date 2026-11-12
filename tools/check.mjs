@@ -142,6 +142,8 @@ try {
         if (label === 'desktop') check('[desktop] nav is 72px high', Math.abs(hero.navH - 73) <= 1.5, `${hero.navH}px incl. line`);
         const radius = await page.evaluate(() => [...document.querySelectorAll('.btn, .nav-cta, .layer-btn, .box')].filter((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) !== 0).map((e) => e.className));
         check(`[${label}] buttons are square`, !radius.length, radius.join(', '));
+        const still = await page.evaluate(() => !document.querySelector('#headline.is-marquee') && !document.querySelector('.marquee-clone'));
+        check(`[${label}] reduced motion: the name stands still (no ticker, no copies)`, still);
 
         // Reduced motion: the box is docked at once, every bot is at home, nothing to call.
         const dock = await page.evaluate(() => {
@@ -176,6 +178,18 @@ try {
         let built = true;
         try { await page.waitForFunction(HERO_BUILT, null, { timeout: 60000 }); } catch { built = false; }
         check('hero builds itself (chars typed, shapes dragged, underline drawn)', built);
+
+        // The motion-bot sets the name running: an endless ticker whose copies screen readers never see.
+        let ticker = true;
+        try { await page.waitForFunction(() => document.querySelector('#headline.is-marquee'), null, { timeout: 30000 }); } catch { ticker = false; }
+        const t1 = await page.evaluate(() => getComputedStyle(document.getElementById('headline')).transform);
+        await page.waitForTimeout(600);
+        const t2 = await page.evaluate(() => getComputedStyle(document.getElementById('headline')).transform);
+        const tk = await page.evaluate(() => {
+            const h = document.getElementById('headline');
+            return { copies: h.querySelectorAll('.marquee-clone').length + 1, readers: [...h.children].filter((c) => c.getAttribute('aria-hidden') !== 'true').map((c) => c.textContent.trim()), loop: h.style.getPropertyValue('--loop') };
+        });
+        check('the name runs as an endless ticker, its copies are hidden from screen readers', ticker && t1 !== t2 && tk.copies >= 2 && tk.readers.length === 1 && tk.readers[0] === 'Micael Gomes Fernandes' && parseFloat(tk.loop) > 0, JSON.stringify({ t1, t2, ...tk }));
         const nan = await page.evaluate(() => [...document.querySelectorAll('.fake-cursor, .inspector-tag')].filter((e) => /NaN/.test(e.style.transform + e.style.cssText)).length);
         check('no NaN positions on the bots (square outlines)', nan === 0, String(nan));
 
@@ -243,6 +257,9 @@ try {
         await page.evaluate(() => document.fonts.ready);
         let st = await state();
         check('reload after the start shows the finished page, box docked, all bots home', st.visible && st.docked && st.home === BOTS && st.missing === 0 && st.enabled, JSON.stringify(st));
+        let runs = true;
+        try { await page.waitForFunction(() => document.querySelector('#headline.is-marquee'), null, { timeout: 5000 }); } catch { runs = false; }
+        check('after a reload the name runs at once', runs);
         await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'instant' }));
         await page.waitForTimeout(300);
         await page.reload();
@@ -258,7 +275,7 @@ try {
         check('back button shows the finished page at the old scroll position', st.visible && st.docked && Math.abs(st.y - 1200) <= 5, JSON.stringify(st));
         await page.locator('#box').click();
         await page.waitForTimeout(500);
-        check('after a reload the box still plays the show again', await page.evaluate(() => document.getElementById('box').getAttribute('aria-disabled') === 'true' && scrollY === 0));
+        check('after a reload the box still plays the show again (the name is typed anew)', await page.evaluate(() => document.getElementById('box').getAttribute('aria-disabled') === 'true' && scrollY === 0 && !document.querySelector('#headline.is-marquee') && !document.querySelector('.marquee-clone')));
         await ctx.close();
 
         // A tab that never started the show always starts on top (a remembered scroll position would show an empty page).

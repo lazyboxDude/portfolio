@@ -467,6 +467,21 @@ html:not(.js) .box-slot { display: none; }
     }
 }
 
+/* The motion-bot sets the name running: an endless ticker (js/marquee.js). The script appends copies of the name and
+   sets --loop (one copy plus its gap, in px) and --loop-time; one transform animation does the rest. */
+.marquee-copy { display: inline-block; margin-right: 0.5em; }
+
+.hero h1.is-marquee {
+    will-change: transform;
+    animation: name-run var(--loop-time, 25s) linear infinite;
+}
+
+.hero h1.is-marquee.is-offscreen { animation-play-state: paused; }
+
+@keyframes name-run {
+    to { transform: translateX(calc(-1 * var(--loop))); }
+}
+
 .hero-copy { padding: 40px var(--gutter) 0; }
 
 /* The serif italic accent word; its underline is drawn by the design-bot. */
@@ -1331,6 +1346,7 @@ html:not(.js) .cta .btn-ghost { border-color: var(--bg); }
     .box-wrap.is-start .box-art { animation: none; }
     .btn, .nav-links a, .nav-cta, .glow, .sel-frame, .inspector-tag, .a11y-ring, .grid-col, .snap-line { transition: none; }
     .glow.is-moving .glow-a, .glow.is-moving .glow-b { animation: none; }
+    .hero h1.is-marquee { animation: none; }
     .fake-cursor.is-new { animation: none; }
     .fake-cursor-body { transition: none; }
 }

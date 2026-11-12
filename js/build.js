@@ -31,6 +31,7 @@ import { DRAG_DAMPING, prefersReducedMotion } from './cursors.js';
 import { describe, FocusRing } from './a11y.js';
 import { anchor, clamp, easeInOut, pageRect, part } from './geometry.js';
 import { Grid, Guides, MIN_SIZE, Shell, guidePlan } from './layout.js';
+import { NameMarquee } from './marquee.js';
 
 const DRAG_MS = 500;
 const DRAG_FAST_MS = 250;
@@ -371,6 +372,8 @@ export class SiteBuilder {
 
         this.sections = [...site.querySelectorAll('[data-section]')].map((el) => new Section(el));
         this.hero = this.sections.find((s) => s.isHero) ?? this.sections[0];
+        const name = site.querySelector('#headline');
+        this.marquee = name ? new NameMarquee(name, this.hero.el) : null; // the name as an endless ticker, started by the motion-bot
 
         dock.canReceive = () => !this.busy && !this.pumping && !this.current; // bots only go home between builds
         this.builder = null;  // layout-bot
@@ -421,6 +424,7 @@ export class SiteBuilder {
             }
         } finally {
             this.dock.fly(); // in case the name was never typed (error): the box gets to its corner anyway
+            this.marquee?.start(); // ... and the name runs anyway (no-op when the motion-bot already started it)
             this.busy = false;
             this.live = true;
             this.parked = reduced;
@@ -443,6 +447,7 @@ export class SiteBuilder {
         this.live = true;
         this.parked = reduced;
         this.syncDock();
+        document.fonts?.ready.then(() => this.marquee?.start()); // the name runs from the start (needs the final font to measure)
     }
 
     /** The box can only be clicked while no build is running. */
@@ -456,6 +461,7 @@ export class SiteBuilder {
         this.bigCount = 0;
         this.guides.clear();
         for (const s of this.sections) s.reset();
+        this.marquee?.stop();
         this.glow.classList.remove('is-on', 'is-moving');
     }
 
@@ -687,8 +693,8 @@ export class SiteBuilder {
             this.rest(checker);
         })();
 
-        // motion-bot: starts the glow drifting (hero), carries the box to its corner once the name is typed (hero),
-        // then tilts every mockup in once its card stands.
+        // motion-bot: starts the glow drifting (hero), sets the name running and carries the box to its corner once the
+        // name is typed (hero), then tilts every mockup in once its card stands.
         const motion = (async () => {
             if (section.isHero) {
                 await glowOn.promise;
@@ -696,6 +702,7 @@ export class SiteBuilder {
                 await this.startDrift();
                 await nameTyped.promise;
                 if (section.cancelled) return;
+                await this.startMarquee();
                 await this.carryBox();
             }
             for (const tilt of section.tilts) {
@@ -730,6 +737,20 @@ export class SiteBuilder {
         bot.release();
         swarm.ripple(bot.x, bot.y, bot.color);
         await sleep(150);
+        bot.hideTag();
+    }
+
+    /** motion-bot clicks on the finished name: it starts to run, an endless ticker (see marquee.js). */
+    async startMarquee() {
+        const { animator: bot, marquee } = this;
+        if (!marquee || marquee.running) return;
+        const a = anchor(marquee.h1); // measured while the name still stands
+        const at = () => { const r = a(); return { x: Math.min(window.innerWidth * 0.4, r.left + r.width / 2), y: r.top + r.height * 0.5 }; };
+        await bot.chase(at, ARRIVE);
+        await bot.click();
+        const info = marquee.start();
+        if (info) bot.inspect(`marquee ${info.speed}px/s · loop ${info.loop}px`, () => { const p = at(); return { x: p.x, y: p.y - TAG_GAP * 3 }; });
+        await sleep(info ? 900 : 0);
         bot.hideTag();
     }
 
