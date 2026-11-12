@@ -78,8 +78,7 @@ Gestaltungsentwurf der fertigen Seite: https://claude.ai/artifact/7Mt2y5VDf1my2k
 ## Nicht kaputtmachen
 
 - `dienstplan.html` ist eine eigenständige Web-App im Betrieb (Google-Kalender-Login, PDF-Import).
-- `datenschutz.html` und `nutzungsbedingungen.html` werden für die Google-Integration gebraucht.
-  Sie nutzen `css/hub.css` und `js/socials.js`.
+- `datenschutz.html` und `nutzungsbedingungen.html` werden für die Google-Integration gebraucht (Text unverändert). Sie haben das Design der Startseite (`css/site.css` + `css/pages.css`), `css/hub.css` und `js/socials.js` gibt es nicht mehr.
 - `CNAME` bleibt im Root.
 - `archive/` bleibt unverändert. Ausnahme: `archive/v1-2026-11/docs/` (altes CV-PDF und `CV.txt` mit privaten Daten) bleibt im Repo, wird aber nicht ausgeliefert: `vercel.json` leitet `/archive/v1-2026-11/docs/*` auf `/cv.html` um (`.assetsignore` greift nur bei Cloudflare-Deploys).
 
@@ -292,6 +291,15 @@ Wird die Zeit knapp, dann zuerst 10 (Essentials) vorziehen, bevor 8 oder 9 gebau
   - **KI-Skills, so wie Micael sie genannt hat** (Absprache im Chat, die Zeugnisse liegen nicht im Repo, belegt ist nur, was im Lebenslauf steht oder von Micael gesagt wurde): Claude für Code, Gemini für Recherche, dazu Microsoft Copilot (steht im Lebenslauf bei MS Office). Gewählt nach dem gängigen Muster "Methode oder Einsatz + Tool, kein Name ohne Einsatzfall".
     Startseite, Karte "AI tools": `Claude for code · Gemini for research · Microsoft Copilot` (daraus werden die Agent-Namen `claude-for-code-agent`, `gemini-for-research-agent`, `microsoft-copilot-agent`, deshalb kurze Einträge ohne Klammern).
     `cv.html` (Deutsch und Englisch): "Office" und "KI-Kenntnisse" / "AI tools" getrennt, dazu "Eigene Tools" / "Own tools" mit der Dienstplan-App (online). Nicht aufgenommen, weil nicht bestätigt: Prompting als Methode, Photoshop, Illustrator, Midjourney, Premiere Pro, C# (stehen nur im alten Portfolio).
+- **Alle Seiten im neuen Design + Reload-Fix** (nach dem Redesign, Branch `claude/bold-lamport-n9w5kv`): Micael hat gemeldet, dass die verlinkten Seiten (Archiv) noch den alten Stil haben und dass die Startseite bei Reload oder Zurück "bricht".
+  - **Reload und Zurück:** Reproduziert (leere Seite, vom Browser nach unten gescrollt, die Box ausser Sicht, nichts zum Klicken). Jetzt merkt sich der Tab in `sessionStorage` (`lazybox-show-seen`, gesetzt beim ersten Klick auf die Box), dass er die Show gesehen hat. Danach stellt `SiteBuilder.restore()` die fertige Seite sofort her (Box angedockt, alle Bots zu Hause, `aria-disabled` gesetzt), auch bei Reload, Zurück-Button und Rücklinks von anderen Seiten; die Scroll-Position bleibt (das Head-Skript entsperrt die Seite schon vor dem ersten Layout, und `history.scrollRestoration` wird auf `auto` zurückgesetzt, weil das "manual" vom ersten Besuch am Verlauf-Eintrag klebt).
+    Ein Klick auf die Box spielt die Show neu ab. Ein Tab, der die Show nie gestartet hat, startet immer oben mit der Box. Ohne Storage (privater Modus) läuft die Show einfach wieder.
+  - **Archiv wird nicht mehr verlinkt:** `archive/` bleibt eingefroren (altes Design, 8 Seiten, unverändert, per direkter Adresse noch erreichbar). Der Link "Browse the archive" ist jetzt "Renders in detail" und führt auf die neue Seite `renders.html` (die acht Renders gross, mit Beschreibung, Tools und Jahr aus dem alten Portfolio, Texte von dort übernommen), im Footer steht "Renders" statt "Archive".
+    Wer die alten Archiv-Adressen auch umleiten will, kann das in `vercel.json` tun (nicht gemacht, Entscheidung offen).
+  - **Gemeinsame Basis:** Jede Unterseite lädt `css/site.css` und `css/pages.css` (Nav, Footer, Titel, Labels, Links aus der Startseite). Dafür ist die `h1`-Regel von `site.css` auf `.hero h1` beschränkt. Neue Seite = Nav und Footer aus `renders.html` kopieren.
+    `datenschutz.html`, `nutzungsbedingungen.html` (Text Zeichen für Zeichen geprüft), `cv.html` (Blatt mit Tintenrahmen, Druckansicht nur das Blatt) und `renders.html` sind neu aufgebaut, `dienstplan.html` nur im CSS (Schrift, Tokens, eckig, flacher Header, Tinte statt Blau); ausserhalb des `<style>`-Blocks ändern sich nur vier Farbwerte (Theme-Farbe, Icon, Manifest), die App-Logik ist unberührt. Das Design des Ergebnisfensters (nach einem PDF-Import) ist nicht mit einem echten Dienstplan getestet.
+  - **Datenschutz:** Die Rechtsseiten luden Schriften von Google und Font Awesome von einem CDN. Das ist weg (selbst gehostete Schrift, Text statt Icon-Leiste im Footer). Als einzige Fremd-Requests bleiben im Dienstplan pdf.js und die Google-Anmeldung, ohne die er nicht funktioniert.
+  - **Prüfung:** `tools/check.mjs` prüft jede Seite auf Papier-Hintergrund, Space Grotesk, eckige Bedienelemente, Kontrast, Fremd-Requests, aufgelöste interne Links und dass die Startseite nur auf Seiten mit dem Design verlinkt (62 Prüfungen). Dazu Tests für Reload, Scroll-Position und den Zurück-Button.
 
 ## Offene Fragen an Micael
 

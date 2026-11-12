@@ -340,15 +340,62 @@ try {
     // ---- Homepage makes no third-party requests -------------------------------------------------
     check('homepage requests only same-origin files (no Google)', !requests.length, requests.join(', '));
 
-    // ---- Other pages still load -----------------------------------------------------------------
-    for (const file of ['dienstplan.html', 'datenschutz.html', 'nutzungsbedingungen.html', 'cv.html']) {
+    // ---- Every page has the same design, loads without errors and links only to pages that exist ----
+    const PAGES = ['index.html', 'renders.html', 'cv.html', 'datenschutz.html', 'nutzungsbedingungen.html', 'dienstplan.html'];
+    // Dienstplan needs pdf.js and Google sign-in to work; nothing else may leave the site (no Google fonts, no icon fonts).
+    const ALLOWED_EXTERNAL = { 'dienstplan.html': [/^https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pdf\.js\//, /^https:\/\/accounts\.google\.com\/gsi\//] };
+    const linked = new Set();
+    for (const file of PAGES) {
         const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
         const page = await ctx.newPage();
-        const errors = [];
+        const errors = [], external = [];
         page.on('pageerror', (e) => errors.push(e.message));
-        const resp = await page.goto(`${server.url}/${file}`, { waitUntil: 'domcontentloaded' });
+        page.on('request', (r) => { if (!r.url().startsWith(server.url) && !r.url().startsWith('data:') && !r.url().startsWith('blob:')) external.push(r.url()); });
+        const resp = await page.goto(`${server.url}/${file}`, { waitUntil: 'load' });
+        await page.evaluate(() => document.fonts.ready);
         await page.waitForTimeout(400);
-        check(`${file} loads`, resp.status() === 200 && !errors.length, errors.join(' | '));
+        check(`${file} loads without script errors`, resp.status() === 200 && !errors.length, errors.join(' | '));
+
+        const look = await page.evaluate(() => {
+            const cs = getComputedStyle(document.body);
+            const round = [...document.querySelectorAll('button, input, select, textarea, .btn, .nav-cta, .cv-print, .cv-langs a')]
+                .filter((e) => getComputedStyle(e).display !== 'none' && parseFloat(getComputedStyle(e).borderTopLeftRadius) > 0).map((e) => e.className || e.tagName);
+            return { bg: cs.backgroundColor, font: cs.fontFamily.split(',')[0].replace(/["']/g, ''), loaded: document.fonts.check('700 16px "Space Grotesk"'), round };
+        });
+        check(`${file} uses the design: paper, Space Grotesk, square controls`, look.bg === 'rgb(251, 250, 246)' && look.font === 'Space Grotesk' && look.loaded && !look.round.length, JSON.stringify(look));
+        if (file !== 'index.html') {
+            const low = await page.evaluate(CONTRAST);
+            check(`${file} text contrast`, !low.length, low.slice(0, 6).join(' | '));
+        }
+        const allowed = ALLOWED_EXTERNAL[file] ?? [];
+        const stray = external.filter((u) => !allowed.some((re) => re.test(u)));
+        check(`${file} makes no stray third-party requests`, !stray.length, stray.join(', '));
+
+        // Every internal link resolves (ignoring anchors), and no page links into the old archive.
+        const hrefs = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')));
+        const internal = [...new Set(hrefs.filter((h) => h && !/^(https?:|mailto:|tel:|#)/.test(h)).map((h) => h.split('#')[0] || null).filter(Boolean))];
+        const broken = [];
+        for (const h of internal) {
+            linked.add(h);
+            const r = await ctx.request.get(new URL(h, `${server.url}/${file}`).href);
+            if (r.status() !== 200) broken.push(`${h} ${r.status()}`);
+        }
+        check(`${file}: internal links resolve, none into the archive`, !broken.length && !internal.some((h) => h.includes('archive/')), broken.concat(internal.filter((h) => h.includes('archive/'))).join(', '));
+        if (file === 'cv.html') {
+            await page.emulateMedia({ media: 'print' });
+            const hidden = await page.evaluate(() => ['.nav', '.cv-toolbar', '.footer'].every((sel) => getComputedStyle(document.querySelector(sel)).display === 'none'));
+            check('cv.html prints only the sheet (nav, toolbar and footer are hidden)', hidden);
+        }
+        await ctx.close();
+    }
+    // The pages the homepage links to are exactly the pages that have the design.
+    {
+        const ctx = await browser.newContext();
+        const page = await ctx.newPage();
+        await page.goto(`${server.url}/index.html`);
+        const fromHome = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).filter((h) => h && !/^(https?:|mailto:|tel:|#)/.test(h)).map((h) => h.split('#')[0]).filter((h) => h && h !== './'));
+        const missing = [...new Set(fromHome)].filter((h) => !PAGES.includes(h));
+        check('every page the homepage links to has the design', !missing.length, missing.join(', '));
         await ctx.close();
     }
 } finally {

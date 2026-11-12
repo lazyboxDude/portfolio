@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="light">
     <title>CV · Micael Gomes Fernandes</title>
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/space-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/site.css">
     <link rel="stylesheet" href="css/cv.css">
 </head>
-<body>
+<body class="page cv-page">
+    <header>
+        <nav class="nav" aria-label="Main">
+            <a class="nav-logo" href="index.html">._lazybox_</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+            </ul>
+            <a class="nav-cta" href="index.html#contact">Contact</a>
+        </nav>
+    </header>
+
     <!-- The CV is a page, not a PDF file: the visitor saves it as a PDF from the print dialog.
          One <article class="cv"> per language. To add a language, copy an article, translate it,
          give it its own id (the language code) and add a link to the toolbar.
@@ -17,7 +32,7 @@
          Deliberately NOT on this page: address, phone, date of birth, marital status, nationality,
          and the contact details of references. They are available on request. -->
     <nav class="cv-toolbar" aria-label="CV options">
-        <a class="cv-back" href="./">← Back to the site</a>
+        <a class="cv-back" href="index.html">Back to the site</a>
         <ul class="cv-langs">
             <li><a href="#en" lang="en" hreflang="en">English</a></li>
             <li><a href="#de" lang="de" hreflang="de">Deutsch</a></li>
@@ -262,6 +277,20 @@
             <p class="cv-foot">Weitere Angaben und Referenzen auf Anfrage.</p>
         </article>
     </main>
+
+    <footer class="footer">
+        <div class="wrap footer-inner">
+            <p class="footer-name">Micael Gomes Fernandes · gomes-fernandes.ch</p>
+            <ul class="footer-links">
+                <li><a href="https://github.com/lazyboxDude">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/micael-gomes-fernandes">LinkedIn</a></li>
+                <li><a href="dienstplan.html">Dienstplan</a></li>
+                <li><a href="renders.html">Renders</a></li>
+                <li><a href="datenschutz.html">Datenschutz</a></li>
+                <li><a href="nutzungsbedingungen.html">Nutzungsbedingungen</a></li>
+            </ul>
+        </div>
+    </footer>
 
     <script type="module" src="js/cv.js"></script>
 </body>

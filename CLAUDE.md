@@ -13,8 +13,8 @@ Statisches HTML, CSS und Vanilla-JS (ES-Module), kein Build-Schritt, kein Framew
 - `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/dock.js`, `js/agents.js`: die neue interaktive Startseite (`dock.js` = die Box: Startknopf, dann Zuhause der Bots).
 - `tools/check.mjs`, `tools/shoot.mjs`: Prüfung (`node tools/check.mjs`) und Screenshots (`node tools/shoot.mjs --out <Ordner>`), siehe `PLAN.md`, Arbeitsweise.
 - `dienstplan.html`: eigenständige Web-App im Betrieb, nicht kaputtmachen.
-- `datenschutz.html`, `nutzungsbedingungen.html`: Rechtsseiten für die Google-Kalender-Integration des Dienstplans. Nutzen `css/hub.css` und `js/socials.js`.
-- `archive/v1-2026-11/`: eingefrorene alte Website, nicht ändern.
+- `datenschutz.html`, `nutzungsbedingungen.html`, `renders.html`, `cv.html`, `dienstplan.html`: alle Unterseiten haben dasselbe Design wie die Startseite. Sie laden `css/site.css` (Tokens, Schrift, Nav, Footer) und `css/pages.css`, ohne JS, ohne Google-Schriften, ohne Icon-Fonts. Neue Seite = Nav und Footer aus `renders.html` kopieren.
+- `archive/v1-2026-11/`: eingefrorene alte Website (altes Design), nicht ändern und nicht mehr von der Website verlinkt.
 - `.assetsignore`: schließt zu große Dateien vom Cloudflare-Deploy aus (gilt bei Vercel nicht).
 - `vercel.json`: Weiterleitungen. Die alten CV-Dateien unter `archive/v1-2026-11/docs/` (enthalten private Daten) werden auf `cv.html` umgeleitet.
 - `cv.html`, `css/cv.css`, `js/cv.js`: der Lebenslauf als Seite (Deutsch/Englisch), kein PDF im Deploy. Keine privaten Daten auf der Website, siehe `PLAN.md`.

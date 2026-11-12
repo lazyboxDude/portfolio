@@ -3,54 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title>Nutzungsbedingungen | Micael G. Fernandes</title>
-
     <meta name="description" content="Nutzungsbedingungen für gomes-fernandes.ch und die Web-Apps, inklusive des Dienstplan-Tools mit Google-Kalender-Integration.">
     <meta name="robots" content="noindex">
-
     <link rel="icon" type="image/png" href="images/icons/favicon.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <link rel="stylesheet" href="css/hub.css">
-    <style>
-      .legal{background:var(--hub-surface);border:1px solid var(--hub-line);border-radius:var(--hub-radius);
-        padding:32px 30px;margin-top:8px}
-      .legal h2{font-size:18px;margin:28px 0 10px;letter-spacing:-.01em}
-      .legal h2:first-child{margin-top:0}
-      .legal p,.legal li{font-size:14.5px;color:var(--hub-muted);line-height:1.7}
-      .legal ul{margin:6px 0;padding-left:20px}
-      .legal a{color:var(--hub-accent)}
-      .legal .updated{font-family:var(--hub-mono);font-size:11.5px;color:var(--hub-muted);
-        text-transform:uppercase;letter-spacing:.08em;margin-bottom:0}
-    </style>
+    <link rel="preload" href="fonts/space-grotesk-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/pages.css">
 </head>
-<body class="hub">
-
-<div class="hub-shell">
-
-    <header class="hub-header">
-        <a href="index.html" class="hub-logo">
-            <b>Micael G. Fernandes</b>
-            <span>lazyboxdude · gomes-fernandes.ch</span>
-        </a>
-        <nav>
-            <a href="dienstplan.html">Dienstplan</a>
+<body class="page">
+    <header>
+        <nav class="nav" aria-label="Main">
+            <a class="nav-logo" href="index.html">._lazybox_</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+            </ul>
+            <a class="nav-cta" href="index.html#contact">Contact</a>
         </nav>
     </header>
 
-    <a href="dienstplan.html" class="hub-back"><i class="fas fa-arrow-left"></i> Zurück zum Dienstplan</a>
+    <main class="page-main">
+        <a class="back" href="dienstplan.html">Zurück zum Dienstplan</a>
+        <div class="page-head">
+            <p class="eyebrow">Rechtliches</p>
+            <h1 class="title title-xl">Nutzungs&shy;bedingungen</h1>
+            <p class="lede">Gilt für gomes-fernandes.ch und die darauf gehosteten Web-Apps, insbesondere für den <a href="dienstplan.html">Dienstplan</a>.</p>
+        </div>
 
-    <section class="hub-hero" style="padding-top:0;padding-bottom:8px;">
-        <span class="hub-eyebrow"><span class="dot"></span> Rechtliches</span>
-        <h1>Nutzungs&shy;bedingungen</h1>
-        <p>Gilt für gomes-fernandes.ch und die darauf gehosteten Web-Apps, insbesondere für den <a href="dienstplan.html" style="color:var(--hub-accent)">Dienstplan</a>.</p>
-    </section>
-
-    <div class="legal">
+        <div class="prose">
       <p class="updated">Stand: September 2026</p>
 
       <h2>Anbieter</h2>
@@ -83,25 +68,21 @@
 
       <h2>Kontakt</h2>
       <p>Fragen dazu gerne per E-Mail an <a href="mailto:micael@gomes-fernandes.ch">micael@gomes-fernandes.ch</a>.</p>
-    </div>
+        </div>
+    </main>
 
-    <footer class="hub-footer">
-        <p>&copy; 2025 Micael G. Fernandes.</p>
-        <div class="hub-social"></div>
+    <footer class="footer">
+        <div class="wrap footer-inner">
+            <p class="footer-name">Micael Gomes Fernandes · gomes-fernandes.ch</p>
+            <ul class="footer-links">
+                <li><a href="https://github.com/lazyboxDude">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/micael-gomes-fernandes">LinkedIn</a></li>
+                <li><a href="dienstplan.html">Dienstplan</a></li>
+                <li><a href="renders.html">Renders</a></li>
+                <li><a href="datenschutz.html">Datenschutz</a></li>
+                <li><a href="nutzungsbedingungen.html">Nutzungsbedingungen</a></li>
+            </ul>
+        </div>
     </footer>
-
-</div>
-
-<script src="js/socials.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const container = document.querySelector('.hub-social');
-        if (!container || typeof socialLinks === 'undefined') return;
-        container.innerHTML = socialLinks.map(link => {
-            const content = link.customHtml ? link.customHtml : `<i class="${link.icon}"></i>`;
-            return `<a href="${link.url}" target="_blank" rel="noopener" title="${link.platform}">${content}</a>`;
-        }).join('');
-    });
-</script>
 </body>
 </html>
