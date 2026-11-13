@@ -1015,45 +1015,242 @@ html:not(.js) .link { border-bottom: 1px solid var(--fg); }
     font-weight: 500;
 }
 
-/* Skills: five layers, each a cell with its own frame (neighbours share a line) */
-.skills {
+/* Skills (js/skills.js makes the picker from the lists in index.html; the lists are the no-JS version).
+   Six abilities as a ruled grid, below them every tool by layer and a card with the proof. Square, 1px ink. */
+.skills-ui,
+.skills-data { margin-top: 56px; }
+
+.abilities {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    margin: 56px 1px 0 0;
-    padding: 0;
-    list-style: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0 1px 0 0;
 }
 
-.skill {
+.ability {
+    appearance: none;
     position: relative;
-    grid-column: span 2;
-    min-height: 200px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 230px;
     margin: 0 -1px -1px 0;
-    padding: 28px;
+    padding: 28px 32px;
     border: 1px solid var(--fg);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.skill:nth-child(-n + 2) { grid-column: span 3; }
+.ability:hover { background: var(--surface); }
+.ability[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.ability:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; }
+.ability[aria-pressed="true"]:focus-visible { outline-color: var(--accent-on-ink); }
 
-.skill h3 {
-    margin: 0 0 12px;
-    font: 700 clamp(24px, 2.2vw, 32px)/1.1 var(--font-sans);
-    letter-spacing: -0.035em;
+.ability-n {
+    display: block;
+    color: var(--accent);
+    font: 500 12px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
 }
 
-.skill p {
-    margin: 0;
+.ability-h {
+    display: block;
+    margin-top: 36px;
+    font: 700 clamp(28px, 2.5vw, 36px)/1.05 var(--font-sans);
+    letter-spacing: -0.04em;
+}
+
+.ability-t {
+    display: block;
+    margin-top: 14px;
     color: var(--muted);
     font-size: 15px;
-    line-height: 1.55;
+    line-height: 1.5;
 }
 
-.skill .layer {
-    margin-bottom: 28px;
+.ability[aria-pressed="true"] .ability-n,
+.ability[aria-pressed="true"] .accent { color: var(--accent-on-ink); }
+.ability[aria-pressed="true"] .ability-t { color: var(--muted-on-ink); }
+
+.proof-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 48px;
+    margin-top: clamp(64px, 7vw, 96px);
+}
+
+.proof-title {
+    margin: 0;
+    font: 700 clamp(32px, 3.4vw, 48px)/1 var(--font-sans);
+    letter-spacing: -0.04em;
+}
+
+.proof-title .accent { letter-spacing: -0.01em; }
+
+.proof-legend {
+    margin: 0;
+    color: var(--subtle);
+    font: 500 13px/1.4 var(--font-mono);
+}
+
+.proof-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 40px 48px;
+    margin-top: 40px;
+}
+
+.tool-index {
+    position: relative;
+    flex: 1 1 640px;
+    min-width: 0;
+    border-top: 1px solid var(--fg);
+}
+
+.tool-row {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 16px 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--fg);
+    align-items: start;
+}
+
+.tool-layer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding-top: 12px;
+    color: var(--muted);
+    font: 500 12px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tool-layer::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    background: var(--c);
+}
+
+.tool-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tool {
+    appearance: none;
+    margin: 0;
+    padding: 12px 18px;
+    border: 1px solid var(--fg);
+    border-radius: 0;
+    background: var(--surface);
+    color: var(--fg);
+    font: 500 17px/1.2 var(--font-sans);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tool:hover { background: var(--hover); }
+.tool[aria-pressed="true"],
+.tool[aria-pressed="true"]:hover { background: var(--fg); color: var(--bg); }
+.tool.is-related { box-shadow: inset 0 -5px 0 var(--accent); }
+.tool:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.proof-card {
+    position: sticky;
+    top: 24px;
+    flex: 1 1 400px;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 36px 36px 40px;
+    border: 1px solid var(--fg);
+    background: var(--surface);
+}
+
+.proof-layer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
     color: var(--accent);
     font: 500 12px/1.4 var(--font-mono);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+.proof-layer::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    background: var(--c);
+}
+
+.proof-name {
+    margin: 28px 0 0;
+    font: 700 clamp(36px, 3.9vw, 56px)/1 var(--font-sans);
+    letter-spacing: -0.04em;
+    overflow-wrap: anywhere;
+}
+
+.proof-label {
+    margin: 36px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--fg);
+    color: var(--muted);
+    font: 500 12px/1.4 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.proof-item { margin-top: 22px; }
+.proof-when { margin: 0; color: var(--subtle); font: 500 12px/1.4 var(--font-mono); }
+.proof-item-title { margin: 4px 0 0; font: 700 22px/1.2 var(--font-sans); letter-spacing: -0.02em; }
+.proof-text { margin: 8px 0 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
+
+/* Without JS: the same content as plain lists */
+.skills-data { display: grid; gap: 40px; }
+.skills-data ol, .skills-data ul { margin: 0; padding: 0; list-style: none; }
+.data-title { margin: 0; font: 700 28px/1.1 var(--font-sans); letter-spacing: -0.03em; }
+.abilities-data { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+.abilities-data h3 { margin: 0 0 8px; font: 700 24px/1.1 var(--font-sans); letter-spacing: -0.035em; }
+.abilities-data p, .proofs-data p { margin: 0; color: var(--muted); line-height: 1.55; }
+.layers-data { display: grid; gap: 20px; }
+.layers-data h4 { margin: 0 0 6px; color: var(--muted); font: 500 12px/1.4 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.layers-data ul { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.proofs-data { display: grid; gap: 24px; }
+.proofs-data .when { display: block; color: var(--subtle); font: 500 12px/1.4 var(--font-mono); }
+.proofs-data strong { display: block; margin: 4px 0 6px; font: 700 20px/1.2 var(--font-sans); letter-spacing: -0.02em; }
+
+@media (max-width: 1000px) {
+    /* relative, not static: the drawn outline is positioned against the card; max-width leaves room for the 1px it sticks out */
+    .proof-card { position: relative; flex-basis: 100%; max-width: calc(100% - 1px); }
+}
+
+@media (max-width: 900px) {
+    .abilities { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+    .abilities { grid-template-columns: 1fr; }
+    .ability { min-height: 0; padding: 24px 20px; }
+    .ability-h { margin-top: 24px; }
+    .tool-row { grid-template-columns: 1fr; }
+    .tool-layer { padding-top: 0; }
+    .proof-card { padding: 24px 20px 28px; }
 }
 
 .note {
@@ -1074,102 +1271,7 @@ html:not(.js) .link { border-bottom: 1px solid var(--fg); }
 @media (max-width: 720px) {
     .about { grid-template-columns: 1fr; }
     .row { grid-template-columns: 1fr; padding: 24px 20px; }
-    .skills { grid-template-columns: 1fr; }
-    .skill, .skill:nth-child(-n + 2) { grid-column: auto; min-height: 0; padding: 24px 20px; }
     .cell, .renders-head { padding: 24px 20px; }
-}
-
-/* Swarm finale (js/agents.js draws the canvas): light stage, the layer colours stay */
-.swarm {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-    gap: 24px 32px;
-    align-items: center;
-    margin-top: 56px;
-    padding: clamp(16px, 3vw, 28px);
-    border: 1px solid var(--fg);
-    background: var(--surface);
-}
-
-.swarm .swarm-canvas {
-    display: block;
-    width: 100%;
-    height: 520px;
-}
-
-.layer-list {
-    display: grid;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.layer-btn {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-    padding: 14px 18px;
-    border: 1px solid var(--line-strong);
-    border-radius: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font: 500 16px/1.3 var(--font-sans);
-    text-align: left;
-    cursor: pointer;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.layer-btn:hover,
-.layer-btn[aria-pressed="true"] {
-    border-color: var(--fg);
-    background: var(--hover);
-}
-
-.layer-dot {
-    flex: none;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--c);
-}
-
-.layer-n {
-    display: block;
-    margin-bottom: 2px;
-    color: var(--subtle);
-    font: 500 11px/1.4 var(--font-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.swarm-bar {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px 20px;
-}
-
-.swarm-bar .btn[disabled] { opacity: 0.6; cursor: default; }
-.swarm-bar .btn-ghost[aria-pressed="true"] { background: rgba(51, 85, 255, 0.12); }
-
-.swarm-count {
-    margin: 0;
-    color: var(--subtle);
-    font: 500 13px/1 var(--font-mono);
-}
-
-/* Without JS there is nothing to draw or press: only the list of layers stays. */
-html:not(.js) .swarm-canvas,
-html:not(.js) .swarm-bar { display: none; }
-html:not(.js) .swarm { grid-template-columns: 1fr; }
-
-@media (max-width: 720px) {
-    .swarm { grid-template-columns: 1fr; }
-    .swarm .swarm-canvas { height: 380px; }
 }
 
 /* Skip the show: bottom centre, above the page and the docked box, below the bots' cursors. */
@@ -1534,7 +1636,7 @@ html:not(.js) .cta .btn-ghost { border-color: var(--bg); }
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .tile img, .layer-btn, .link, .footer-links a { transition: none; }
+    .tile img, .ability, .tool, .link, .footer-links a { transition: none; }
     .box, .box-lid, .box-gap, .lid-face, .box-count, .box-tip { transition: none; }
     /* The object stands still: isometric pose, no idle. */
     .box-3d, .box-tilt, .box-cube, .box-floor, .box-glow, .box-lid-rattle { animation: none !important; }
