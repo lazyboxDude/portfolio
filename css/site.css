@@ -884,6 +884,13 @@ html:not(.js) .btn-ghost { border-color: var(--fg); }
     line-height: 1.55;
 }
 
+/* Tech line under a case: small mono, like the labels */
+.cell-stack {
+    margin-top: 16px;
+    font: 500 12px/1.5 var(--font-mono);
+    letter-spacing: 0.04em;
+}
+
 .cell-links {
     display: flex;
     flex-wrap: wrap;
