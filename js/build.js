@@ -363,8 +363,9 @@ class Section {
 // ---- The builder -------------------------------------------------------------
 
 export class SiteBuilder {
-    constructor({ swarm, dock, site, glow, status }) {
+    constructor({ swarm, dock, site, glow, status, skip = null }) {
         this.swarm = swarm;
+        this.skipButton = skip; // "Skip animation": shown while something is left to build
         this.dock = dock; // the box: start button, then the bots' home and the button that builds everything again
         this.site = site; // the page
         this.glow = glow;
@@ -391,6 +392,7 @@ export class SiteBuilder {
         this.frame = 0;
         this.guides = new Guides(swarm.layer); // snap lines
         this.bigCount = 0;    // big shapes built so far: every third one overshoots and corrects itself
+        this.skipping = false; // the visitor skipped the show: nothing is animated any more (until the box replays it)
 
         const onScroll = () => {
             if (this.frame) return;
@@ -404,9 +406,11 @@ export class SiteBuilder {
     async run() {
         if (this.busy || this.pumping || this.parked) return;
         this.busy = true;
+        this.skipping = false; // a replay is a new show
         this.syncDock();
         if (this.started) this.reset();
         this.started = true;
+        this.syncSkip(); // after reset(): everything is unbuilt again, so the button comes back
         rememberShow();
         document.documentElement.classList.add('is-live');
         this.site.classList.add('is-live');
@@ -454,6 +458,52 @@ export class SiteBuilder {
     /** The box can only be clicked while no build is running. */
     syncDock() {
         this.dock.setBusy(this.busy || this.pumping);
+        this.syncSkip();
+    }
+
+    /** The skip button is there while there is something left to animate (not with reduced motion: that is built at once anyway). */
+    syncSkip() {
+        if (!this.skipButton) return;
+        const left = !prefersReducedMotion() && !this.skipping && this.sections.some((s) => s.state !== 'built');
+        this.skipButton.hidden = !left;
+    }
+
+    /**
+     * Skip the show. Before the first click: the finished page at once, the box in its corner, the bots at home (the same
+     * state as after a reload). While the bots build: the section being built is cancelled (each bot finishes the stroke it
+     * is making, a second at most), then it stands finished, and nothing after it is animated. The box replays the show.
+     */
+    async skip() {
+        if (this.skipping) return;
+        if (!this.started) {
+            rememberShow();
+            window.scrollTo(0, 0);
+            this.restore();
+            this.afterSkip();
+            return;
+        }
+        if (!this.busy && !this.pumping) return;
+        this.skipping = true;
+        this.afterSkip();
+        const s = this.current;
+        if (s && !s.cancelled) {
+            s.cancelled = true;
+            s.release?.();
+        }
+        for (const other of this.sections) if (other.state === 'idle') this.showSection(other);
+    }
+
+    /** Skipped: keyboard focus goes to the page (the button is gone), the bots stand quiet. */
+    afterSkip() {
+        this.site.focus({ preventScroll: true });
+        this.syncSkip();
+    }
+
+    /** Whatever a cancelled build left behind: tags, pressed cursors, snap lines, the focus ring. */
+    tidy() {
+        for (const bot of this.crew) { bot?.release(); bot?.hideTag(); }
+        this.ring?.hide();
+        this.guides.clear();
     }
 
     /** Back to the empty page (the glow fades out on its own). */
@@ -596,8 +646,13 @@ export class SiteBuilder {
         try {
             const scrolledPast = !section.isHero && section.el.getBoundingClientRect().bottom < 0;
             const instant = section.el.hasAttribute('data-instant');
-            if (prefersReducedMotion() || scrolledPast || instant) this.showSection(section);
-            else await this.animate(section, origin);
+            if (prefersReducedMotion() || scrolledPast || instant || this.skipping) {
+                if (this.skipping && section.isHero) await fontsReady(); // the name's ticker measures the final font
+                this.showSection(section);
+            } else {
+                await this.animate(section, origin);
+                if (this.skipping) { this.tidy(); this.showSection(section); } // the bots have wound down: now it is final
+            }
         } catch (error) {
             // Whatever went wrong: the visitor must never be left with a half-built page.
             console.error(error);

@@ -884,6 +884,13 @@ html:not(.js) .btn-ghost { border-color: var(--fg); }
     line-height: 1.55;
 }
 
+/* Tech line under a case: small mono, like the labels */
+.cell-stack {
+    margin-top: 16px;
+    font: 500 12px/1.5 var(--font-mono);
+    letter-spacing: 0.04em;
+}
+
 .cell-links {
     display: flex;
     flex-wrap: wrap;
@@ -1165,6 +1172,31 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
     .swarm .swarm-canvas { height: 380px; }
 }
 
+/* Skip the show: bottom centre, above the page and the docked box, below the bots' cursors. */
+.skip {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    z-index: 8;
+    translate: -50% 0;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid var(--fg);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 700 12px/1 var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.skip:hover { background: var(--fg); color: var(--bg); }
+
+@media (max-width: 760px) { .skip { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); } }
+
 /* Contact: one ink block, left aligned */
 .cta {
     --outline: var(--bg);
@@ -1191,6 +1223,10 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
     margin: 24px 0 0;
     color: var(--muted-on-ink);
 }
+
+.cta .cta-links { padding-top: 20px; }
+.cta .link:hover { color: var(--accent-on-ink); }
+html:not(.js) .cta .link { border-bottom-color: var(--bg); }
 
 .cta .btn-solid { background: var(--bg); color: var(--fg); }
 .cta .btn-solid:hover { background: #fff; color: var(--fg); }
