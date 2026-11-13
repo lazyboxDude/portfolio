@@ -151,7 +151,7 @@ html:not(.js) .glow { opacity: 1; }
     position: absolute;
     z-index: -1; /* behind the name: it blends with whatever stands behind it */
     top: 0;
-    right: 0;
+    left: calc(50% - var(--bw) / 2); /* centred in the slot on small screens (desktop overrides below) */
     width: var(--bw);
     transform-origin: 0 0; /* the flight to the corner scales from the top-left corner */
     visibility: visible;   /* the page is hidden before the first click, the box is not */
@@ -167,6 +167,7 @@ html:not(.js) .glow { opacity: 1; }
     /* Centred (a bit high) on the name, whose height is 12.75vw. */
     .box-wrap {
         top: auto;
+        left: auto;
         right: 5vw;
         bottom: calc(-5.6vw - var(--bw) * 0.605);
     }
@@ -177,6 +178,7 @@ html:not(.js) .glow { opacity: 1; }
     position: fixed;
     z-index: 6;
     top: auto;
+    left: auto;
     right: calc(24px + env(safe-area-inset-right, 0px));
     bottom: calc(24px + env(safe-area-inset-bottom, 0px));
     width: 120px;
@@ -273,7 +275,7 @@ html:not(.js) .glow { opacity: 1; }
     white-space: nowrap;
 }
 
-/* Narrow screens: the box hugs the right edge, so the hint goes to its left. */
+/* Narrow screens: the box is centred, the hint goes to its left. */
 @media (max-width: 999px) {
     .box-hint { left: auto; right: 64%; top: 18%; }
 }
@@ -336,6 +338,12 @@ html:not(.js) .box-slot { display: none; }
     min-height: 100svh;
     display: flex;
     flex-direction: column;
+}
+
+/* Tall windows wider than a phone (tablet portrait, a narrow desktop window): the hero must not stretch to the full
+   height, or the free slot above the name turns into a huge empty gap. */
+@media (min-width: 761px) and (orientation: portrait) {
+    .s-hero { min-height: min(100svh, 85vw); }
 }
 
 /* With JS nothing of the page is shown (or focusable) before the first click. */
