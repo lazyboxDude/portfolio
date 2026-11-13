@@ -1192,6 +1192,10 @@ html:not(.js) .swarm { grid-template-columns: 1fr; }
     color: var(--muted-on-ink);
 }
 
+.cta .cta-links { padding-top: 20px; }
+.cta .link:hover { color: var(--accent-on-ink); }
+html:not(.js) .cta .link { border-bottom-color: var(--bg); }
+
 .cta .btn-solid { background: var(--bg); color: var(--fg); }
 .cta .btn-solid:hover { background: #fff; color: var(--fg); }
 .cta .btn-ghost { --outline: var(--bg); color: var(--bg); }

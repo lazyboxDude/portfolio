@@ -12,6 +12,7 @@ Statisches HTML, CSS und Vanilla-JS (ES-Module), kein Build-Schritt, kein Framew
 ## Struktur
 - `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/dock.js`, `js/agents.js`, `js/marquee.js`: die neue interaktive Startseite (`dock.js` = die Box: Startknopf, dann Zuhause der Bots; `marquee.js` = der Name als Laufband).
 - `tools/check.mjs`, `tools/shoot.mjs`: Prüfung (`node tools/check.mjs`) und Screenshots (`node tools/shoot.mjs --out <Ordner>`), siehe `PLAN.md`, Arbeitsweise.
+- `tools/og.mjs`: nimmt das Vorschaubild `images/og.jpg` (Open Graph) neu auf.
 - `dienstplan.html`: eigenständige Web-App im Betrieb, nicht kaputtmachen.
 - `datenschutz.html`, `nutzungsbedingungen.html`, `renders.html`, `cv.html`, `dienstplan.html`: alle Unterseiten haben dasselbe Design wie die Startseite. Sie laden `css/site.css` (Tokens, Schrift, Nav, Footer) und `css/pages.css`, ohne JS, ohne Google-Schriften, ohne Icon-Fonts. Neue Seite = Nav und Footer aus `renders.html` kopieren.
 - `archive/v1-2026-11/`: eingefrorene alte Website (altes Design), nicht ändern und nicht mehr von der Website verlinkt.
