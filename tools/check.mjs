@@ -285,6 +285,21 @@ try {
         await fresh.reload();
         check('a tab that has not started the show starts on top with the box', await fresh.evaluate(() => scrollY === 0 && document.getElementById('box-wrap').classList.contains('is-start')));
         await fresh.context().close();
+
+        // The start box stands in the middle of the screen, on every screen shape (also tall ones).
+        for (const [label, viewport] of [['desktop', VIEWPORTS.desktop], ['phone', VIEWPORTS.mobile], ['tall window', { width: 1020, height: 1830 }]]) {
+            const c = await browser.newContext({ viewport });
+            const p = await c.newPage();
+            await p.goto(server.url + '/index.html');
+            await p.evaluate(() => document.fonts.ready);
+            await p.waitForTimeout(200);
+            const mid = await p.evaluate(() => {
+                const r = document.getElementById('box-wrap').getBoundingClientRect();
+                return { dx: Math.round(r.left + r.width / 2 - innerWidth / 2), dy: Math.round(r.top + r.height / 2 - innerHeight / 2) };
+            });
+            check(`${label}: the start box is centred on the screen`, Math.abs(mid.dx) <= 2 && Math.abs(mid.dy) <= 2, JSON.stringify(mid));
+            await c.close();
+        }
     }
 
     // ---- Scrolling while the box flies: it still lands exactly in the corner --------------------
@@ -294,7 +309,8 @@ try {
         await page.goto(server.url + '/index.html');
         await page.evaluate(() => document.fonts.ready);
         await startBuild(page);
-        await page.waitForFunction(() => document.getElementById('box-wrap').getAnimations().length > 0, null, { timeout: 40000 });
+        // (the flight animates `transform`; the short settle from the screen centre at the start animates `translate`)
+        await page.waitForFunction(() => document.getElementById('box-wrap').getAnimations().some((a) => a.effect.getKeyframes().some((k) => 'transform' in k)), null, { timeout: 40000 });
         // Record where the box is on every frame of the flight, then scroll once in the middle of it.
         await page.evaluate(() => {
             window.__last = null;

@@ -412,9 +412,10 @@ export class SiteBuilder {
         this.site.classList.add('is-live');
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         this.site.focus({ preventScroll: true }); // keep keyboard focus somewhere sensible while building
-        const origin = this.dock.entry(); // the opening of the box
         const reduced = prefersReducedMotion();
-        this.dock.open(); // the lid lifts, the bots come out; the box travels to its corner once the name is typed (data-dock-after)
+        this.dock.open(); // the lid lifts while the box settles into its place; the box travels to its corner once the name is typed (data-dock-after)
+        await this.dock.settled;
+        const origin = this.dock.entry(); // the opening of the box, where it stands now: the bots come out of it there
         try {
             if (reduced) {
                 this.dock.fly({ instant: true });
