@@ -406,6 +406,10 @@
         </footer>
     </div>
 
+    <!-- Skip the show: the finished page at once (or, while the bots build, as soon as they have finished their current
+         stroke). Shown by js/build.js (SiteBuilder.syncSkip) only while there is something left to build; hidden without JS. -->
+    <button id="skip" class="skip" type="button" hidden>Skip animation</button>
+
     <!-- Announces build progress to screen readers -->
     <p id="status" class="sr-only" role="status"></p>
 

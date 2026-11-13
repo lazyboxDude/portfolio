@@ -20,6 +20,7 @@ const builder = new SiteBuilder({
     site: document.getElementById('site'),
     glow: document.getElementById('glow'),
     status: document.getElementById('status'),
+    skip: document.getElementById('skip'),
 });
 
 // Reload, back button, a link back from another page: show the finished page at once if this tab has seen the show
@@ -43,6 +44,10 @@ box.addEventListener('click', () => {
     setTimeout(() => box.classList.remove('is-pressed'), 120);
     builder.run();
 });
+
+// Skip the show (visible before the first click and while bots are building).
+document.getElementById('skip').addEventListener('click', () => builder.skip());
+builder.syncSkip();
 
 // The swarm finale: hundreds of agents on a canvas, drawn from the same animation loop as the bots.
 const swarmStage = document.querySelector('.swarm');

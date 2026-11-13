@@ -355,6 +355,124 @@ try {
         await ctx.close();
     }
 
+    // ---- Skip the show ----------------------------------------------------------------------------
+    /** Runs in the page: what a finished page looks like (section rects, leftovers of a cancelled build). */
+    const FINISHED = () => ({
+        rects: [...document.querySelectorAll('[data-section]')].map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.top + scrollY), Math.round(r.height)]; }),
+        missing: document.querySelectorAll('#site [data-section] .ch:not(.on)').length,
+        building: document.querySelectorAll('#site .is-building, #site .is-framing, #site .shell, #site .sel-frame').length,
+        hiddenBoxes: [...document.querySelectorAll('#site [data-box]')].filter((e) => !e.classList.contains('is-shown')).length,
+        tags: document.querySelectorAll('.inspector-tag.is-visible, .snap-line.is-on').length,
+        unlocked: getComputedStyle(document.documentElement).overflowY !== 'hidden' && getComputedStyle(document.getElementById('site')).visibility !== 'hidden',
+        docked: document.getElementById('box-wrap').classList.contains('is-home'),
+        skipHidden: document.getElementById('skip').hidden,
+        status: document.getElementById('status').textContent,
+    });
+    const sameRects = (a, b) => a.length === b.length && a.every((r, i) => Math.abs(r[0] - b[i][0]) <= 2 && Math.abs(r[1] - b[i][1]) <= 2);
+    const finished = (st) => st.missing === 0 && st.building === 0 && st.hiddenBoxes === 0 && st.tags === 0 && st.unlocked && st.docked && st.skipHidden;
+
+    // Before the first click: the finished page at once.
+    {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        const shown = await page.evaluate(() => !document.getElementById('skip').hidden);
+        const t0 = Date.now();
+        await page.locator('#skip').click();
+        const st = await page.evaluate(FINISHED);
+        const focus = await page.evaluate(() => document.activeElement?.id);
+        check('skip before the start: the finished page stands at once, box docked, button gone', shown && finished(st) && st.status === 'Website built.' && Date.now() - t0 < 1500, JSON.stringify(st));
+        check('skip: keyboard focus moves to the page, no script errors', focus === 'site' && !errors.length, `${focus} ${errors.join(' | ')}`);
+        await page.waitForTimeout(400);
+        const again = await page.evaluate(() => document.getElementById('box').getAttribute('aria-disabled'));
+        // Same page after a reload (the restored page): same geometry.
+        await page.reload();
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(300);
+        const restored = await page.evaluate(FINISHED);
+        check('skip before the start: same layout as the restored page', sameRects(st.rects, restored.rects), `${JSON.stringify(st.rects)} vs ${JSON.stringify(restored.rects)}`);
+        // The box plays the show again, and the button comes back with it.
+        await page.locator('#box').click({ force: true });
+        await page.waitForTimeout(800);
+        const replay = await page.evaluate(() => ({ off: document.getElementById('box').getAttribute('aria-disabled'), skip: !document.getElementById('skip').hidden }));
+        check('after a skip the box still replays the show (with its skip button)', again === 'false' && replay.off === 'true' && replay.skip, JSON.stringify({ again, ...replay }));
+        await ctx.close();
+    }
+
+    // With reduced motion there is nothing to skip: no button.
+    {
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: 'reduce' });
+        const page = await ctx.newPage();
+        await page.goto(server.url + '/index.html');
+        const hidden = await page.evaluate(() => document.getElementById('skip').hidden);
+        const nojs = await (async () => {
+            const c = await browser.newContext({ viewport: VIEWPORTS.desktop, javaScriptEnabled: false });
+            const p = await c.newPage();
+            await p.goto(server.url + '/index.html');
+            const d = await p.locator('#skip').isVisible();
+            await c.close();
+            return !d;
+        })();
+        check('no skip button with reduced motion or without JS', hidden && nojs);
+        await ctx.close();
+    }
+
+    if (!quick) {
+        // While the bots build the hero: they wind down, then everything stands.
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        await startBuild(page);
+        await page.waitForTimeout(4500);
+        const t0 = Date.now();
+        await page.locator('#skip').click();
+        let ok = true;
+        try { await page.waitForFunction(() => document.getElementById('status').textContent === 'Website built.', null, { timeout: 12000 }); } catch { ok = false; }
+        const took = Date.now() - t0;
+        // The page stands at once; the box may still be on its way to the corner (the flight is not cut short).
+        try { await page.waitForFunction(() => document.getElementById('box-wrap').classList.contains('is-home'), null, { timeout: 4000 }); } catch { /* reported below */ }
+        await page.waitForTimeout(300);
+        const st = await page.evaluate(FINISHED);
+        const nan = await page.evaluate(() => [...document.querySelectorAll('#cursor-layer *')].some((e) => /NaN/.test(e.getAttribute('style') ?? '')));
+        const marquee = await page.evaluate(() => document.querySelector('#headline').classList.contains('is-running') || getComputedStyle(document.querySelector('#headline')).animationName !== 'none');
+        check('skip while the hero is built: the bots wind down, then everything stands', ok && finished(st) && !nan && !errors.length, `${took} ms ${JSON.stringify(st)} ${errors.join(' | ')}`);
+        check('skip while the hero is built: done within a few seconds', took < 6000, `${took} ms`);
+        await page.reload();
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(300);
+        const restored = await page.evaluate(FINISHED);
+        check('skip while the hero is built: same layout as the restored page', sameRects(st.rects, restored.rects), `${JSON.stringify(st.rects)} vs ${JSON.stringify(restored.rects)}`);
+        await ctx.close();
+    }
+
+    if (!quick) {
+        // While a later section is built (scrolled there after the hero stood).
+        const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+        const page = await ctx.newPage();
+        const errors = [];
+        page.on('pageerror', (e) => errors.push(e.message));
+        await page.goto(server.url + '/index.html');
+        await page.evaluate(() => document.fonts.ready);
+        await startBuild(page);
+        await page.waitForFunction(HERO_BUILT, null, { timeout: 60000 });
+        await page.evaluate(() => window.scrollTo({ top: document.getElementById('projects').offsetTop - 60, behavior: 'instant' }));
+        await page.waitForTimeout(2500);
+        const visible = await page.evaluate(() => !document.getElementById('skip').hidden);
+        await page.locator('#skip').click();
+        let ok = true;
+        try { await page.waitForFunction(() => document.getElementById('skip').hidden && document.getElementById('status').textContent === 'Website built.' && document.getElementById('box').getAttribute('aria-disabled') === 'false', null, { timeout: 12000 }); } catch { ok = false; }
+        await page.waitForTimeout(500);
+        const st = await page.evaluate(FINISHED);
+        check('skip while a later section is built: the rest stands at once, the box is free again', visible && ok && finished(st) && !errors.length, JSON.stringify(st) + errors.join(' | '));
+        await ctx.close();
+    }
+
     // ---- No JS -----------------------------------------------------------------------------------
     {
         const ctx = await browser.newContext({ viewport: VIEWPORTS.mobile, javaScriptEnabled: false });
