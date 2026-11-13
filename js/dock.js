@@ -33,8 +33,28 @@ export class Dock {
 
         swarm.home = this;
         swarm.stateHooks.add(() => this.render());
-        window.addEventListener('resize', () => { this.rect = null; }, { passive: true });
+        this.glide = null;    // the animation that settles the box from the screen centre into its place in the hero
+        window.addEventListener('resize', () => { this.rect = null; this.centerOnScreen(); }, { passive: true });
+        window.addEventListener('load', () => this.centerOnScreen());
+        document.fonts?.ready.then(() => this.centerOnScreen());
+        this.centerOnScreen();
         this.canReceive = () => true; // replaced by the builder: bots only go home while nothing is being built
+    }
+
+    /**
+     * Before the first click the box is all the visitor sees: put it in the middle of the screen (both axes), whatever
+     * the layout of the hero behind it. It is only shifted with the `translate` property (the flight to the corner uses
+     * `transform`, so the two never collide); open() lets it settle into its real place.
+     */
+    centerOnScreen() {
+        if (this.state !== 'start') return;
+        const { wrap } = this;
+        wrap.style.translate = 'none'; // measure the box at its place in the hero
+        const r = wrap.getBoundingClientRect();
+        if (!r.width) return;
+        const dx = window.innerWidth / 2 - (r.left + r.width / 2);
+        const dy = window.innerHeight / 2 - (r.top + r.height / 2);
+        wrap.style.translate = `${dx.toFixed(1)}px ${dy.toFixed(1)}px`;
     }
 
     get disabled() { return this.button.getAttribute('aria-disabled') === 'true'; }
@@ -64,11 +84,17 @@ export class Dock {
     }
 
     /** The lid lifts and the hint goes (CSS); the box is not a start button any more. */
-    open() {
+    open({ glide = true } = {}) {
         if (this.state !== 'start') return;
         this.state = 'open';
         this.wrap.classList.remove('is-start');
         this.setLabel('Call the bots');
+        // The box settles from the screen centre into its place in the hero (not with reduced motion, not when it docks at once).
+        const from = this.wrap.style.translate;
+        this.wrap.style.translate = '';
+        if (glide && from && from !== 'none' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            this.glide = this.wrap.animate({ translate: [from, '0px 0px'] }, { duration: 700, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
+        }
     }
 
     /**
@@ -76,9 +102,10 @@ export class Dock {
      * Call it after the page is live: the target is measured, and the layout must be final.
      */
     async fly({ instant = false } = {}) {
-        this.open();
+        this.open({ glide: !instant });
         if (this.state !== 'open') return;
         const { wrap } = this;
+        this.glide?.cancel(); // measure the box at its real place
         this.state = 'flying';
 
         const first = wrap.getBoundingClientRect();
