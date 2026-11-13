@@ -14,7 +14,7 @@ const check = (name, ok, detail = '') => {
 };
 
 const BOTS = 5; // layout, copy, design, a11y, motion
-const IDS = ['box', 'box-wrap', 'box-count', 'cursor-layer', 'site', 'glow', 'status', 'swarm-canvas', 'swarm-count', 'swarm-more', 'swarm-stack', 'headline', 'hello', 'nav', 'nav-cta'];
+const IDS = ['box', 'box-wrap', 'box-count', 'cursor-layer', 'site', 'glow', 'status', 'headline', 'hello', 'nav', 'nav-cta'];
 
 /** Runs in the page: contrast of every visible text node against the first opaque ancestor background. */
 const CONTRAST = () => {
@@ -56,7 +56,7 @@ const CONTRAST = () => {
 /** Runs in the page: interactive things in the hero, nav, buttons and footer that are smaller than 40px. */
 const TOUCH = () => {
     const small = [];
-    for (const el of document.querySelectorAll('.s-hero a, .btn, .nav-cta, .footer a, .layer-btn, #box')) {
+    for (const el of document.querySelectorAll('.s-hero a, .btn, .nav-cta, .footer a, .ability, .tool, #box')) {
         const r = el.getBoundingClientRect();
         const cs = getComputedStyle(el);
         if (!r.width || cs.visibility === 'hidden' || cs.display === 'none') continue;
@@ -94,12 +94,22 @@ try {
         check('no script errors on load', !errors.length, errors.join(' | '));
         check('Space Grotesk and Instrument Serif are loaded', await page.evaluate(() => document.fonts.check('700 20px "Space Grotesk"') && document.fonts.check('italic 20px "Instrument Serif"')));
 
-        // The swarm's agents are named after the skills (tools of each skill, see agents.js toolNames).
-        const names = await page.evaluate(async () => {
-            const { toolNames } = await import('/js/agents.js');
-            return [toolNames('Blender · Autodesk Maya · Affinity Photo, Publisher, Designer'), toolNames('C++ · Blueprint · Python · GDScript, for my own prototypes'), toolNames('Unreal Engine 5 · Unity · Godot 4'), toolNames('Claude for code · Gemini for research · Microsoft Copilot')];
+        // The Skills picker (js/skills.js): six abilities, every tool, a proof card that follows the clicks.
+        const picker = await page.evaluate(() => {
+            const sel = () => document.querySelector('.proof-name')?.textContent;
+            const first = { abilities: document.querySelectorAll('.ability').length, tools: document.querySelectorAll('.tool').length, name: sel(), data: !!document.getElementById('skills-data') };
+            const tool = document.querySelector('.tool[data-tool="unity"]');
+            tool.click();
+            const unity = { name: sel(), proofs: document.querySelectorAll('.proof-item').length, pressed: tool.getAttribute('aria-pressed') };
+            document.querySelectorAll('.ability')[1].click(); // Make: Blender first, its tools are marked
+            const make = { name: sel(), related: document.querySelectorAll('.tool.is-related').length, pressedAbility: document.querySelectorAll('.ability[aria-pressed="true"]').length };
+            const none = document.querySelector('.tool[data-tool="painter"]');
+            none.click();
+            const bare = document.querySelector('.proof-item-title')?.textContent;
+            return { first, unity, make, bare };
         });
-        check('swarm agents are named after the tools of the skills', names[0].join() === 'blender-agent,autodesk-maya-agent,affinity-photo-agent' && names[1].join() === 'cpp-agent,blueprint-agent,python-agent,gdscript-agent' && names[2].join() === 'unreal-engine-5-agent,unity-agent,godot-4-agent' && names[3].join() === 'claude-for-code-agent,gemini-for-research-agent,microsoft-copilot-agent', JSON.stringify(names));
+        check('skills picker: 6 abilities, 23 tools, Build > JavaScript at the start', picker.first.abilities === 6 && picker.first.tools === 23 && picker.first.name === 'JavaScript' && !picker.first.data, JSON.stringify(picker.first));
+        check('skills picker: a tool shows its proof, an ability marks its tools, a tool without proof says so', picker.unity.name === 'Unity' && picker.unity.proofs === 2 && picker.unity.pressed === 'true' && picker.make.name === 'Blender' && picker.make.related === 5 && picker.make.pressedAbility === 1 && picker.bare === 'Part of the layer', JSON.stringify(picker));
 
         // Tokens: contrast pairs from the :root custom properties.
         const tokens = await page.evaluate(() => {
@@ -140,7 +150,7 @@ try {
         check(`[${label}] h1 is the name, one line, 700, hero isolated`, hero.lines === 1 && hero.weight === '700' && hero.iso === 'isolate' && hero.text.includes('Micael Gomes Fernandes'), JSON.stringify(hero));
         check(`[${label}] blend only on desktop`, label === 'desktop' ? hero.blend === 'difference' : hero.blend === 'normal', hero.blend);
         if (label === 'desktop') check('[desktop] nav is 72px high', Math.abs(hero.navH - 73) <= 1.5, `${hero.navH}px incl. line`);
-        const radius = await page.evaluate(() => [...document.querySelectorAll('.btn, .nav-cta, .layer-btn, .box')].filter((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) !== 0).map((e) => e.className));
+        const radius = await page.evaluate(() => [...document.querySelectorAll('.btn, .nav-cta, .ability, .tool, .box')].filter((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) !== 0).map((e) => e.className));
         check(`[${label}] buttons are square`, !radius.length, radius.join(', '));
         const still = await page.evaluate(() => !document.querySelector('#headline.is-marquee') && !document.querySelector('.marquee-clone'));
         check(`[${label}] reduced motion: the name stands still (no ticker, no copies)`, still);
@@ -485,6 +495,8 @@ try {
             h1: getComputedStyle(document.querySelector('h1')).color,
         }));
         check('without JS everything is visible, no start box', state.hidden === 0 && state.box === 'none', JSON.stringify(state));
+        const lists = await page.evaluate(() => ({ abilities: document.querySelectorAll('.abilities-data > li').length, tools: document.querySelectorAll('.layers-data li[data-tool]').length, proofs: document.querySelectorAll('.proofs-data > li').length, vis: getComputedStyle(document.getElementById('skills-data')).display }));
+        check('without JS the skills are plain lists (6 abilities, 23 tools, 10 proofs)', lists.abilities === 6 && lists.tools === 23 && lists.proofs === 10 && lists.vis !== 'none', JSON.stringify(lists));
         await ctx.close();
     }
 

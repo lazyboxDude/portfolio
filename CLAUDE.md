@@ -10,7 +10,7 @@ Pro PR genau ein Roadmap-Schritt, danach `PLAN.md` (Status/Roadmap) aktualisiere
 Statisches HTML, CSS und Vanilla-JS (ES-Module), kein Build-Schritt, kein Framework. Deploy über Vercel (statisch, Konfiguration in `vercel.json`). Domain bei GoDaddy, DNS und Proxy über Cloudflare.
 
 ## Struktur
-- `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/dock.js`, `js/agents.js`, `js/marquee.js`: die neue interaktive Startseite (`dock.js` = die Box: Startknopf, dann Zuhause der Bots; `marquee.js` = der Name als Laufband).
+- `index.html`, `css/site.css`, `js/main.js`, `js/cursors.js`, `js/build.js`, `js/dock.js`, `js/skills.js`, `js/marquee.js`: die neue interaktive Startseite (`dock.js` = die Box: Startknopf, dann Zuhause der Bots; `marquee.js` = der Name als Laufband, `skills.js` = der Skills-Picker, gebaut aus den Listen in `#skills-data`).
 - `tools/check.mjs`, `tools/shoot.mjs`: Prüfung (`node tools/check.mjs`) und Screenshots (`node tools/shoot.mjs --out <Ordner>`), siehe `PLAN.md`, Arbeitsweise.
 - `tools/og.mjs`: nimmt das Vorschaubild `images/og.jpg` (Open Graph) neu auf.
 - `dienstplan.html`: eigenständige Web-App im Betrieb, nicht kaputtmachen.

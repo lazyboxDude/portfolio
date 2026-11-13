@@ -313,62 +313,111 @@
             </div>
         </section>
 
-        <section id="skills" class="section" data-section aria-labelledby="skills-title">
+        <!-- Skills: six abilities (a grid of buttons) and, below, every tool by layer with the proof where it was used.
+             The lists inside #skills-data are the single source and the no-JS version: js/skills.js reads them and builds the
+             picker (the abilities grid, the tool index and the proof card) from them before the build starts, so the bots
+             build the real thing. data-tools = ids of data-tool, data-proofs = ids of the proofs below. -->
+        <section id="skills" class="section" data-section data-type-ms="5000" aria-labelledby="skills-title">
             <div class="wrap">
                 <p class="eyebrow" data-type>Skills</p>
-                <h2 id="skills-title" class="title title-xl" data-type>Five layers, <em class="accent">one stack.</em></h2>
-                <ul class="skills" data-grid>
-                    <li class="skill" data-box="fast">
-                        <p class="layer" data-type>Layer 1</p>
-                        <h3 data-type>Business &amp; operations</h3>
-                        <p data-type data-a11y>Kaufmann EFZ · e-commerce · live operation · documentation · MS Office</p>
-                    </li>
-                    <li class="skill" data-box="fast">
-                        <p class="layer" data-type>Layer 2</p>
-                        <h3 data-type>3D &amp; graphics</h3>
-                        <p data-type>Blender · Autodesk Maya · Substance Painter · Substance Designer · Affinity Photo, Publisher, Designer</p>
-                    </li>
-                    <li class="skill" data-box="fast">
-                        <p class="layer" data-type>Layer 3</p>
-                        <h3 data-type>Game engines</h3>
-                        <p data-type>Unreal Engine 5 · Unity · Godot 4</p>
-                    </li>
-                    <li class="skill" data-box="fast">
-                        <p class="layer" data-type>Layer 4</p>
-                        <h3 data-type>Programming</h3>
-                        <p data-type>C++ · Blueprint · Python · GDScript, for my own prototypes</p>
-                    </li>
-                    <li class="skill" data-box="fast">
-                        <p class="layer" data-type>Layer 5</p>
-                        <h3 data-type>AI tools</h3>
-                        <p data-type>Claude for code · Gemini for research · Microsoft Copilot</p>
-                    </li>
-                </ul>
-                <p class="note" data-type>Languages: German (native), English (B2)</p>
-            </div>
-        </section>
+                <h2 id="skills-title" class="title title-xl" data-type>What I can do <em class="accent">for you.</em></h2>
+                <p class="lede" data-type data-a11y>Six things I do, and the tools behind each of them. Pick one and its tools light up. Pick a tool and you see where I used it.</p>
 
-        <section id="swarm" class="section" data-section aria-labelledby="swarm-title">
-            <div class="wrap">
-                <p class="eyebrow" data-type>The stack, alive</p>
-                <h2 id="swarm-title" class="title" data-type>Press the button, <em class="accent">they multiply.</em></h2>
-                <p class="lede" data-type>The same five layers as a swarm. Every cursor is a small agent with a job. Add more of them and watch the layers fill up.</p>
-                <div class="swarm" data-box data-frame="none">
-                    <!-- Decorative picture, drawn by js/agents.js. The list on the right says the same in words. -->
-                    <canvas id="swarm-canvas" class="swarm-canvas" aria-hidden="true"></canvas>
-                    <ol class="layer-list" aria-label="The five layers, top to bottom">
-                        <li><button class="layer-btn" type="button" data-layer="4" aria-pressed="false"><span class="layer-dot" style="--c:#ff8fb8"></span><span><span class="layer-n">Layer 5</span>AI tools</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="3" aria-pressed="false"><span class="layer-dot" style="--c:#ffc766"></span><span><span class="layer-n">Layer 4</span>Programming</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="2" aria-pressed="false"><span class="layer-dot" style="--c:#6fe3a5"></span><span><span class="layer-n">Layer 3</span>Game engines</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="1" aria-pressed="false"><span class="layer-dot" style="--c:#5fd4f0"></span><span><span class="layer-n">Layer 2</span>3D &amp; graphics</span></button></li>
-                        <li><button class="layer-btn" type="button" data-layer="0" aria-pressed="false"><span class="layer-dot" style="--c:#7b95ff"></span><span><span class="layer-n">Layer 1</span>Business &amp; operations</span></button></li>
+                <div id="skills-data" class="skills-data">
+                    <ol class="abilities-data">
+                        <li data-ability="design" data-tools="unity docs">
+                            <h3><em class="accent">Design</em> whole player experiences</h3>
+                            <p>Co-design, concept and strategic planning.</p>
+                        </li>
+                        <li data-ability="make" data-tools="blender maya painter sdesigner affinity">
+                            <h3><em class="accent">Make</em> the 3D and the look</h3>
+                            <p>Modelling, lighting and renders.</p>
+                        </li>
+                        <li data-ability="proto" data-tools="unreal unity godot cpp bp py gd">
+                            <h3><em class="accent">Prototype</em> in real engines</h3>
+                            <p>Own prototypes in three engines.</p>
+                        </li>
+                        <li data-ability="build" data-tools="js pdfjs gcal claude">
+                            <h3><em class="accent">Build</em> tools that solve a task</h3>
+                            <p>In daily use, not a demo.</p>
+                        </li>
+                        <li data-ability="doc" data-tools="docs office copilot">
+                            <h3><em class="accent">Document</em> it so others can build</h3>
+                            <p>The interface to development.</p>
+                        </li>
+                        <li data-ability="run" data-tools="live ecom kauf">
+                            <h3><em class="accent">Keep</em> things running</h3>
+                            <p>Live operation and a commercial base.</p>
+                        </li>
                     </ol>
-                    <div class="swarm-bar">
-                        <button id="swarm-more" class="btn btn-solid" type="button" data-a11y>More agents</button>
-                        <button id="swarm-stack" class="btn btn-ghost" type="button" aria-pressed="false" data-outline><span class="stack-label">Stack them up</span></button>
-                        <p id="swarm-count" class="swarm-count" role="status">16 agents · 5 layers</p>
-                    </div>
+
+                    <h3 class="data-title">Tools, by layer</h3>
+                    <ul class="layers-data">
+                        <li data-layer="1" data-color="#7b95ff">
+                            <h4>Layer 1 · Business &amp; operations</h4>
+                            <ul>
+                                <li data-tool="kauf" data-proofs="gustello">Kaufmann EFZ</li>
+                                <li data-tool="ecom" data-proofs="gustello">E-commerce</li>
+                                <li data-tool="live" data-proofs="cinema">Live operation</li>
+                                <li data-tool="docs" data-proofs="moonflux">Documentation</li>
+                                <li data-tool="office">MS Office</li>
+                            </ul>
+                        </li>
+                        <li data-layer="2" data-color="#5fd4f0">
+                            <h4>Layer 2 · 3D &amp; graphics</h4>
+                            <ul>
+                                <li data-tool="blender" data-proofs="raumgleiter">Blender</li>
+                                <li data-tool="maya" data-proofs="maya-2024 maya-2023">Autodesk Maya</li>
+                                <li data-tool="painter">Substance Painter</li>
+                                <li data-tool="sdesigner">Substance Designer</li>
+                                <li data-tool="affinity">Affinity Photo, Publisher, Designer</li>
+                            </ul>
+                        </li>
+                        <li data-layer="3" data-color="#6fe3a5">
+                            <h4>Layer 3 · Game engines</h4>
+                            <ul>
+                                <li data-tool="unreal" data-proofs="proto">Unreal Engine 5</li>
+                                <li data-tool="unity" data-proofs="dolphin proto">Unity</li>
+                                <li data-tool="godot" data-proofs="proto">Godot 4</li>
+                            </ul>
+                        </li>
+                        <li data-layer="4" data-color="#ffc766">
+                            <h4>Layer 4 · Programming</h4>
+                            <ul>
+                                <li data-tool="cpp" data-proofs="proto">C++</li>
+                                <li data-tool="bp" data-proofs="proto">Blueprint</li>
+                                <li data-tool="py" data-proofs="proto">Python</li>
+                                <li data-tool="gd" data-proofs="proto">GDScript</li>
+                                <li data-tool="js" data-proofs="dienstplan">JavaScript</li>
+                                <li data-tool="pdfjs" data-proofs="dienstplan">pdf.js</li>
+                                <li data-tool="gcal" data-proofs="dienstplan">Google Calendar API</li>
+                            </ul>
+                        </li>
+                        <li data-layer="5" data-color="#ff8fb8">
+                            <h4>Layer 5 · AI tools</h4>
+                            <ul>
+                                <li data-tool="claude" data-proofs="ai">Claude for code</li>
+                                <li data-tool="gemini" data-proofs="ai">Gemini for research</li>
+                                <li data-tool="copilot" data-proofs="ai">Microsoft Copilot</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 class="data-title">Where I used them</h3>
+                    <ul class="proofs-data">
+                        <li id="gustello"><span class="when">08.2016 – 07.2019</span><strong>gustello GmbH, Winterthur</strong><p>Commercial apprenticeship (Kaufmann EFZ): ran an e-commerce website, bought and sold goods on online platforms and designed digital and print advertising.</p></li>
+                        <li id="cinema"><span class="when">03.2025 – today</span><strong>Cinema 8, Schöftland</strong><p>Fixing system faults and keeping the cinema technology running in live operation. Coordinating the entry team and logging operational and system data.</p></li>
+                        <li id="moonflux"><span class="when">11.2024 – today</span><strong>Moonflux Interactive, Zürich</strong><p>Structured documentation of technical and game design as the interface to development.</p></li>
+                        <li id="raumgleiter"><span class="when">04.2019 – 07.2019</span><strong>Raumgleiter AG, Zürich</strong><p>3D modelling of assets in Blender for an interactive AR architecture viewer.</p></li>
+                        <li id="maya-2024"><span class="when">2024</span><strong>Thoughts and Sunshine</strong><p>A surreal composition and a lighting study, both made in Maya.</p></li>
+                        <li id="maya-2023"><span class="when">2023</span><strong>Fridom and FBDNL</strong><p>Concept art and digital art made with Autodesk tools.</p></li>
+                        <li id="dolphin"><span class="when">2023</span><strong>Dolphin Rush</strong><p>Educational game for Whale and Dolphin Conservation that raises awareness for marine life, built with Unity.</p></li>
+                        <li id="proto"><span class="when">ongoing</span><strong>My own prototypes</strong><p>The engines and languages I use for my own game prototypes and small tools.</p></li>
+                        <li id="dienstplan"><span class="when">live</span><strong>Dienstplan</strong><p>A web app that reads a monthly roster PDF in the browser, finds your shifts and exports them to your calendar. Built with JavaScript, pdf.js and the Google Calendar API.</p></li>
+                        <li id="ai"><span class="when">daily</span><strong>AI in my daily work</strong><p>Claude for code, Gemini for research and Microsoft Copilot in Office: to get from an idea to a working prototype faster, for games as well as for tools.</p></li>
+                    </ul>
                 </div>
+                <p class="note" data-type>Languages: German (native), English (B2)</p>
             </div>
         </section>
 

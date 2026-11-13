@@ -72,7 +72,7 @@ export class Shell {
             pad, gap, kids,
             isStatic: cs.position === 'static',
             // Containers with several children get the auto-layout step. data-frame="none" opts out
-            // (the swarm stage: its canvas would be resized on every frame).
+            // (for containers whose children must not be re-flowed while building).
             frames: el.dataset.frame !== 'none' && kids >= 2 && sum(pad) + sum(gap) > 0,
         };
         return this.m;

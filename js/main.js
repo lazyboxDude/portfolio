@@ -1,12 +1,10 @@
 import { CursorSwarm } from './cursors.js';
 import { SiteBuilder, showSeen } from './build.js';
-import { AgentField, toolNames } from './agents.js';
+import { initSkills } from './skills.js';
 import { Dock } from './dock.js';
 
-// The swarm's agents are named after the skills: read the tools from the Skills section now, before the
-// builder wraps its text into single characters (layer 1 = the first skill = the base of the stack).
-const skillNames = [...document.querySelectorAll('.skills .skill')]
-    .map((skill) => toolNames(skill.querySelector('h3 + p')?.textContent ?? ''));
+// The Skills picker is made from the lists in index.html before the builder looks at the page (js/skills.js).
+initSkills(document.getElementById('skills'));
 
 const box = document.getElementById('box');
 const swarm = new CursorSwarm(document.getElementById('cursor-layer'), { max: 40 });
@@ -48,21 +46,6 @@ box.addEventListener('click', () => {
 // Skip the show (visible before the first click and while bots are building).
 document.getElementById('skip').addEventListener('click', () => builder.skip());
 builder.syncSkip();
-
-// The swarm finale: hundreds of agents on a canvas, drawn from the same animation loop as the bots.
-const swarmStage = document.querySelector('.swarm');
-if (swarmStage) {
-    new AgentField({
-        stage: swarmStage,
-        canvas: document.getElementById('swarm-canvas'),
-        swarm,
-        counter: document.getElementById('swarm-count'),
-        more: document.getElementById('swarm-more'),
-        stack: document.getElementById('swarm-stack'),
-        layerButtons: [...swarmStage.querySelectorAll('.layer-btn')],
-        names: skillNames,
-    });
-}
 
 // Nav: mark the link of the section in view (aria-current). Home is the default at the top.
 const navLinks = [...document.querySelectorAll('.nav-links a')];
