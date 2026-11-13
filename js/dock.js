@@ -11,6 +11,7 @@
 // It is also the `home` of the CursorSwarm: bots walk to `entry()`, the opening in the lid, and sink into it.
 
 const FLY_MS = 1500;
+const GLIDE_MS = 650;                 // the box settles from the screen centre into its place in the hero (at the first click)
 const OPENING = { x: 0.5, y: 0.285 }; // where the opening is, as a fraction of the box (x, y); matches the SVG in index.html
 const ANNOUNCE_MS = 900;              // the live region speaks at most this often (no constant chatter)
 
@@ -34,6 +35,7 @@ export class Dock {
         swarm.home = this;
         swarm.stateHooks.add(() => this.render());
         this.glide = null;    // the animation that settles the box from the screen centre into its place in the hero
+        this.settled = Promise.resolve(); // resolves once the box stands in its place: the bots come out of it there
         window.addEventListener('resize', () => { this.rect = null; this.centerOnScreen(); }, { passive: true });
         window.addEventListener('load', () => this.centerOnScreen());
         document.fonts?.ready.then(() => this.centerOnScreen());
@@ -93,7 +95,8 @@ export class Dock {
         const from = this.wrap.style.translate;
         this.wrap.style.translate = '';
         if (glide && from && from !== 'none' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            this.glide = this.wrap.animate({ translate: [from, '0px 0px'] }, { duration: 700, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
+            this.glide = this.wrap.animate({ translate: [from, '0px 0px'] }, { duration: GLIDE_MS, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
+            this.settled = this.glide.finished.catch(() => {});
         }
     }
 
